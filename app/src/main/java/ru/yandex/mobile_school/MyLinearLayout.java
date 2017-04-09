@@ -38,6 +38,12 @@ public class MyLinearLayout extends LinearLayout {
 	}
 
 	@Override
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		addToLog("ViewGroup.onLayout");
+		super.onLayout(changed, l, t, r, b);
+	}
+
+	@Override
 	public void onViewRemoved(View child) {
 		super.onViewRemoved(child);
 		addToLog("ViewGroup.onViewRemoved");
