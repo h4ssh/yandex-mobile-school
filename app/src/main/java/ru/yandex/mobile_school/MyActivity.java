@@ -17,7 +17,6 @@ public class MyActivity extends AppCompatActivity {
 	private TextView logView;
 	private Button addViewButton;
 	private Button removeViewButton;
-	private Button exitButton;
 	private MyLinearLayout mMyLinearLayout;
 	private MyImageView mMyImageView;
 
@@ -33,7 +32,7 @@ public class MyActivity extends AppCompatActivity {
 		mMyLinearLayout = (MyLinearLayout)findViewById(R.id.my_view_group);
 		addViewButton = (Button)findViewById(R.id.add_view_button);
 		removeViewButton = (Button)findViewById(R.id.remove_view_button);
-		exitButton = (Button)findViewById(R.id.exit_button);
+		Button exitButton = (Button)findViewById(R.id.exit_button);
 		logView = (TextView)findViewById(R.id.log_view);
 		mMyImageView = new MyImageView(this);
 		mMyImageView.setImageResource(R.drawable.android_win);
@@ -70,39 +69,7 @@ public class MyActivity extends AppCompatActivity {
 			}
 		});
 	}
-/*
-	private void addViews() {
-		MyLinearLayout viewGroup = new MyLinearLayout(this);
-		viewGroup.setOrientation(LinearLayout.VERTICAL);
-		Button exitButton = new Button(this);
-		exitButton.setText("Exit");
-		exitButton.setLayoutParams(new LinearLayout.LayoutParams(
-				ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT, 0.0f));
-		exitButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
 
-			}
-		});
-
-		ScrollView scrollView = new ScrollView(this);
-		scrollView.setLayoutParams(new LinearLayout.LayoutParams(
-				ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.MATCH_PARENT, 1.0f));
-
-
-		logView = new TextView(this);
-		logView.setLayoutParams(new ActionBar.LayoutParams(
-				ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.MATCH_PARENT));
-		scrollView.addView(logView);
-
-		viewGroup.addView(scrollView);
-		viewGroup.addView(exitButton);
-		setContentView(viewGroup);
-	}
-*/
 	@Override
 	protected void onStart() {
 		super.onStart();
@@ -146,15 +113,13 @@ public class MyActivity extends AppCompatActivity {
 	}
 
 	public void addToLog(String text) {
-		MyApplication myApp = (MyApplication) getApplication();
+		MyApplication.getStringBuilder().append(text).append("\n");
 		if (logView != null) {
-			for (String logString : myApp.log) {
-				logView.append(logString + "\n");
-			}
-			myApp.log.clear();
-			logView.append(text + "\n");
-		} else {
-			myApp.addToLog(text);
+			logView.setText(getLog());
 		}
+	}
+
+	public static String getLog() {
+		return MyApplication.getStringBuilder().toString();
 	}
 }

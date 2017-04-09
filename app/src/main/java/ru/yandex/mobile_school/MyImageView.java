@@ -1,15 +1,8 @@
 package ru.yandex.mobile_school;
-
 import android.content.Context;
-import android.graphics.Canvas;
-import android.util.Log;
-import android.widget.Button;
 
 import java.lang.ref.WeakReference;
 
-/**
- * Created by hash on 07/04/2017.
- */
 
 public class MyImageView extends android.support.v7.widget.AppCompatImageView {
 

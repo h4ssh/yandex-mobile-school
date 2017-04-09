@@ -1,17 +1,11 @@
 package ru.yandex.mobile_school;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import java.lang.ref.WeakReference;
-
-/**
- * Created by hash on 07/04/2017.
- */
 
 public class MyLinearLayout extends LinearLayout {
 

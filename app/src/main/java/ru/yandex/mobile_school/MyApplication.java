@@ -3,25 +3,25 @@ package ru.yandex.mobile_school;
 import android.app.Application;
 import android.content.res.Configuration;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-
-/**
- * Created by hash on 07/04/2017.
- */
-
 public class MyApplication extends Application {
 
-	public Queue<String> log;
+	private static StringBuilder stringBuilder;
 
-	public void addToLog(String text) {
-		log.add(text);
+	public static StringBuilder getStringBuilder() {
+		if (stringBuilder == null) {
+			stringBuilder = new StringBuilder();
+		}
+		return stringBuilder;
+	}
+
+
+	private void addToLog(String text) {
+		getStringBuilder().append(text).append("\n");
 	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		log = new ArrayDeque<>();
 		addToLog("Application.onCreate");
 	}
 
