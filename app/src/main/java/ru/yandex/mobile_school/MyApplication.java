@@ -2,7 +2,9 @@ package ru.yandex.mobile_school;
 
 import android.app.Application;
 import android.content.res.Configuration;
-import android.util.Log;
+
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 /**
  * Created by hash on 07/04/2017.
@@ -10,23 +12,28 @@ import android.util.Log;
 
 public class MyApplication extends Application {
 
-	public static String TAG = "MS_APP";
+	public Queue<String> log;
+
+	public void addToLog(String text) {
+		log.add(text);
+	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d(TAG, "Application.onCreate");
+		log = new ArrayDeque<>();
+		addToLog("Application.onCreate");
 	}
 
 	@Override
 	public void onTerminate() {
 		super.onTerminate();
-		Log.d(TAG, "Application.onTerminate");
+		addToLog("Application.onTerminate");
 	}
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		Log.d(TAG, "Application.onConfigurationChanged");
+		addToLog("Application.onConfigurationChanged");
 	}
 }
