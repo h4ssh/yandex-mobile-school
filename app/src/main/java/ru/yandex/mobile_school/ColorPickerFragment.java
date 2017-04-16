@@ -1,8 +1,10 @@
 package ru.yandex.mobile_school;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.util.DisplayMetrics;
@@ -70,7 +72,7 @@ public class ColorPickerFragment extends Fragment {
 				view.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						HSVColor pickedColor = view.getCurrentColor();
+						@ColorInt int pickedColor = view.getCurrentColor();
 						mCurrentColorView.setCurrentColor(pickedColor);
 						setCurrentColorDescription(pickedColor);
 					}
@@ -91,20 +93,22 @@ public class ColorPickerFragment extends Fragment {
 		return view;
 	}
 
-	private void setCurrentColorDescription(HSVColor currentColor) {
-		mCurrentColorR.setText(getResources().getString(R.string.color_description_r, currentColor.getRed()));
-		mCurrentColorG.setText(getResources().getString(R.string.color_description_g, currentColor.getGreen()));
-		mCurrentColorB.setText(getResources().getString(R.string.color_description_b, currentColor.getBlue()));
-		mCurrentColorH.setText(getResources().getString(R.string.color_description_h, currentColor.getHue()));
-		mCurrentColorS.setText(getResources().getString(R.string.color_description_s, currentColor.getSaturation()));
-		mCurrentColorV.setText(getResources().getString(R.string.color_description_v, currentColor.getValue()));
+	private void setCurrentColorDescription(@ColorInt int currentColor) {
+		mCurrentColorR.setText(getResources().getString(R.string.color_description_r, Color.red(currentColor)));
+		mCurrentColorG.setText(getResources().getString(R.string.color_description_g, Color.green(currentColor)));
+		mCurrentColorB.setText(getResources().getString(R.string.color_description_b, Color.blue(currentColor)));
+		float [] hsv = new float[] {0,0,0};
+		Color.colorToHSV(currentColor, hsv);
+		mCurrentColorH.setText(getResources().getString(R.string.color_description_h, hsv[0]));
+		mCurrentColorS.setText(getResources().getString(R.string.color_description_s, hsv[1]));
+		mCurrentColorV.setText(getResources().getString(R.string.color_description_v, hsv[2]));
 	}
 
 	static ColorView newColorView(float hue) {
 		return new ColorView(YMSApplication.getAppContext(), hue);
 	}
 
-	static ColorView newColorView(HSVColor color) {
+	static ColorView newColorView(@ColorInt int color) {
 		return  new ColorView(YMSApplication.getAppContext(), color);
 	}
 
@@ -135,7 +139,7 @@ public class ColorPickerFragment extends Fragment {
 									veloTracker.computeCurrentVelocity(10);
 									float deltaX = VelocityTrackerCompat.getXVelocity(veloTracker, pointerId);
 									float deltaY = 	VelocityTrackerCompat.getYVelocity(veloTracker,	pointerId);
-									mColorView.variateColor(deltaX * HUE_SENSIVITY, deltaY * VALUE_SENSIVITY);
+									mColorView.variateColor(deltaX * HUE_SENSIVITY, -deltaY * VALUE_SENSIVITY);
 								}
 								else if (event.getAction() == MotionEvent.ACTION_UP) {
 									mColorScroll.setScrollingEnabled(true);
@@ -149,7 +153,7 @@ public class ColorPickerFragment extends Fragment {
 
 					@Override
 					public boolean onSingleTapConfirmed(MotionEvent e) {
-						HSVColor pickedColor = mColorView.getCurrentColor();
+						@ColorInt int pickedColor = mColorView.getCurrentColor();
 						mCurrentColorView.setCurrentColor(pickedColor);
 						setCurrentColorDescription(pickedColor);
 						return true;

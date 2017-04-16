@@ -3,13 +3,14 @@ package ru.yandex.mobile_school;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.view.View;
 
 public class ColorView extends View {
 
-	private HSVColor mPrimaryColor;
-	private HSVColor mCurrentColor;
+	@ColorInt private int mPrimaryColor;
+	@ColorInt private int mCurrentColor;
 
 	private float mMinimalHue;
 	private float mMaximalHue;
@@ -17,7 +18,7 @@ public class ColorView extends View {
 
 	public ColorView (Context context, AttributeSet atrs) {
 		super(context, atrs);
-		mPrimaryColor = new HSVColor(0, 1, 1);
+		mPrimaryColor = Color.WHITE;
 		mMinimalHue = 0;
 		mMaximalHue = 360;
 		setCurrentColor(mPrimaryColor);
@@ -25,13 +26,13 @@ public class ColorView extends View {
 
 	public ColorView (Context context, float hue) {
 		super(context);
-		mPrimaryColor = new HSVColor(hue);
+		mPrimaryColor = Color.HSVToColor(new float[]{hue, 1f, 1f});
 		mMaximalHue = hue + HUE_MAX_DELTA;
 		mMinimalHue = hue - HUE_MAX_DELTA;
 		setCurrentColor(mPrimaryColor);
 	}
 
-	public ColorView (Context context, HSVColor color) {
+	public ColorView (Context context, @ColorInt int color) {
 		super(context);
 		mPrimaryColor = color;
 		mMinimalHue = 0;
@@ -40,7 +41,7 @@ public class ColorView extends View {
 
 	}
 
-	public HSVColor getCurrentColor() {
+	public @ColorInt int getCurrentColor() {
 		return mCurrentColor;
 	}
 
@@ -48,23 +49,24 @@ public class ColorView extends View {
 		setCurrentColor(mPrimaryColor);
 	}
 
-	public void setCurrentColor(HSVColor color) {
+	public void setCurrentColor(@ColorInt int color) {
 		mCurrentColor = color;
 		GradientDrawable backgroundShape = new GradientDrawable();
-		backgroundShape.setColor(mCurrentColor.toRgb());
+		backgroundShape.setColor(mCurrentColor);
 		backgroundShape.setStroke(3, Color.BLACK);
 		setBackground(backgroundShape);
 	}
 
 	public void variateColor(float deltaHue, float deltaValue) {
-		float currentHue = mCurrentColor.getHue();
-		float newHue = currentHue + deltaHue;
+		float [] hsv = new float[] {0,0,0};
+		Color.colorToHSV(mCurrentColor, hsv);
+		float newHue = hsv[0] + deltaHue;
 		if (newHue > mMaximalHue) newHue = mMaximalHue;
 		if (newHue < mMinimalHue) newHue = mMinimalHue;
-		float currentValue = mCurrentColor.getValue();
+		float currentValue = hsv[2];
 		float newValue = currentValue + deltaValue;
 		if (newValue > 1) newValue = 1;
 		if (newValue < 0) newValue = 0;
-		setCurrentColor(new HSVColor(newHue, newValue));
+		setCurrentColor(Color.HSVToColor(new float[] {newHue, 1f, newValue}));
 	}
 }
