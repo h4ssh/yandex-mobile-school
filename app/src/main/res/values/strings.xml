@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">mobile-school</string>
-    <string name="add_view_button_text">Add View</string>
-    <string name="remove_view_button_text">Remove View</string>
-    <string name="exit_button_text">Exit</string>
+
+    <string name="current_color_title">Current color:</string>
+    <string name="favorite_colors_title">Favorite colors:</string>
+
+    <string name="color_description_r">R: %1$d</string>
+    <string name="color_description_g">G: %1$d</string>
+    <string name="color_description_b">B: %1$d</string>
+    <string name="color_description_h">H: %1$f</string>
+    <string name="color_description_s">S: %1$f</string>
+    <string name="color_description_v">V: %1$f</string>
 </resources>
