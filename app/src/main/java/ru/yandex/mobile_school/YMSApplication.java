@@ -12,7 +12,7 @@ public class YMSApplication extends Application {
 		YMSApplication.context = getApplicationContext();
 	}
 
-	public static Context getAppContext() {
+	public static Context getContext() {
 		return YMSApplication.context;
 	}
 

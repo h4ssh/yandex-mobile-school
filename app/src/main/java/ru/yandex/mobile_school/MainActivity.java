@@ -7,6 +7,6 @@ public class MainActivity extends SingleFragmentActivity {
 
 	@Override
 	protected Fragment createFragment() {
-		return ColorPickerFragment.newInstance();
+		return ColorsListFragment.newInstance();
 	}
 }

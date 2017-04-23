@@ -5,27 +5,45 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.ColorInt;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+interface IColorPicker{
+	void onColorPicked(@ColorInt int color, String title, String descr);
+}
+
 public class ColorPickerFragment extends Fragment {
+
+	private static final String ARG_COLOR = "color";
+	private static final String ARG_TITLE = "title";
+	private static final String ARG_DESCR = "description";
+
 	private static final int COLOR_VIEW_SIZE_IN_DP = 50;
 	private static final int COLOR_VIEW_MARGIN_IN_DP = 25;
 	private static final int COLOR_VIEWS_COUNT = 16;
 
+	@BindView(R.id.color_fragment_title) EditText mTitleEdit;
+	@BindView(R.id.color_fragment_description) EditText mDescriptionEdit;
 	@BindView(R.id.colors_scroll_view) LockableHorizontalScrollView mColorScroll;
 	@BindView(R.id.favorite_scroll_layout) LinearLayout mFavoriteScrollLayout;
 	@BindView(R.id.colors_scroll_layout) LinearLayout mColorScrollLayout;
@@ -37,17 +55,47 @@ public class ColorPickerFragment extends Fragment {
 	@BindView(R.id.curent_color_s) TextView mCurrentColorS;
 	@BindView(R.id.curent_color_v) TextView mCurrentColorV;
 
+	private static final ArrayList<Integer> FAVORITE_COLORS = new ArrayList<>();
+	private IColorPicker mDelegate;
 	private LinearLayout.LayoutParams defaultViewParams;
-	private View.OnTouchListener defaultTouchListener = new ViewColorTouchListener();
+	private final View.OnTouchListener defaultTouchListener = new ViewColorTouchListener();
 
-	static ColorPickerFragment newInstance() {
-		return new ColorPickerFragment();
+	static ColorPickerFragment newInstance(@ColorInt int color, @Nullable String title,
+										   @Nullable String descr, @Nullable IColorPicker delegate) {
+		Bundle args = new Bundle();
+		args.putInt(ARG_COLOR, color);
+		if (title != null) args.putString(ARG_TITLE, title);
+		if (descr != null) args.putString(ARG_DESCR, descr);
+		ColorPickerFragment fragment = new ColorPickerFragment();
+		fragment.setArguments(args);
+		fragment.setDelegate(delegate);
+		return fragment;
+	}
+
+	private void setDelegate (IColorPicker delegate) {
+		mDelegate = delegate;
+	}
+
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_color_picker, container, false);
 		ButterKnife.bind(this,view);
+
+		Bundle arguments = getArguments();
+		if (arguments != null) {
+			if (arguments.containsKey(ARG_TITLE))
+				mTitleEdit.setText(arguments.getString(ARG_TITLE));
+			if (arguments.containsKey(ARG_DESCR))
+				mDescriptionEdit.setText(arguments.getString(ARG_DESCR));
+			if (arguments.containsKey(ARG_COLOR))
+				mCurrentColorView.setCurrentColor(arguments.getInt(ARG_COLOR));
+		}
 
 		setCurrentColorDescription(mCurrentColorView.getCurrentColor());
 
@@ -63,6 +111,11 @@ public class ColorPickerFragment extends Fragment {
 			final ColorView colorView = newColorView(colorInterval / 2 + (colorInterval * i));
 			colorView.setOnTouchListener(defaultTouchListener);
 			mColorScrollLayout.addView(colorView, defaultViewParams);
+		}
+
+		for (Integer color: FAVORITE_COLORS) {
+			ColorView favorite = newColorView(color);
+			mFavoriteScrollLayout.addView(favorite, defaultViewParams);
 		}
 
 		mCurrentColorView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -81,11 +134,13 @@ public class ColorPickerFragment extends Fragment {
 					@Override
 					public boolean onLongClick(View v) {
 						ViewGroup parent = (ViewGroup) v.getParent();
+						FAVORITE_COLORS.remove((Integer)((ColorView)v).getCurrentColor());
 						parent.removeView(v);
 						return true;
 					}
 				});
 				mFavoriteScrollLayout.addView(view, defaultViewParams);
+				FAVORITE_COLORS.add(view.getCurrentColor());
 				return true;
 			}
 		});
@@ -104,12 +159,12 @@ public class ColorPickerFragment extends Fragment {
 		mCurrentColorV.setText(getResources().getString(R.string.color_description_v, hsv[2]));
 	}
 
-	static ColorView newColorView(float hue) {
-		return new ColorView(YMSApplication.getAppContext(), hue);
+	private static ColorView newColorView(float hue) {
+		return new ColorView(YMSApplication.getContext(), hue);
 	}
 
-	static ColorView newColorView(@ColorInt int color) {
-		return  new ColorView(YMSApplication.getAppContext(), color);
+	private static ColorView newColorView(@ColorInt int color) {
+		return  new ColorView(YMSApplication.getContext(), color);
 	}
 
 	private class ViewColorTouchListener implements View.OnTouchListener {
@@ -118,7 +173,7 @@ public class ColorPickerFragment extends Fragment {
 
 		private ColorView mColorView;
 
-		private GestureDetector gestureDetector =
+		private final GestureDetector gestureDetector =
 				new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
 
 					@Override
@@ -173,5 +228,23 @@ public class ColorPickerFragment extends Fragment {
 			return true;
 		}
 	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.color_picker_menu, menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.color_fragment_menu_done:
+				if (mDelegate != null)
+					mDelegate.onColorPicked(mCurrentColorView.getCurrentColor(),
+							mTitleEdit.getText().toString(), mDescriptionEdit.getText().toString());
+				break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
 
 }

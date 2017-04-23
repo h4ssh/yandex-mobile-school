@@ -9,11 +9,11 @@ import android.view.View;
 
 public class ColorView extends View {
 
-	@ColorInt private int mPrimaryColor;
+	@ColorInt private final int mPrimaryColor;
 	@ColorInt private int mCurrentColor;
 
-	private float mMinimalHue;
-	private float mMaximalHue;
+	private final float mMinimalHue;
+	private final float mMaximalHue;
 	private static final float HUE_MAX_DELTA = 11.25f;
 
 	public ColorView (Context context, AttributeSet atrs) {
@@ -60,13 +60,13 @@ public class ColorView extends View {
 	public void variateColor(float deltaHue, float deltaValue) {
 		float [] hsv = new float[] {0,0,0};
 		Color.colorToHSV(mCurrentColor, hsv);
-		float newHue = hsv[0] + deltaHue;
-		if (newHue > mMaximalHue) newHue = mMaximalHue;
-		if (newHue < mMinimalHue) newHue = mMinimalHue;
-		float currentValue = hsv[2];
-		float newValue = currentValue + deltaValue;
-		if (newValue > 1) newValue = 1;
-		if (newValue < 0) newValue = 0;
-		setCurrentColor(Color.HSVToColor(new float[] {newHue, 1f, newValue}));
+		hsv[0] += deltaHue;
+		hsv[1] = 1;
+		if (hsv[0] > mMaximalHue) hsv[0] = mMaximalHue;
+		if (hsv[0] < mMinimalHue) hsv[0] = mMinimalHue;
+		hsv[2] += deltaValue;
+		if (hsv[2] > 1) hsv[2] = 1;
+		if (hsv[2] < 0) hsv[2] = 0;
+		setCurrentColor(Color.HSVToColor(hsv));
 	}
 }

@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="color_fragment_title_font_size">18sp</dimen>
+    <dimen name="color_fragment_description_font_size">16sp</dimen>
+
+    <dimen name="colors_list_item_title_font_size">16sp</dimen>
+    <dimen name="colors_list_item_description_font_size">14sp</dimen>
+    <dimen name="colors_list_item_height">88dp</dimen>
+    <dimen name="colors_list_item_margin">16dp</dimen>
+    <dimen name="colors_list_item_preview_size">40dp</dimen>
+    <dimen name="colors_list_item_top_margin">16dp</dimen>
+    <dimen name="colors_list_item_bottom_margin">16dp</dimen>
+
 </resources>
