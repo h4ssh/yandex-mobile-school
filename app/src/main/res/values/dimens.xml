@@ -2,6 +2,8 @@
 <resources>
     <dimen name="color_fragment_title_font_size">18sp</dimen>
     <dimen name="color_fragment_description_font_size">16sp</dimen>
+    <dimen name="color_fragment_default_margin">16dp</dimen>
+    <dimen name="color_fragment_between_margin">8dp</dimen>
 
     <dimen name="colors_list_item_title_font_size">16sp</dimen>
     <dimen name="colors_list_item_description_font_size">14sp</dimen>

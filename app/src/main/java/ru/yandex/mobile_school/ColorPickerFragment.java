@@ -40,6 +40,7 @@ public class ColorPickerFragment extends Fragment {
 
 	private static final int COLOR_VIEW_SIZE_IN_DP = 50;
 	private static final int COLOR_VIEW_MARGIN_IN_DP = 25;
+	private static final int COLOR_VIEW_FAVORITE_MARGIN_IN_DP = 8;
 	private static final int COLOR_VIEWS_COUNT = 16;
 
 	@BindView(R.id.color_fragment_title) EditText mTitleEdit;
@@ -58,6 +59,7 @@ public class ColorPickerFragment extends Fragment {
 	private static final ArrayList<Integer> FAVORITE_COLORS = new ArrayList<>();
 	private IColorPicker mDelegate;
 	private LinearLayout.LayoutParams defaultViewParams;
+	private LinearLayout.LayoutParams favoriteViewParams;
 	private final View.OnTouchListener defaultTouchListener = new ViewColorTouchListener();
 
 	static ColorPickerFragment newInstance(@ColorInt int color, @Nullable String title,
@@ -102,8 +104,11 @@ public class ColorPickerFragment extends Fragment {
 		DisplayMetrics metrics = getResources().getDisplayMetrics();
 		int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, COLOR_VIEW_SIZE_IN_DP, metrics);
 		int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, COLOR_VIEW_MARGIN_IN_DP, metrics);
+		int favMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, COLOR_VIEW_FAVORITE_MARGIN_IN_DP, metrics);
 		defaultViewParams = new LinearLayout.LayoutParams(size, size);
 		defaultViewParams.setMargins(margin, margin, margin, margin);
+		favoriteViewParams = new LinearLayout.LayoutParams(size, size);
+		favoriteViewParams.setMargins(0, 0, favMargin, 0);
 
 		float colorInterval = 360f/ COLOR_VIEWS_COUNT;
 		for (int i = 0; i < COLOR_VIEWS_COUNT; i++) {
@@ -139,7 +144,7 @@ public class ColorPickerFragment extends Fragment {
 						return true;
 					}
 				});
-				mFavoriteScrollLayout.addView(view, defaultViewParams);
+				mFavoriteScrollLayout.addView(view, favoriteViewParams);
 				FAVORITE_COLORS.add(view.getCurrentColor());
 				return true;
 			}

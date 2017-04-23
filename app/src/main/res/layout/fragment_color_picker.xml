@@ -4,33 +4,37 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp">
+    android:layout_marginLeft="@dimen/color_fragment_default_margin"
+    android:layout_marginRight="@dimen/color_fragment_default_margin">
+
     <EditText
         android:id="@+id/color_fragment_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/color_fragment_title_font_size"
-        android:hint="@string/color_fragment_title_hint"/>
+        android:hint="@string/color_fragment_title_hint"
+        android:textSize="@dimen/color_fragment_title_font_size"/>
+
     <EditText
         android:id="@+id/color_fragment_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/color_fragment_description_font_size"
-        android:hint="@string/color_fragment_description_hint"/>
+        android:hint="@string/color_fragment_description_hint"
+        android:textSize="@dimen/color_fragment_description_font_size"/>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/color_fragment_between_margin">
         <ru.yandex.mobile_school.ColorView
             android:id="@+id/current_color_view"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginRight="15dp"/>
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/color_fragment_default_margin"/>
         <LinearLayout
-            android:layout_marginRight="15dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/color_fragment_default_margin"
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -48,6 +52,7 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
         <LinearLayout
+            android:layout_gravity="center_vertical"
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -69,7 +74,8 @@
     <ru.yandex.mobile_school.LockableHorizontalScrollView
         android:id="@+id/colors_scroll_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/color_fragment_between_margin">
         <LinearLayout
             android:id="@+id/colors_scroll_layout"
             android:layout_width="wrap_content"
@@ -80,15 +86,18 @@
     </ru.yandex.mobile_school.LockableHorizontalScrollView>
 
     <TextView
+        android:id="@+id/textView"
+        android:layout_marginTop="@dimen/color_fragment_between_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/color_fragment_title_font_size"
-        android:text="@string/favorite_colors_title"/>
+        android:text="@string/favorite_colors_title"
+        android:textSize="@dimen/color_fragment_title_font_size"/>
+
     <HorizontalScrollView
         android:id="@+id/favorite_scroll_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary">
+        android:layout_marginTop="@dimen/color_fragment_between_margin">
         <LinearLayout
             android:id="@+id/favorite_scroll_layout"
             android:layout_width="wrap_content"
