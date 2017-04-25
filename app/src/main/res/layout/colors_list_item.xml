@@ -29,6 +29,7 @@
             android:layout_below="@id/colors_list_item_color_title"
             android:layout_marginRight="@dimen/colors_list_item_margin"
             android:layout_marginBottom="@dimen/colors_list_item_bottom_margin"
+            android:textColor="@color/colorSecondaryDark"
             android:ellipsize="end"
             android:lines="2"/>
 </RelativeLayout>

@@ -25,6 +25,8 @@ public class ColorsListFragment extends Fragment {
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
 
+	private static final String EXTRA_COLOR_ITEMS = "extra_color_items";
+
 	private ArrayList<ColorItem> mColors;
 	private int editPosition = 0;
 
@@ -38,8 +40,12 @@ public class ColorsListFragment extends Fragment {
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mColors = new ArrayList<>();
-		fillWithSampleData();
+		if (savedInstanceState != null && savedInstanceState.containsKey(EXTRA_COLOR_ITEMS)) {
+			mColors = savedInstanceState.getParcelableArrayList(EXTRA_COLOR_ITEMS);
+		} else {
+			mColors = new ArrayList<>();
+			fillWithSampleData();
+		}
 	}
 
 	private void fillWithSampleData() {
@@ -56,20 +62,20 @@ public class ColorsListFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_colors_list, container, false);
 		ButterKnife.bind(this, view);
 
-		colorsListView.setAdapter(new ColorsListAdapter(mColors));
+		colorsListView.setAdapter(new ColorsListAdapter(getContext(), mColors));
 		colorsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				editPosition = position;
 				ColorItem item = mColors.get(position);
-				startActivityForResult(ColorPickerActivity.newIntent(item), REQUEST_CODE_EDIT);
+				startActivityForResult(ColorPickerActivity.newIntent(getContext(), item), REQUEST_CODE_EDIT);
 			}
 		});
 
 		addColorFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivityForResult(ColorPickerActivity.newIntent(), REQUEST_CODE_ADD);
+				startActivityForResult(ColorPickerActivity.newIntent(getContext()), REQUEST_CODE_ADD);
 			}
 		});
 
@@ -79,19 +85,23 @@ public class ColorsListFragment extends Fragment {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK) {
-			ColorItem item = new ColorItem(
-					data.getIntExtra(ColorPickerActivity.EXTRA_COLOR, Color.WHITE),
-					data.getStringExtra(ColorPickerActivity.EXTRA_TITLE),
-					data.getStringExtra(ColorPickerActivity.EXTRA_DESCR));
+			ColorItem item = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
 			mColors.add(item);
 			((BaseAdapter)colorsListView.getAdapter()).notifyDataSetChanged();
 		}
 		if (requestCode == REQUEST_CODE_EDIT && resultCode == RESULT_OK) {
 			ColorItem item = mColors.get(editPosition);
-			item.setColor(data.getIntExtra(ColorPickerActivity.EXTRA_COLOR, item.getColor()));
-			item.setTitle(data.getStringExtra(ColorPickerActivity.EXTRA_TITLE));
-			item.setDescription(data.getStringExtra(ColorPickerActivity.EXTRA_DESCR));
+			ColorItem updated = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
+			item.setColor(updated.getColor());
+			item.setTitle(updated.getTitle());
+			item.setDescription(updated.getDescription());
 			((BaseAdapter)colorsListView.getAdapter()).notifyDataSetChanged();
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putParcelableArrayList(EXTRA_COLOR_ITEMS, mColors);
+		super.onSaveInstanceState(outState);
 	}
 }
