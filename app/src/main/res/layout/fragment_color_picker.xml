@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<ru.yandex.mobile_school.LockableScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:id="@+id/colors_picker_main_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="@dimen/color_fragment_default_margin"
@@ -77,6 +77,7 @@
     </LinearLayout>
 
     <ru.yandex.mobile_school.LockableHorizontalScrollView
+        android:orientation="horizontal"
         android:id="@+id/colors_scroll_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -111,4 +112,4 @@
         </LinearLayout>
     </HorizontalScrollView>
     </LinearLayout>
-</ScrollView>
+</ru.yandex.mobile_school.LockableScrollView>

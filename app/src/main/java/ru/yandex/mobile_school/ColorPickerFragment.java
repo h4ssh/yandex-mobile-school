@@ -35,6 +35,7 @@ interface IColorPicker{
 public class ColorPickerFragment extends Fragment {
 
 	private static final String ARG_COLOR_ITEM = "color_item";
+	private static final String SAVED_COLOR_ITEM = "saved_color_item";
 
 	private static final int COLOR_VIEW_SIZE_IN_DP = 50;
 	private static final int COLOR_VIEW_MARGIN_IN_DP = 25;
@@ -43,7 +44,8 @@ public class ColorPickerFragment extends Fragment {
 
 	@BindView(R.id.color_fragment_title) EditText mTitleEdit;
 	@BindView(R.id.color_fragment_description) EditText mDescriptionEdit;
-	@BindView(R.id.colors_scroll_view) LockableHorizontalScrollView mColorScroll;
+	@BindView(R.id.colors_scroll_view)	LockableHorizontalScrollView mColorScroll;
+	@BindView(R.id.colors_picker_main_scroll) LockableScrollView mMainScroll;
 	@BindView(R.id.favorite_scroll_layout) LinearLayout mFavoriteScrollLayout;
 	@BindView(R.id.colors_scroll_layout) LinearLayout mColorScrollLayout;
 	@BindView(R.id.current_color_view) ColorView mCurrentColorView;
@@ -71,7 +73,7 @@ public class ColorPickerFragment extends Fragment {
 		return fragment;
 	}
 
-	private void setDelegate (IColorPicker delegate) {
+	public void setDelegate (IColorPicker delegate) {
 		mDelegate = delegate;
 	}
 
@@ -87,7 +89,12 @@ public class ColorPickerFragment extends Fragment {
 		ButterKnife.bind(this,view);
 
 		Bundle arguments = getArguments();
-		if (arguments != null && arguments.containsKey(ARG_COLOR_ITEM)) {
+		if (savedInstanceState != null && savedInstanceState.containsKey(SAVED_COLOR_ITEM)) {
+			ColorItem colorItem = savedInstanceState.getParcelable(SAVED_COLOR_ITEM);
+			mCurrentColorView.setCurrentColor(colorItem.getColor());
+			mTitleEdit.setText(colorItem.getTitle());
+			mDescriptionEdit.setText(colorItem.getDescription());
+		} else if (arguments != null && arguments.containsKey(ARG_COLOR_ITEM)) {
 			ColorItem colorItem = arguments.getParcelable(ARG_COLOR_ITEM);
 			mCurrentColorView.setCurrentColor(colorItem.getColor());
 			mTitleEdit.setText(colorItem.getTitle());
@@ -113,10 +120,7 @@ public class ColorPickerFragment extends Fragment {
 			mColorScrollLayout.addView(colorView, defaultViewParams);
 		}
 
-		for (Integer color: FAVORITE_COLORS) {
-			ColorView favorite = newColorView(getContext(), color);
-			mFavoriteScrollLayout.addView(favorite, favoriteViewParams);
-		}
+		restoreFavoriteColors(view);
 
 		mCurrentColorView.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
@@ -146,6 +150,30 @@ public class ColorPickerFragment extends Fragment {
 		});
 
 		return view;
+	}
+
+	private void restoreFavoriteColors(View view) {
+		for (Integer color: FAVORITE_COLORS) {
+			final ColorView favorite = newColorView(getContext(), color);
+			favorite.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					@ColorInt int pickedColor = favorite.getCurrentColor();
+					mCurrentColorView.setCurrentColor(pickedColor);
+					setCurrentColorDescription(pickedColor);
+				}
+			});
+			view.setOnLongClickListener(new View.OnLongClickListener() {
+				@Override
+				public boolean onLongClick(View v) {
+					ViewGroup parent = (ViewGroup) v.getParent();
+					FAVORITE_COLORS.remove((Integer)((ColorView)v).getCurrentColor());
+					parent.removeView(v);
+					return true;
+				}
+			});
+			mFavoriteScrollLayout.addView(favorite, favoriteViewParams);
+		}
 	}
 
 	private void setCurrentColorDescription(@ColorInt int currentColor) {
@@ -180,6 +208,7 @@ public class ColorPickerFragment extends Fragment {
 					public void onLongPress(MotionEvent e) {
 						Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
 						vibrator.vibrate(100);
+						mMainScroll.setScrollingEnabled(false);
 						mColorScroll.setScrollingEnabled(false);
 						mColorView.setOnTouchListener(new View.OnTouchListener() {
 							@Override
@@ -197,6 +226,7 @@ public class ColorPickerFragment extends Fragment {
 									mColorView.variateColor(deltaX * HUE_SENSIVITY, -deltaY * VALUE_SENSIVITY);
 								}
 								else if (event.getAction() == MotionEvent.ACTION_UP) {
+									mMainScroll.setScrollingEnabled(true);
 									mColorScroll.setScrollingEnabled(true);
 									mColorView.setOnTouchListener(defaultTouchListener);
 								}
@@ -249,5 +279,13 @@ public class ColorPickerFragment extends Fragment {
 		return super.onOptionsItemSelected(item);
 	}
 
-
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		ColorItem savedColor = new ColorItem(
+				mCurrentColorView.getCurrentColor(),
+				mTitleEdit.getText().toString(),
+				mDescriptionEdit.getText().toString());
+		outState.putParcelable(SAVED_COLOR_ITEM, savedColor);
+		super.onSaveInstanceState(outState);
+	}
 }

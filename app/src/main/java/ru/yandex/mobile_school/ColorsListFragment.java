@@ -26,9 +26,10 @@ public class ColorsListFragment extends Fragment {
 	private static final int REQUEST_CODE_EDIT = 2;
 
 	private static final String EXTRA_COLOR_ITEMS = "extra_color_items";
+	private static final String EXTRA_EDIT_POSITION = "extra_edit_position";
 
 	private ArrayList<ColorItem> mColors;
-	private int editPosition = 0;
+	private int mEditPosition = 0;
 
 	@BindView(R.id.colors_list_fab)	FloatingActionButton addColorFAB;
 	@BindView(R.id.colors_list_view) ListView colorsListView;
@@ -40,8 +41,9 @@ public class ColorsListFragment extends Fragment {
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (savedInstanceState != null && savedInstanceState.containsKey(EXTRA_COLOR_ITEMS)) {
+		if (savedInstanceState != null) {
 			mColors = savedInstanceState.getParcelableArrayList(EXTRA_COLOR_ITEMS);
+			mEditPosition = savedInstanceState.getInt(EXTRA_EDIT_POSITION);
 		} else {
 			mColors = new ArrayList<>();
 			fillWithSampleData();
@@ -66,7 +68,7 @@ public class ColorsListFragment extends Fragment {
 		colorsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				editPosition = position;
+				mEditPosition = position;
 				ColorItem item = mColors.get(position);
 				startActivityForResult(ColorPickerActivity.newIntent(getContext(), item), REQUEST_CODE_EDIT);
 			}
@@ -90,7 +92,7 @@ public class ColorsListFragment extends Fragment {
 			((BaseAdapter)colorsListView.getAdapter()).notifyDataSetChanged();
 		}
 		if (requestCode == REQUEST_CODE_EDIT && resultCode == RESULT_OK) {
-			ColorItem item = mColors.get(editPosition);
+			ColorItem item = mColors.get(mEditPosition);
 			ColorItem updated = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
 			item.setColor(updated.getColor());
 			item.setTitle(updated.getTitle());
@@ -102,6 +104,7 @@ public class ColorsListFragment extends Fragment {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putParcelableArrayList(EXTRA_COLOR_ITEMS, mColors);
+		outState.putInt(EXTRA_EDIT_POSITION, mEditPosition);
 		super.onSaveInstanceState(outState);
 	}
 }

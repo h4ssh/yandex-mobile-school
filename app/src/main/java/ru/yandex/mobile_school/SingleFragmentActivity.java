@@ -27,7 +27,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 					.add(R.id.fragment_container, fragment)
 					.commit();
 		}
+		if (savedInstanceState != null)
+			restoreFragmentState(fragment);
 	}
+
+	protected void restoreFragmentState(Fragment fragment) {}
 
 	@Override
 	protected void onResume() {
