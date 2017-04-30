@@ -7,6 +7,11 @@
     <string name="current_color_title">Current color:</string>
     <string name="favorite_colors_title">Favorite colors:</string>
 
+    <string name="colors_list_menu_search">Search</string>
+    <string name="colors_list_menu_filter">Filter</string>
+    <string name="colors_list_menu_sort">Sort</string>
+    <string name="colors_list_menu_import_export">Import\/Export</string>
+
     <string name="color_fragment_title_hint">Enter title</string>
     <string name="color_fragment_description_hint">Enter description</string>
     <string name="color_fragment_menu_done">Done</string>
@@ -17,4 +22,6 @@
     <string name="color_description_h">H: %1$f</string>
     <string name="color_description_s">S: %1$f</string>
     <string name="color_description_v">V: %1$f</string>
+
+    <string name="search_hint">Type here</string>
 </resources>

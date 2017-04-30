@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ru.yandex.mobile_school.LockableScrollView
+<ru.yandex.mobile_school.ui.views.LockableScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/colors_picker_main_scroll"
     android:layout_width="match_parent"
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="@dimen/color_fragment_between_margin">
-        <ru.yandex.mobile_school.ColorView
+        <ru.yandex.mobile_school.ui.views.ColorView
             android:id="@+id/current_color_view"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -76,7 +76,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ru.yandex.mobile_school.LockableHorizontalScrollView
+    <ru.yandex.mobile_school.ui.views.LockableHorizontalScrollView
         android:orientation="horizontal"
         android:id="@+id/colors_scroll_view"
         android:layout_width="wrap_content"
@@ -89,7 +89,7 @@
             android:orientation="horizontal"
             android:background="@drawable/hue">
         </LinearLayout>
-    </ru.yandex.mobile_school.LockableHorizontalScrollView>
+    </ru.yandex.mobile_school.ui.views.LockableHorizontalScrollView>
 
     <TextView
         android:id="@+id/textView"
@@ -112,4 +112,4 @@
         </LinearLayout>
     </HorizontalScrollView>
     </LinearLayout>
-</ru.yandex.mobile_school.LockableScrollView>
+</ru.yandex.mobile_school.ui.views.LockableScrollView>
