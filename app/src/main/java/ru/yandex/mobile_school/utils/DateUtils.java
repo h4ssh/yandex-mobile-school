@@ -8,10 +8,22 @@ import java.util.TimeZone;
 
 public class DateUtils {
 
-	public static String getCurrentDate() {
+	private static final String ISO8601Format = ("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+	public static String getCurrentDateString() {
 		Date now = new Date();
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+		DateFormat dateFormat = new SimpleDateFormat(ISO8601Format, Locale.US);
 		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return dateFormat.format(now);
+	}
+
+	public static Date parseDateString(String dateString) {
+		SimpleDateFormat format = new SimpleDateFormat(ISO8601Format);
+		try {
+			return format.parse(dateString);
+		} catch (Exception ignored) {
+			return null;
+		}
+
 	}
 }

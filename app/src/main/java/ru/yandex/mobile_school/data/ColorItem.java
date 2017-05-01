@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 
+import java.util.Date;
 import java.util.UUID;
 
 import ru.yandex.mobile_school.utils.DateUtils;
@@ -27,9 +28,9 @@ public class ColorItem implements Parcelable{
 		mColor = Color.WHITE;
 		mTitle = "";
 		mDescription = "";
-		mCreated = DateUtils.getCurrentDate();
-		mEdited = DateUtils.getCurrentDate();
-		mViewed = DateUtils.getCurrentDate();
+		mCreated = DateUtils.getCurrentDateString();
+		mEdited = DateUtils.getCurrentDateString();
+		mViewed = DateUtils.getCurrentDateString();
 	}
 
 	public ColorItem(@ColorInt int color, @Nullable String title, @Nullable String description) {
@@ -118,8 +119,14 @@ public class ColorItem implements Parcelable{
 		return mViewed;
 	}
 
+	public Date getCreatedDate() { return DateUtils.parseDateString(mCreated); }
+
+	public Date getEditedDate() {return  DateUtils.parseDateString(mEdited);}
+
+	public Date getViewedDate() { return DateUtils.parseDateString(mViewed);}
+
 	private void onEdit() {
-		mEdited = DateUtils.getCurrentDate();
+		mEdited = DateUtils.getCurrentDateString();
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package ru.yandex.mobile_school.ui.colors_list;
 
 import android.app.SearchManager;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -9,11 +10,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -27,7 +30,8 @@ import ru.yandex.mobile_school.utils.ArrayUtils;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ColorsListFragment extends Fragment {
+public class ColorsListFragment extends Fragment implements
+		ColorsListSortFragment.ColorsListSortDialogListener {
 
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
@@ -120,5 +124,33 @@ public class ColorsListFragment extends Fragment {
 		outState.putParcelableArrayList(EXTRA_COLOR_ITEMS, mColors);
 		outState.putInt(EXTRA_EDIT_POSITION, mEditPosition);
 		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.colors_list_menu_sort:
+				ColorsListSortFragment fragment = new ColorsListSortFragment();
+				fragment.setTargetFragment(this, 0);
+				fragment.show(getActivity().getSupportFragmentManager(), "");
+				break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onSortPositiveClick(int sortParam, boolean ascending) {
+		Resources res = getResources();
+		String[] sortParams = res.getStringArray(R.array.colors_list_sort_by_items);
+		String selectedParam = sortParams[sortParam];
+		ColorsListAdapter adapter =  (ColorsListAdapter) colorsListView.getAdapter();
+		if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_title)))
+			adapter.sortBy(ColorsListAdapter.SORT_PARAM_TITLE, ascending);
+		else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_created)))
+			adapter.sortBy(ColorsListAdapter.SORT_PARAM_CREATED, ascending);
+		else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_edited)))
+			adapter.sortBy(ColorsListAdapter.SORT_PARAM_EDITED, ascending);
+		else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_viewed)))
+			adapter.sortBy(ColorsListAdapter.SORT_PARAM_VIEWED, ascending);
 	}
 }
