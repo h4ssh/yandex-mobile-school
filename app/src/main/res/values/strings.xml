@@ -4,8 +4,11 @@
     <string name="color_picker_activity_add_title">Pick a color</string>
     <string name="color_picker_activity_edit_title">Edit color</string>
 
-    <string name="current_color_title">Current color:</string>
-    <string name="favorite_colors_title">Favorite colors:</string>
+    <string name="color_picker_current_color_title">Current color:</string>
+    <string name="color_picker_favorite_colors_title">Favorite colors:</string>
+    <string name="color_picker_created_date">Created:\t %1$s</string>
+    <string name="color_picker_edited_date">Edited:\t %1$s</string>
+    <string name="color_picker_viewed_date">Viewed:\t %1$s</string>
 
     <string name="colors_list_menu_search">Search</string>
     <string name="colors_list_menu_filter">Filter</string>

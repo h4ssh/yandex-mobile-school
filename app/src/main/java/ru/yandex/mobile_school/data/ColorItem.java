@@ -11,9 +11,7 @@ import java.util.UUID;
 
 import ru.yandex.mobile_school.utils.DateUtils;
 
-public class ColorItem implements Parcelable{
-
-	private static int lastId = 0;
+public class ColorItem implements Parcelable {
 
 	private UUID mId;
 	private @ColorInt int mColor;
@@ -105,6 +103,10 @@ public class ColorItem implements Parcelable{
 
 	public String getColorAsHexString() {
 		return String.format("#%06X", (0xFFFFFF & mColor));
+	}
+
+	public void setViewed() {
+		mViewed = DateUtils.getCurrentDateString();
 	}
 
 	public String getCreated() {

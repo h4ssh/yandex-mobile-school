@@ -21,8 +21,8 @@
             <meta-data android:name="android.app.searchable"
                        android:resource="@xml/searchable"/>
         </activity>
-        <activity android:name=".ui.color_picker.ColorPickerActivity">
-
+        <activity android:name=".ui.color_picker.ColorPickerActivity"
+            android:windowSoftInputMode="stateHidden">
         </activity>
     </application>
 

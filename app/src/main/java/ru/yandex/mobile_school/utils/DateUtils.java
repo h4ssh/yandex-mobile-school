@@ -13,7 +13,7 @@ public class DateUtils {
 	public static String getCurrentDateString() {
 		Date now = new Date();
 		DateFormat dateFormat = new SimpleDateFormat(ISO8601Format, Locale.US);
-		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		dateFormat.setTimeZone(TimeZone.getDefault());
 		return dateFormat.format(now);
 	}
 

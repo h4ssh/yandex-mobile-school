@@ -8,6 +8,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.VelocityTrackerCompat;
+import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -23,7 +24,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,6 +40,7 @@ public class ColorPickerFragment extends Fragment {
 
 	private static final String ARG_COLOR_ITEM = "color_item";
 	private static final String SAVED_COLOR_ITEM = "saved_color_item";
+	private static final String DATE_FORMAT = "d MMM hh:mm:ss";
 
 	private static final int COLOR_VIEW_SIZE_IN_DP = 50;
 	private static final int COLOR_VIEW_MARGIN_IN_DP = 25;
@@ -56,6 +60,9 @@ public class ColorPickerFragment extends Fragment {
 	@BindView(R.id.curent_color_h) TextView mCurrentColorH;
 	@BindView(R.id.curent_color_s) TextView mCurrentColorS;
 	@BindView(R.id.curent_color_v) TextView mCurrentColorV;
+	@BindView(R.id.color_picker_date_created) TextView mDateCreatedText;
+	@BindView(R.id.color_picker_date_edited) TextView mDateEditedText;
+	@BindView(R.id.color_picker_date_viewed) TextView mDateViewedText;
 
 	private static final ArrayList<Integer> FAVORITE_COLORS = new ArrayList<>();
 	private IColorPicker mDelegate;
@@ -106,6 +113,7 @@ public class ColorPickerFragment extends Fragment {
 		}
 
 		setCurrentColorDescription(mCurrentColorView.getCurrentColor());
+		setColorItemMetadata();
 
 		DisplayMetrics metrics = getResources().getDisplayMetrics();
 		int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, COLOR_VIEW_SIZE_IN_DP, metrics);
@@ -154,6 +162,18 @@ public class ColorPickerFragment extends Fragment {
 		});
 
 		return view;
+	}
+
+	private void setColorItemMetadata() {
+		if (mColorItem == null) return;
+		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+		format.setTimeZone(TimeZone.getDefault());
+		mDateCreatedText.setText(getString(R.string.color_picker_created_date,
+				format.format(mColorItem.getCreatedDate())));
+		mDateEditedText.setText(getString(R.string.color_picker_edited_date,
+				format.format(mColorItem.getEditedDate())));
+		mDateViewedText.setText(getString(R.string.color_picker_viewed_date,
+				format.format(mColorItem.getViewedDate())));
 	}
 
 	private void restoreFavoriteColors(View view) {
