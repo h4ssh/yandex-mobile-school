@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,8 +26,6 @@ import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.data.DataStorage;
 import ru.yandex.mobile_school.ui.color_picker.ColorPickerActivity;
-import ru.yandex.mobile_school.utils.ArrayUtils;
-import ru.yandex.mobile_school.utils.DateFilter;
 import ru.yandex.mobile_school.utils.DateUtils;
 
 import static android.app.Activity.RESULT_OK;
@@ -142,6 +139,13 @@ public class ColorsListFragment extends Fragment implements
 				ColorsListFilterFragment filterFragment = new ColorsListFilterFragment();
 				filterFragment.setTargetFragment(this, 0);
 				filterFragment.show(getActivity().getSupportFragmentManager(), "");
+				break;
+			case R.id.colors_list_menu_import_export:
+				DataStorage.get(getContext()).exportColorItems();
+				break;
+			case R.id.colors_list_menu_search:
+				DataStorage.get(getContext()).importColorItems();
+				break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
