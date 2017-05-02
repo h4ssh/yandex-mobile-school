@@ -1,5 +1,9 @@
 package ru.yandex.mobile_school.utils;
 
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
+
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,9 +16,15 @@ public class DateUtils {
 
 	public static String getCurrentDateString() {
 		Date now = new Date();
-		DateFormat dateFormat = new SimpleDateFormat(ISO8601Format, Locale.US);
+		DateFormat dateFormat = new SimpleDateFormat(ISO8601Format, Locale.getDefault());
 		dateFormat.setTimeZone(TimeZone.getDefault());
 		return dateFormat.format(now);
+	}
+
+	public static String dateToDateString(Date date) {
+		DateFormat dateFormat = new SimpleDateFormat(ISO8601Format, Locale.getDefault());
+		dateFormat.setTimeZone(TimeZone.getDefault());
+		return dateFormat.format(date);
 	}
 
 	public static Date parseDateString(String dateString) {
@@ -22,6 +32,24 @@ public class DateUtils {
 		try {
 			return format.parse(dateString);
 		} catch (Exception ignored) {
+			return null;
+		}
+
+	}
+
+	public static String getFilterString(String paramName, Date startDate, Date endDate) {
+		DateFilter filter = new DateFilter(paramName, startDate, endDate);
+		Moshi moshi = new Moshi.Builder().build();
+		JsonAdapter<DateFilter> jsonAdapter = moshi.adapter(DateFilter.class);
+		return jsonAdapter.toJson(filter);
+	}
+
+	public static DateFilter getDateFilter(String json) {
+		Moshi moshi = new Moshi.Builder().build();
+		JsonAdapter<DateFilter> jsonAdapter = moshi.adapter(DateFilter.class);
+		try {
+			return jsonAdapter.fromJson(json);
+		} catch (IOException ignored) {
 			return null;
 		}
 

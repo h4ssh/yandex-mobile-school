@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
@@ -17,19 +19,29 @@ import butterknife.ButterKnife;
 import ru.yandex.mobile_school.ui.views.ColorView;
 import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.data.ColorItem;
+import ru.yandex.mobile_school.utils.DateFilter;
+import ru.yandex.mobile_school.utils.DateUtils;
 
-public class ColorsListAdapter extends BaseAdapter {
-	private final ArrayList<ColorItem> mColors;
+public class ColorsListAdapter extends BaseAdapter implements Filterable {
+	private ArrayList<ColorItem> mColors;
+	private ArrayList<ColorItem> mFiltered;
+	private ItemFilter mItemFilter = new ItemFilter();
 	private final WeakReference<Context> mWeakContext;
 
-	public static final String SORT_PARAM_TITLE = "sort_param_title";
-	public static final String SORT_PARAM_CREATED = "sort_param_created";
-	public static final String SORT_PARAM_EDITED = "sort_param_edited";
-	public static final String SORT_PARAM_VIEWED = "sort_param_viewed";
+	static final String SORT_PARAM_TITLE = "sort_param_title";
+	static final String SORT_PARAM_CREATED = "sort_param_created";
+	static final String SORT_PARAM_EDITED = "sort_param_edited";
+	static final String SORT_PARAM_VIEWED = "sort_param_viewed";
+
+	static final String FILTER_PARAM_CREATED = "filter_param_created";
+	static final String FILTER_PARAM_EDITED = "filter_param_edited";
+	static final String FILTER_PARAM_VIEWED = "filter_param_viewed";
+
 
 	ColorsListAdapter(Context context, ArrayList<ColorItem> items) {
 		mWeakContext = new WeakReference<>(context);
 		mColors = items;
+		mFiltered = items;
 	}
 
 	static class ViewHolder {
@@ -42,12 +54,12 @@ public class ColorsListAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		return mColors.size();
+		return mFiltered.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return mColors.get(position);
+		return mFiltered.get(position);
 	}
 
 	@Override
@@ -79,7 +91,7 @@ public class ColorsListAdapter extends BaseAdapter {
 	}
 
 	public void sortBy(final String sortParam, final boolean ascending) {
-		Collections.sort(mColors, new Comparator<ColorItem>() {
+		Collections.sort(mFiltered, new Comparator<ColorItem>() {
 			@Override
 			public int compare(ColorItem c1, ColorItem c2) {
 				switch (sortParam) {
@@ -102,5 +114,46 @@ public class ColorsListAdapter extends BaseAdapter {
 			}
 		});
 		notifyDataSetChanged();
+	}
+
+	@Override
+	public Filter getFilter() {
+		return mItemFilter;
+	}
+
+	private class ItemFilter extends Filter {
+
+		@Override
+		protected FilterResults performFiltering(CharSequence constraint) {
+			FilterResults results = new FilterResults();
+			DateFilter filter = DateUtils.getDateFilter(constraint.toString());
+			ArrayList<ColorItem> filtered = new ArrayList<>();
+			for (int i=0; i< mColors.size(); i++) {
+				if (filter.getParamName().equals(FILTER_PARAM_CREATED)) {
+					if (filter.match(mColors.get(i).getCreatedDate())) {
+						filtered.add(mColors.get(i));
+					}
+				} else
+				if (filter.getParamName().equals(FILTER_PARAM_EDITED)) {
+					if (filter.match(mColors.get(i).getEditedDate())) {
+						filtered.add(mColors.get(i));
+					}
+				} else
+				if (filter.getParamName().equals(FILTER_PARAM_VIEWED)) {
+					if (filter.match(mColors.get(i).getViewedDate())) {
+						filtered.add(mColors.get(i));
+					}
+				}
+			}
+			results.count = filtered.size();
+			results.values = filtered;
+			return results;
+		}
+
+		@Override
+		protected void publishResults(CharSequence constraint, FilterResults results) {
+			mFiltered = (ArrayList<ColorItem>)results.values;
+			notifyDataSetChanged();
+		}
 	}
 }

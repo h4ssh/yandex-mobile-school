@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,11 +28,14 @@ import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.data.DataStorage;
 import ru.yandex.mobile_school.ui.color_picker.ColorPickerActivity;
 import ru.yandex.mobile_school.utils.ArrayUtils;
+import ru.yandex.mobile_school.utils.DateFilter;
+import ru.yandex.mobile_school.utils.DateUtils;
 
 import static android.app.Activity.RESULT_OK;
 
 public class ColorsListFragment extends Fragment implements
-		ColorsListSortFragment.ColorsListSortDialogListener {
+		ColorsListSortFragment.ColorsListSortDialogListener,
+		ColorsListFilterFragment.ColorsListFilterDialogListener {
 
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
@@ -130,10 +134,14 @@ public class ColorsListFragment extends Fragment implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.colors_list_menu_sort:
-				ColorsListSortFragment fragment = new ColorsListSortFragment();
-				fragment.setTargetFragment(this, 0);
-				fragment.show(getActivity().getSupportFragmentManager(), "");
+				ColorsListSortFragment sortFragment = new ColorsListSortFragment();
+				sortFragment.setTargetFragment(this, 0);
+				sortFragment.show(getActivity().getSupportFragmentManager(), "");
 				break;
+			case R.id.colors_list_menu_filter:
+				ColorsListFilterFragment filterFragment = new ColorsListFilterFragment();
+				filterFragment.setTargetFragment(this, 0);
+				filterFragment.show(getActivity().getSupportFragmentManager(), "");
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -152,5 +160,21 @@ public class ColorsListFragment extends Fragment implements
 			adapter.sortBy(ColorsListAdapter.SORT_PARAM_EDITED, ascending);
 		else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_viewed)))
 			adapter.sortBy(ColorsListAdapter.SORT_PARAM_VIEWED, ascending);
+	}
+
+	@Override
+	public void onFilterPositiveClick(int filterParam, Date startDate, Date endDate) {
+		Resources res = getResources();
+		String[] filterParams = res.getStringArray(R.array.colors_list_filter_by_items);
+		String selectedParam = filterParams[filterParam];
+		String filterName = "";
+		if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_created)))
+			filterName = ColorsListAdapter.FILTER_PARAM_CREATED;
+		else if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_edited)))
+			filterName = ColorsListAdapter.FILTER_PARAM_EDITED;
+		else if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_viewed)))
+			filterName = ColorsListAdapter.FILTER_PARAM_VIEWED;
+		ColorsListAdapter adapter =  (ColorsListAdapter) colorsListView.getAdapter();
+		adapter.getFilter().filter(DateUtils.getFilterString(filterName, startDate, endDate));
 	}
 }

@@ -1,8 +1,6 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
