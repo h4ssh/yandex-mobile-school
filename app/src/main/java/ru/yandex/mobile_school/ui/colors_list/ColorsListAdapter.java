@@ -117,6 +117,19 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 		notifyDataSetChanged();
 	}
 
+	public void search(String query) {
+		query = query.toLowerCase();
+		ArrayList<ColorItem> filtered = new ArrayList<>();
+		for (int i=0; i< mColors.size(); i++) {
+			ColorItem item = mColors.get(i);
+			if (item.getTitle().toLowerCase().contains(query) ||
+					item.getDescription().toLowerCase().contains(query))
+				filtered.add(item);
+		}
+		mFiltered = filtered;
+		notifyDataSetChanged();
+	}
+
 	@Override
 	public Filter getFilter() {
 		return mItemFilter;
@@ -126,6 +139,15 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 		mColors = items;
 		mFiltered = items;
 		notifyDataSetChanged();
+	}
+
+	public void resetFilters() {
+		mFiltered = mColors;
+		notifyDataSetChanged();
+	}
+
+	public ColorItem getColorItem(int position) {
+		return mFiltered.get(position);
 	}
 
 	private class ItemFilter extends Filter {

@@ -40,7 +40,7 @@ public class ColorPickerFragment extends Fragment {
 
 	private static final String ARG_COLOR_ITEM = "color_item";
 	private static final String SAVED_COLOR_ITEM = "saved_color_item";
-	private static final String DATE_FORMAT = "d MMM hh:mm:ss";
+	private static final String DATE_FORMAT = "d MMM HH:mm:ss";
 
 	private static final int COLOR_VIEW_SIZE_IN_DP = 50;
 	private static final int COLOR_VIEW_MARGIN_IN_DP = 25;
@@ -101,12 +101,14 @@ public class ColorPickerFragment extends Fragment {
 		if (savedInstanceState != null && savedInstanceState.containsKey(SAVED_COLOR_ITEM)) {
 			ColorItem colorItem = savedInstanceState.getParcelable(SAVED_COLOR_ITEM);
 			mColorItem = colorItem;
+			mColorItem.setViewed();
 			mCurrentColorView.setCurrentColor(colorItem.getColor());
 			mTitleEdit.setText(colorItem.getTitle());
 			mDescriptionEdit.setText(colorItem.getDescription());
 		} else if (arguments != null && arguments.containsKey(ARG_COLOR_ITEM)) {
 			ColorItem colorItem = arguments.getParcelable(ARG_COLOR_ITEM);
 			mColorItem = colorItem;
+			mColorItem.setViewed();
 			mCurrentColorView.setCurrentColor(colorItem.getColor());
 			mTitleEdit.setText(colorItem.getTitle());
 			mDescriptionEdit.setText(colorItem.getDescription());

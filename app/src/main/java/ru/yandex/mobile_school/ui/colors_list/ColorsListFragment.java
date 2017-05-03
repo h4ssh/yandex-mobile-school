@@ -1,6 +1,5 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
-import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -34,7 +33,8 @@ import static android.app.Activity.RESULT_OK;
 public class ColorsListFragment extends Fragment implements
 		ColorsListSortFragment.ColorsListSortDialogListener,
 		ColorsListFilterFragment.ColorsListFilterDialogListener,
-		ColorsListExportFragment.ColorsListExportDialogListener {
+		ColorsListExportFragment.ColorsListExportDialogListener,
+		ColorsListSearchFragment.ColorsListSearchDialogListener {
 
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
@@ -63,21 +63,11 @@ public class ColorsListFragment extends Fragment implements
 		} else {
 			mColors = DataStorage.get(getContext()).getColorItems();
 		}
-
-		Intent intent = getActivity().getIntent();
-		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-			String query = intent.getStringExtra(SearchManager.QUERY);
-			searchColors(query);
-		}
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.colors_list_menu, menu);
-	}
-
-	private void searchColors(String query) {
-
 	}
 
 	@Override
@@ -90,7 +80,7 @@ public class ColorsListFragment extends Fragment implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				mEditPosition = position;
-				ColorItem item = mColors.get(position);
+				ColorItem item = ((ColorsListAdapter)colorsListView.getAdapter()).getColorItem(position);
 				startActivityForResult(ColorPickerActivity.newIntent(getContext(), item), REQUEST_CODE_EDIT);
 			}
 		});
@@ -111,14 +101,17 @@ public class ColorsListFragment extends Fragment implements
 			ColorItem item = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
 			DataStorage.get(getContext()).addColorItem(item);
 			mColors.add(item);
-			((BaseAdapter)colorsListView.getAdapter()).notifyDataSetChanged();
+			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
+			adapter.resetFilters();
 		}
 		if (requestCode == REQUEST_CODE_EDIT && resultCode == RESULT_OK) {
-			mColors.remove(mEditPosition);
+			ColorItem old = ((ColorsListAdapter)(colorsListView.getAdapter())).getColorItem(mEditPosition);
+			mColors.remove(old);
 			ColorItem updated = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
 			mColors.add(updated);
 			DataStorage.get(getContext()).updateColorItem(updated);
-			((BaseAdapter)colorsListView.getAdapter()).notifyDataSetChanged();
+			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
+			adapter.resetFilters();
 		}
 	}
 
@@ -146,6 +139,11 @@ public class ColorsListFragment extends Fragment implements
 				ColorsListExportFragment exportFragment = new ColorsListExportFragment();
 				exportFragment.setTargetFragment(this, 0);
 				exportFragment.show(getActivity().getSupportFragmentManager(), "");
+				break;
+			case R.id.colors_list_menu_search:
+				ColorsListSearchFragment searchFragment = new ColorsListSearchFragment();
+				searchFragment.setTargetFragment(this, 0);
+				searchFragment.show(getActivity().getSupportFragmentManager(), "");
 				break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -204,5 +202,11 @@ public class ColorsListFragment extends Fragment implements
 		} else {
 			Toast.makeText(getContext(), getString(R.string.colors_list_import_error), Toast.LENGTH_SHORT).show();
 		}
+	}
+
+	@Override
+	public void onSearchClick(String query) {
+		ColorsListAdapter adapter =  (ColorsListAdapter) colorsListView.getAdapter();
+		adapter.search(query);
 	}
 }

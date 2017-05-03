@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!--
     <item
         android:id="@+id/colors_list_menu_search"
         android:icon="@drawable/ic_search_white_24dp"
         android:title="@string/colors_list_menu_search"
         app:showAsAction="always"
         />
-    -->
     <item
         android:id="@+id/colors_list_menu_sort"
         android:icon="@drawable/ic_sort_by_alpha_white_24dp"

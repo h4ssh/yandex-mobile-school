@@ -56,6 +56,9 @@
     <string name="colors_list_import_success">Colors imported!</string>
     <string name="colors_list_import_error">Import colors error!</string>
 
+    <string name="colors_list_search_title">Search</string>
+    <string name="colors_list_search_search">Search</string>
+
     <string name="color_fragment_title_hint">Enter title</string>
     <string name="color_fragment_description_hint">Enter description</string>
     <string name="color_fragment_menu_done">Done</string>
@@ -67,7 +70,6 @@
     <string name="color_description_s">S: %1$f</string>
     <string name="color_description_v">V: %1$f</string>
 
-    <string name="search_hint">Type here</string>
 
     <string name="button_ok">Ok</string>
     <string name="button_cancel">Cancel</string>
