@@ -12,7 +12,7 @@ import java.util.TimeZone;
 
 public class DateUtils {
 
-	private static final String ISO8601Format = ("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	private static final String ISO8601Format = ("yyyy-MM-dd'T'HH:mm:ssZ");
 
 	public static String getCurrentDateString() {
 		Date now = new Date();

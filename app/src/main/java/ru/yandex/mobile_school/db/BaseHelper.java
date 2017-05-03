@@ -73,6 +73,11 @@ public class BaseHelper extends SQLiteOpenHelper {
 				new String[] {color.getId().toString()});
 	}
 
+	public int clearColors() {
+		if (mDatabase == null) mDatabase = getWritableDatabase();
+		return mDatabase.delete(ColorsTable.NAME, null, null);
+	}
+
 	private ContentValues getContentValues(ColorItem color) {
 		ContentValues values = new ContentValues();
 		values.put(ColorsTable.Cols.ID, color.getId().toString());

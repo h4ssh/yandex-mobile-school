@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +33,8 @@ import static android.app.Activity.RESULT_OK;
 
 public class ColorsListFragment extends Fragment implements
 		ColorsListSortFragment.ColorsListSortDialogListener,
-		ColorsListFilterFragment.ColorsListFilterDialogListener {
+		ColorsListFilterFragment.ColorsListFilterDialogListener,
+		ColorsListExportFragment.ColorsListExportDialogListener {
 
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
@@ -141,10 +143,9 @@ public class ColorsListFragment extends Fragment implements
 				filterFragment.show(getActivity().getSupportFragmentManager(), "");
 				break;
 			case R.id.colors_list_menu_import_export:
-				DataStorage.get(getContext()).exportColorItems();
-				break;
-			case R.id.colors_list_menu_search:
-				DataStorage.get(getContext()).importColorItems();
+				ColorsListExportFragment exportFragment = new ColorsListExportFragment();
+				exportFragment.setTargetFragment(this, 0);
+				exportFragment.show(getActivity().getSupportFragmentManager(), "");
 				break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -180,5 +181,28 @@ public class ColorsListFragment extends Fragment implements
 			filterName = ColorsListAdapter.FILTER_PARAM_VIEWED;
 		ColorsListAdapter adapter =  (ColorsListAdapter) colorsListView.getAdapter();
 		adapter.getFilter().filter(DateUtils.getFilterString(filterName, startDate, endDate));
+	}
+
+	@Override
+	public void onExportClick(String path) {
+		boolean result = DataStorage.get(getContext()).exportColorItems(path);
+		if (result) {
+			Toast.makeText(getContext(), getString(R.string.colors_list_export_success), Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(getContext(), getString(R.string.colors_list_export_error), Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	@Override
+	public void onImportClick(String path) {
+		boolean result = DataStorage.get(getContext()).importColorItems(path);
+		if (result) {
+			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
+			mColors = DataStorage.get(getContext()).getColorItems();
+			adapter.changeData(mColors);
+			Toast.makeText(getContext(), getString(R.string.colors_list_import_success), Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(getContext(), getString(R.string.colors_list_import_error), Toast.LENGTH_SHORT).show();
+		}
 	}
 }

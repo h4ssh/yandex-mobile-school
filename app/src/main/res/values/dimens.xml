@@ -15,5 +15,5 @@
 
     <dimen name="colors_list_sort_fragment_font">16sp</dimen>
     <dimen name="colors_list_filter_fragment_font">16sp</dimen>
-
+    <dimen name="colors_list_export_fragment_font">16sp</dimen>
 </resources>

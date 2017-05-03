@@ -93,26 +93,25 @@ public class DataStorage {
 		return new ColorItemCursorWrapper(cursor);
 	}
 
-	public void exportColorItems() {
-		String destination = "/storage/emulated/0/itemlist.ili";
-		Moshi moshi = new Moshi.Builder()
-				.add(new ColorItemJsonAdapter())
-				.build();
-		Type type = Types.newParameterizedType(List.class, ColorItem.class);
-		JsonAdapter<List<ColorItem>> adapter = moshi.adapter(type);
+	public boolean exportColorItems(String destination) {
+		JsonAdapter<List<ColorItem>> adapter = getColorsListJsonAdapter();
 		String json = adapter.toJson(getColorItems());
+		FileWriter file = null;
 		try {
-			FileWriter file = new FileWriter(destination);
+			file = new FileWriter(destination);
 			file.write(json);
 			file.flush();
-			file.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
+		finally {
+			if (file != null) try {file.close();} catch (IOException ignored){}
+		}
+		return true;
 	}
 
-	public void importColorItems() {
-		String source = "/storage/emulated/0/itemlist.ili";
+	public boolean importColorItems(String source) {
 		File file = new File(source);
 		StringBuilder text = new StringBuilder();
 		BufferedReader br = null;
@@ -122,26 +121,31 @@ public class DataStorage {
 			while ((line = br.readLine()) != null) {
 				text.append(line + '\n');
 			}
-		} catch (Exception ignored){
+		} catch (IOException e){
+			e.printStackTrace();
+			return false;
 		} finally {
-			try {
-				br.close();
-			} catch (IOException ignored) {}
+			try { if(br != null) br.close(); } catch (IOException ignored) {}
 		}
-		Moshi moshi = new Moshi.Builder()
-				.add(new ColorItemJsonAdapter())
-				.build();
-		Type type = Types.newParameterizedType(List.class, ColorItem.class);
-		JsonAdapter<List<ColorItem>> adapter = moshi.adapter(type);
+		JsonAdapter<List<ColorItem>> adapter = getColorsListJsonAdapter();
 		List<ColorItem> items = null;
 		try {
 			items = adapter.fromJson(text.toString());
 		} catch (IOException ignored) {}
 		if (items != null) {
+			mBaseHelper.clearColors();
 			for (int i = 0; i < items.size(); i++) {
 				addColorItem(items.get(i));
 			}
 		}
+		return true;
+	}
 
+	private JsonAdapter<List<ColorItem>> getColorsListJsonAdapter() {
+		Moshi moshi = new Moshi.Builder()
+				.add(new ColorItemJsonAdapter())
+				.build();
+		Type type = Types.newParameterizedType(List.class, ColorItem.class);
+		return moshi.adapter(type);
 	}
 }

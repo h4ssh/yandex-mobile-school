@@ -13,7 +13,7 @@
     <string name="colors_list_menu_search">Search</string>
     <string name="colors_list_menu_filter">Filter</string>
     <string name="colors_list_menu_sort">Sort</string>
-    <string name="colors_list_menu_import_export">Import\/Export</string>
+    <string name="colors_list_menu_import_export">Import\\Export</string>
 
     <string name="colors_list_sort_title">Sort list</string>
     <string name="colors_list_sort_order">Sort order:</string>
@@ -47,6 +47,14 @@
         <item>@string/colors_list_filter_by_viewed</item>
     </string-array>
 
+    <string name="colors_list_export_title">Import\\Export</string>
+    <string name="colors_list_export_export">Export</string>
+    <string name="colors_list_export_import">Import</string>
+    <string name="colors_list_export_filename">Filename</string>
+    <string name="colors_list_export_success">Colors exported!</string>
+    <string name="colors_list_export_error">Export colors error!</string>
+    <string name="colors_list_import_success">Colors imported!</string>
+    <string name="colors_list_import_error">Import colors error!</string>
 
     <string name="color_fragment_title_hint">Enter title</string>
     <string name="color_fragment_description_hint">Enter description</string>

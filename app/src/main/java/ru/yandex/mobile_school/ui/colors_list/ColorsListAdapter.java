@@ -16,6 +16,7 @@ import java.util.Comparator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.yandex.mobile_school.data.DataStorage;
 import ru.yandex.mobile_school.ui.views.ColorView;
 import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.data.ColorItem;
@@ -119,6 +120,12 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	@Override
 	public Filter getFilter() {
 		return mItemFilter;
+	}
+
+	public void changeData(ArrayList<ColorItem> items) {
+		mColors = items;
+		mFiltered = items;
+		notifyDataSetChanged();
 	}
 
 	private class ItemFilter extends Filter {
