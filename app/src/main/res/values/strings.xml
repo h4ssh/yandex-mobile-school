@@ -50,6 +50,8 @@
     <string name="colors_list_export_title">Import\\Export</string>
     <string name="colors_list_export_export">Export</string>
     <string name="colors_list_export_import">Import</string>
+    <string name="colors_list_export_pick_title">Pick a file</string>
+    <string name="colors_list_export_intent_error">File managers not found!</string>
     <string name="colors_list_export_filename">Filename</string>
     <string name="colors_list_export_success">Colors exported!</string>
     <string name="colors_list_export_error">Export colors error!</string>

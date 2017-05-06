@@ -94,6 +94,11 @@ public class DataStorage {
 	}
 
 	public boolean exportColorItems(String destination) {
+		File targetFile = new File(destination);
+		File parent = targetFile.getParentFile();
+		if (!parent.exists() && !parent.mkdirs()) {
+			return false;
+		}
 		JsonAdapter<List<ColorItem>> adapter = getColorsListJsonAdapter();
 		String json = adapter.toJson(getColorItems());
 		FileWriter file = null;
