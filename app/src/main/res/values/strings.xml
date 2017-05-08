@@ -12,6 +12,7 @@
 
     <string name="colors_list_menu_search">Search</string>
     <string name="colors_list_menu_filter">Filter</string>
+    <string name="colors_list_menu_reset">Reset search\\filter</string>
     <string name="colors_list_menu_sort">Sort</string>
     <string name="colors_list_menu_import_export">Import\\Export</string>
 
@@ -73,6 +74,9 @@
     <string name="color_description_v">V: %1$f</string>
 
 
+    <string name="delete_dialog_title">Confirm delete</string>
+    <string name="delete_dialog_text">Do you realy want to delete this item?</string>
+    <string name="button_delete">Delete</string>
     <string name="button_ok">Ok</string>
     <string name="button_cancel">Cancel</string>
 </resources>

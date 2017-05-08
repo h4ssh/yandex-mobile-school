@@ -1,11 +1,12 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -53,7 +53,7 @@ public class ColorsListFragment extends Fragment implements
 	}
 
 	@Override
-	public void onCreate(@Nullable Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 
@@ -84,7 +84,13 @@ public class ColorsListFragment extends Fragment implements
 				startActivityForResult(ColorPickerActivity.newIntent(getContext(), item), REQUEST_CODE_EDIT);
 			}
 		});
-
+		colorsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+				getDeleteAlertDialog().show();
+				return true;
+			}
+		});
 		addColorFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -93,6 +99,28 @@ public class ColorsListFragment extends Fragment implements
 		});
 
 		return view;
+	}
+
+	private AlertDialog getDeleteAlertDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+		builder.setTitle(R.string.delete_dialog_title);
+		builder.setMessage(R.string.delete_dialog_text);
+		builder.setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
+				ColorItem item = adapter.getColorItem(which);
+				adapter.deleteItem(item);
+				DataStorage.get(getContext()).deleteColorItem(item);
+			}
+		});
+		builder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		return builder.create();
 	}
 
 	@Override
@@ -104,14 +132,19 @@ public class ColorsListFragment extends Fragment implements
 			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
 			adapter.resetFilters();
 		}
-		if (requestCode == REQUEST_CODE_EDIT && resultCode == RESULT_OK) {
-			ColorItem old = ((ColorsListAdapter)(colorsListView.getAdapter())).getColorItem(mEditPosition);
-			mColors.remove(old);
-			ColorItem updated = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
-			mColors.add(updated);
-			DataStorage.get(getContext()).updateColorItem(updated);
+		if (requestCode == REQUEST_CODE_EDIT) {
 			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
-			adapter.resetFilters();
+			ColorItem old = adapter.getColorItem(mEditPosition);
+			ColorItem updated;
+			if (resultCode == RESULT_OK) {
+				updated = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
+			} else {
+				updated = old;
+				updated.setViewed();
+			}
+			old.updateWith(updated);
+			adapter.notifyDataSetChanged();
+			DataStorage.get(getContext()).updateColorItem(updated);
 		}
 	}
 
@@ -144,6 +177,10 @@ public class ColorsListFragment extends Fragment implements
 				ColorsListSearchFragment searchFragment = new ColorsListSearchFragment();
 				searchFragment.setTargetFragment(this, 0);
 				searchFragment.show(getActivity().getSupportFragmentManager(), "");
+				break;
+			case R.id.colors_list_menu_reset:
+				ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
+				adapter.resetFilters();
 				break;
 		}
 		return super.onOptionsItemSelected(item);

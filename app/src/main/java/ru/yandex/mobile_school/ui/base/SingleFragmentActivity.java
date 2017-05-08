@@ -33,7 +33,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 			restoreFragmentState(fragment);
 	}
 
-	protected void restoreFragmentState(Fragment fragment) {}
+	protected void restoreFragmentState(Fragment fragment) {
+	}
 
 	@Override
 	protected void onResume() {

@@ -31,7 +31,7 @@ public class ColorItem implements Parcelable {
 		mViewed = DateUtils.getCurrentDateString();
 	}
 
-	public ColorItem(@ColorInt int color, @Nullable String title, @Nullable String description) {
+	public ColorItem(@ColorInt int color, String title, String description) {
 		this();
 		mColor = color;
 		if (title != null) mTitle = title;
@@ -56,6 +56,15 @@ public class ColorItem implements Parcelable {
 		mCreated = in.readString();
 		mEdited = in.readString();
 		mViewed = in.readString();
+	}
+
+	public void updateWith(ColorItem item) {
+		mColor = item.getColor();
+		mTitle = item.getTitle();
+		mDescription = item.getDescription();
+		mCreated = item.getCreated();
+		mEdited = item.getEdited();
+		mViewed = item.getViewed();
 	}
 
 	public static final Creator<ColorItem> CREATOR = new Creator<ColorItem>() {

@@ -19,7 +19,6 @@ public class BaseHelper extends SQLiteOpenHelper {
 		super(context, DATABASE_NAME, null, VERSION);
 	}
 
-
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		mDatabase = db;
@@ -61,20 +60,26 @@ public class BaseHelper extends SQLiteOpenHelper {
 	}
 
 	public int insertColor(ColorItem color) {
-		if (mDatabase == null) mDatabase = getWritableDatabase();
+		openForWriting();
 		ContentValues colorValues = getContentValues(color);
 		return (int) mDatabase.insert(ColorsTable.NAME, null, colorValues);
 	}
 
 	public int updateColor(ColorItem color) {
-		if (mDatabase == null) mDatabase = getWritableDatabase();
+		openForWriting();
 		ContentValues colorValues = getContentValues(color);
 		return mDatabase.update(ColorsTable.NAME, colorValues, ColorsTable.Cols.ID + " = ?",
 				new String[] {color.getId().toString()});
 	}
 
+	public int deleteColor(ColorItem color) {
+		openForWriting();
+		return mDatabase.delete(ColorsTable.NAME, ColorsTable.Cols.ID + " = ?",
+				new String[] {color.getId().toString()});
+	}
+
 	public int clearColors() {
-		if (mDatabase == null) mDatabase = getWritableDatabase();
+		openForWriting();
 		return mDatabase.delete(ColorsTable.NAME, null, null);
 	}
 
@@ -92,5 +97,11 @@ public class BaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	}
+
+	protected void openForWriting() {
+		if (mDatabase == null ) {
+			mDatabase = getWritableDatabase();
+		}
 	}
 }

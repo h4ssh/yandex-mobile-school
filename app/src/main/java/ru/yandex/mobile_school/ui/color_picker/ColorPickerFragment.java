@@ -5,10 +5,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.ColorInt;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.VelocityTrackerCompat;
-import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -71,7 +69,7 @@ public class ColorPickerFragment extends Fragment {
 	private final View.OnTouchListener defaultTouchListener = new ViewColorTouchListener();
 	private ColorItem mColorItem;
 
-	static ColorPickerFragment newInstance(@Nullable ColorItem item, @Nullable IColorPicker delegate) {
+	static ColorPickerFragment newInstance(ColorItem item, IColorPicker delegate) {
 		ColorPickerFragment fragment = new ColorPickerFragment();
 		if (item != null) {
 			Bundle args = new Bundle();
@@ -87,7 +85,7 @@ public class ColorPickerFragment extends Fragment {
 	}
 
 	@Override
-	public void onCreate(@Nullable Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 	}

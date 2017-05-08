@@ -1,6 +1,8 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v4.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -19,8 +21,14 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.yandex.mobile_school.R;
+import ru.yandex.mobile_school.utils.DateUtils;
 
 public class ColorsListFilterFragment extends DialogFragment {
+
+	private static final String SHARED_PREFS_NAME = "shared_prefs_filter_name";
+	private static final String SHARED_PREFS_PARAM = "shared_prefs_filter_param";
+	private static final String SHARED_PREFS_START_DATE = "shared_prefs_filter_start_date";
+	private static final String SHARED_PREFS_END_DATE = "shared_prefs_filter_end_date";
 
 	public interface ColorsListFilterDialogListener {
 		void onFilterPositiveClick(int filterParam, Date startDate, Date endDate);
@@ -50,8 +58,10 @@ public class ColorsListFilterFragment extends DialogFragment {
 						int pos = mFilterParamSpinner.getSelectedItemPosition();
 						Date start = mStartDateCheck.isChecked() ? getSelectedDate(mStartDatePicker) : null;
 						Date end = mEndDateCheck.isChecked() ? getSelectedDate(mEndDatePicker) : null;
-						if (mListener != null)
+						if (mListener != null) {
+							saveState(pos, start, end);
 							mListener.onFilterPositiveClick(pos, start, end);
+						}
 					}
 				})
 				.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
@@ -75,11 +85,46 @@ public class ColorsListFilterFragment extends DialogFragment {
 				mEndDatePicker.setEnabled(isChecked);
 			}
 		});
-		setDatePickerDateToday(mStartDatePicker);
-		setDatePickerDateToday(mEndDatePicker);
 
+		restoreState();
 		return builder.create();
 
+	}
+
+	private void restoreState() {
+		mFilterParamSpinner.setSelection(getSavedParam());
+		Date startDate = getSavedStartDate();
+		if (startDate != null) {
+			setDatePickerDate(mStartDatePicker, startDate);
+			mStartDateCheck.setChecked(true);
+		} else {
+			setDatePickerDateToday(mStartDatePicker);
+			mStartDateCheck.setChecked(false);
+		}
+		Date endDate = getSavedEndDate();
+		if (endDate != null) {
+			setDatePickerDate(mEndDatePicker, endDate);
+			mEndDateCheck.setChecked(true);
+		} else {
+			setDatePickerDateToday(mEndDatePicker);
+			mEndDateCheck.setChecked(false);
+		}
+	}
+
+	private void saveState(int pos, Date start, Date end) {
+		SharedPreferences.Editor editor = getContext().getSharedPreferences(SHARED_PREFS_NAME, 0).edit();
+		editor.putInt(SHARED_PREFS_PARAM, pos);
+		if (start != null) {
+			editor.putString(SHARED_PREFS_START_DATE, DateUtils.dateToDateString(start));
+		} else {
+			editor.remove(SHARED_PREFS_START_DATE);
+		}
+		if (end != null) {
+			editor.putString(SHARED_PREFS_END_DATE, DateUtils.dateToDateString(end));
+		} else {
+			editor.remove(SHARED_PREFS_END_DATE);
+		}
+		editor.apply();
 	}
 
 	private Date getSelectedDate(DatePicker picker) {
@@ -91,10 +136,43 @@ public class ColorsListFilterFragment extends DialogFragment {
 	}
 
 	private void setDatePickerDateToday(DatePicker picker) {
-		Calendar cal=Calendar.getInstance();
-		int year=cal.get(Calendar.YEAR);
-		int month=cal.get(Calendar.MONTH);
-		int day=cal.get(Calendar.DAY_OF_MONTH);
+		Calendar calendar = Calendar.getInstance();
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH);
+		int day = calendar.get(Calendar.DAY_OF_MONTH);
 		picker.updateDate(year, month, day);
+	}
+
+	private Date getSavedStartDate() {
+		return 	getSavedDate(SHARED_PREFS_START_DATE);
+	}
+
+	private Date getSavedEndDate() {
+		return getSavedDate(SHARED_PREFS_END_DATE);
+	}
+
+	private Date getSavedDate(String key) {
+		SharedPreferences preferences = getContext().getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+		String dateString = preferences.getString(key, null);
+		if (dateString == null) {
+			return null;
+		} else {
+			return DateUtils.parseDateString(dateString);
+		}
+	}
+
+	private int getSavedParam() {
+		SharedPreferences preferences = getContext().getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+		return preferences.getInt(SHARED_PREFS_PARAM, 0);
+	}
+
+	private void setDatePickerDate(DatePicker picker, Date date) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		picker.updateDate(
+				calendar.get(Calendar.YEAR),
+				calendar.get(Calendar.MONTH),
+				calendar.get(Calendar.DAY_OF_MONTH)
+		);
 	}
 }

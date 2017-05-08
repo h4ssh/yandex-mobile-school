@@ -15,9 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import ru.yandex.mobile_school.db.BaseHelper;
 import ru.yandex.mobile_school.db.ColorItemCursorWrapper;
@@ -80,6 +78,10 @@ public class DataStorage {
 		return mBaseHelper.insertColor(item);
 	}
 
+	public int deleteColorItem(ColorItem item) {
+		return mBaseHelper.deleteColor(item);
+	}
+
 	private ColorItemCursorWrapper queryColorItems(String whereClause, String[] whereArgs) {
 		Cursor cursor = mDatabase.query(
 				DbSchema.ColorsTable.NAME,
@@ -111,9 +113,18 @@ public class DataStorage {
 			return false;
 		}
 		finally {
-			if (file != null) try {file.close();} catch (IOException ignored){}
+			safeCloseWriter(file);
 		}
 		return true;
+	}
+
+	private void safeCloseWriter(FileWriter file) {
+		if (file != null) {
+			try {
+				file.close();
+			} catch (IOException ignored){
+			}
+		}
 	}
 
 	public boolean importColorItems(String source) {
@@ -124,19 +135,20 @@ public class DataStorage {
 			br = new BufferedReader(new FileReader(file));
 			String line;
 			while ((line = br.readLine()) != null) {
-				text.append(line + '\n');
+				text.append(line).append('\n');
 			}
 		} catch (IOException e){
 			e.printStackTrace();
 			return false;
 		} finally {
-			try { if(br != null) br.close(); } catch (IOException ignored) {}
+			saveCloseReader(br);
 		}
 		JsonAdapter<List<ColorItem>> adapter = getColorsListJsonAdapter();
 		List<ColorItem> items = null;
 		try {
 			items = adapter.fromJson(text.toString());
-		} catch (IOException ignored) {}
+		} catch (IOException ignored) {
+		}
 		if (items != null) {
 			mBaseHelper.clearColors();
 			for (int i = 0; i < items.size(); i++) {
@@ -144,6 +156,15 @@ public class DataStorage {
 			}
 		}
 		return true;
+	}
+
+	private void saveCloseReader(BufferedReader br) {
+		try {
+			if (br != null) {
+				br.close();
+			}
+		} catch (IOException ignored) {
+		}
 	}
 
 	private JsonAdapter<List<ColorItem>> getColorsListJsonAdapter() {
