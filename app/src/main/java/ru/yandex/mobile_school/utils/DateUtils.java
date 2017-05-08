@@ -34,7 +34,6 @@ public class DateUtils {
 		} catch (Exception ignored) {
 			return null;
 		}
-
 	}
 
 	public static String getFilterString(String paramName, Date startDate, Date endDate) {
@@ -52,6 +51,5 @@ public class DateUtils {
 		} catch (IOException ignored) {
 			return null;
 		}
-
 	}
 }
