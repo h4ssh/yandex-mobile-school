@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="colors_list_filter_first_column_weight">2</integer>
+    <integer name="colors_list_filter_second_column_weight">3</integer>
+    <integer name="colors_list_filter_columns_weight_sum">5</integer>
+</resources>

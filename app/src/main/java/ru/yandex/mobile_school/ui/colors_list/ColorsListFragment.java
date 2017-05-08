@@ -87,7 +87,7 @@ public class ColorsListFragment extends Fragment implements
 		colorsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-				getDeleteAlertDialog().show();
+				getDeleteAlertDialog(position).show();
 				return true;
 			}
 		});
@@ -101,7 +101,7 @@ public class ColorsListFragment extends Fragment implements
 		return view;
 	}
 
-	private AlertDialog getDeleteAlertDialog() {
+	private AlertDialog getDeleteAlertDialog(final int position) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 		builder.setTitle(R.string.delete_dialog_title);
 		builder.setMessage(R.string.delete_dialog_text);
@@ -109,7 +109,7 @@ public class ColorsListFragment extends Fragment implements
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
-				ColorItem item = adapter.getColorItem(which);
+				ColorItem item = adapter.getColorItem(position);
 				adapter.deleteItem(item);
 				DataStorage.get(getContext()).deleteColorItem(item);
 			}
