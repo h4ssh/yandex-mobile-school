@@ -119,7 +119,7 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	public void search(String query) {
 		query = query.toLowerCase();
 		ArrayList<ColorItem> filtered = new ArrayList<>();
-		for (int i=0; i< mColors.size(); i++) {
+		for (int i = 0; i < mColors.size(); i++) {
 			ColorItem item = mColors.get(i);
 			if (item.getTitle().toLowerCase().contains(query) ||
 					item.getDescription().toLowerCase().contains(query))
@@ -162,7 +162,7 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 			FilterResults results = new FilterResults();
 			DateFilter filter = DateUtils.getDateFilter(constraint.toString());
 			ArrayList<ColorItem> filtered = new ArrayList<>();
-			for (int i=0; i< mColors.size(); i++) {
+			for (int i = 0; i < mColors.size(); i++) {
 				if (filter.getParamName().equals(FILTER_PARAM_CREATED)) {
 					if (filter.match(mColors.get(i).getCreatedDate())) {
 						filtered.add(mColors.get(i));
