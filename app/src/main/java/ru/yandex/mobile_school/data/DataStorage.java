@@ -23,6 +23,7 @@ import ru.yandex.mobile_school.db.DbSchema;
 import ru.yandex.mobile_school.db.DbSchema.ColorsTable;
 
 public class DataStorage {
+
 	private static DataStorage sDataStorage;
 	private SQLiteDatabase mDatabase;
 	private BaseHelper mBaseHelper;
@@ -175,3 +176,5 @@ public class DataStorage {
 		return moshi.adapter(type);
 	}
 }
+
+

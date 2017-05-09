@@ -145,6 +145,12 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 		return mItemFilter;
 	}
 
+	public void addItem(ColorItem item) {
+		mColors.add(item);
+		mFiltered.add(item);
+		notifyDataSetChanged();
+	}
+
 	public void changeData(ArrayList<ColorItem> items) {
 		mColors = items;
 		mFiltered = items;

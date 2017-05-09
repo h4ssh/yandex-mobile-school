@@ -17,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -34,16 +33,16 @@ public class ColorsListFragment extends Fragment implements
 		ColorsListSortFragment.ColorsListSortDialogListener,
 		ColorsListFilterFragment.ColorsListFilterDialogListener,
 		ColorsListExportFragment.ColorsListExportDialogListener,
-		ColorsListSearchFragment.ColorsListSearchDialogListener {
+		ColorsListSearchFragment.ColorsListSearchDialogListener,
+		ColorsListAsyncActor.ColorsListAsyncActorListener {
 
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
 
-	private static final String EXTRA_COLOR_ITEMS = "extra_color_items";
 	private static final String EXTRA_EDIT_POSITION = "extra_edit_position";
 
-	private ArrayList<ColorItem> mColors;
 	private int mEditPosition = 0;
+	private ColorsListAsyncActor mAsyncActor;
 
 	@BindView(R.id.colors_list_fab)	FloatingActionButton addColorFAB;
 	@BindView(R.id.colors_list_view) ListView colorsListView;
@@ -58,10 +57,7 @@ public class ColorsListFragment extends Fragment implements
 		setHasOptionsMenu(true);
 
 		if (savedInstanceState != null) {
-			mColors = savedInstanceState.getParcelableArrayList(EXTRA_COLOR_ITEMS);
 			mEditPosition = savedInstanceState.getInt(EXTRA_EDIT_POSITION);
-		} else {
-			mColors = DataStorage.get(getContext()).getColorItems();
 		}
 	}
 
@@ -75,7 +71,9 @@ public class ColorsListFragment extends Fragment implements
 		View view = inflater.inflate(R.layout.fragment_colors_list, container, false);
 		ButterKnife.bind(this, view);
 
-		colorsListView.setAdapter(new ColorsListAdapter(getContext(), mColors));
+		final ColorsListAdapter adapter = new ColorsListAdapter(getContext(), DataStorage.get(getContext()).getColorItems());
+		mAsyncActor = new ColorsListAsyncActor(getContext(), adapter);
+		colorsListView.setAdapter(adapter);
 		colorsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -97,7 +95,14 @@ public class ColorsListFragment extends Fragment implements
 				startActivityForResult(ColorPickerActivity.newIntent(getContext()), REQUEST_CODE_ADD);
 			}
 		});
-
+		addColorFAB.setOnLongClickListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				mAsyncActor.generateItems();
+				return true;
+			}
+		});
+		mAsyncActor.setListener(this);
 		return view;
 	}
 
@@ -127,11 +132,7 @@ public class ColorsListFragment extends Fragment implements
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK) {
 			ColorItem item = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
-			DataStorage.get(getContext()).addColorItem(item);
-			mColors.add(item);
-			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
-			adapter.resetFilters();
-			adapter.resort();
+			addColorItem(item);
 		}
 		if (requestCode == REQUEST_CODE_EDIT) {
 			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
@@ -149,9 +150,14 @@ public class ColorsListFragment extends Fragment implements
 		}
 	}
 
+	private void addColorItem(ColorItem item) {
+		DataStorage.get(getContext()).addColorItem(item);
+		ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
+		adapter.addItem(item);
+	}
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putParcelableArrayList(EXTRA_COLOR_ITEMS, mColors);
 		outState.putInt(EXTRA_EDIT_POSITION, mEditPosition);
 		super.onSaveInstanceState(outState);
 	}
@@ -223,9 +229,9 @@ public class ColorsListFragment extends Fragment implements
 	public void onExportClick(String path) {
 		boolean result = DataStorage.get(getContext()).exportColorItems(path);
 		if (result) {
-			Toast.makeText(getContext(), getString(R.string.colors_list_export_success), Toast.LENGTH_SHORT).show();
+			alert(getString(R.string.colors_list_export_success));
 		} else {
-			Toast.makeText(getContext(), getString(R.string.colors_list_export_error), Toast.LENGTH_SHORT).show();
+			alert(getString(R.string.colors_list_export_error));
 		}
 	}
 
@@ -234,17 +240,30 @@ public class ColorsListFragment extends Fragment implements
 		boolean result = DataStorage.get(getContext()).importColorItems(path);
 		if (result) {
 			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
-			mColors = DataStorage.get(getContext()).getColorItems();
-			adapter.changeData(mColors);
-			Toast.makeText(getContext(), getString(R.string.colors_list_import_success), Toast.LENGTH_SHORT).show();
+			adapter.changeData(DataStorage.get(getContext()).getColorItems());
+			alert(getString(R.string.colors_list_import_success));
 		} else {
-			Toast.makeText(getContext(), getString(R.string.colors_list_import_error), Toast.LENGTH_SHORT).show();
+			alert(getString(R.string.colors_list_import_error));
 		}
+	}
+
+	private void alert(String text) {
+		Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
 	public void onSearchClick(String query) {
 		ColorsListAdapter adapter =  (ColorsListAdapter) colorsListView.getAdapter();
 		adapter.search(query);
+	}
+
+	@Override
+	public void onItemsAddProgress(float percent) {
+		((ColorsListAdapter)colorsListView.getAdapter()).notifyDataSetChanged();
+	}
+
+	@Override
+	public void onItemsAddFinish() {
+		colorsListView.setAdapter(new ColorsListAdapter(getContext(), DataStorage.get(getContext()).getColorItems()));
 	}
 }
