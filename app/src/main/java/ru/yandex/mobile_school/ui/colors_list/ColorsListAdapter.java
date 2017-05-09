@@ -1,6 +1,7 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,11 @@ import ru.yandex.mobile_school.utils.DateUtils;
 
 public class ColorsListAdapter extends BaseAdapter implements Filterable {
 
+	public interface AdapterSortListener {
+		void onSortStart();
+		void onSortFinish();
+	}
+
 	static final String SORT_PARAM_TITLE = "sort_param_title";
 	static final String SORT_PARAM_CREATED = "sort_param_created";
 	static final String SORT_PARAM_EDITED = "sort_param_edited";
@@ -39,11 +45,16 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	private final WeakReference<Context> mWeakContext;
 	private String mSortParam;
 	private boolean mSortAscending;
+	private AdapterSortListener mListener;
 
 	ColorsListAdapter(Context context, ArrayList<ColorItem> items) {
 		mWeakContext = new WeakReference<>(context);
 		mColors = items;
 		mFiltered = items;
+	}
+
+	public void setAdapterSortListener(AdapterSortListener listener) {
+		mListener = listener;
 	}
 
 	static class ViewHolder {
@@ -95,29 +106,51 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	public void sortBy(final String sortParam, final boolean ascending) {
 		mSortParam = sortParam;
 		mSortAscending = ascending;
-		Collections.sort(mFiltered, new Comparator<ColorItem>() {
-			@Override
-			public int compare(ColorItem c1, ColorItem c2) {
-				switch (sortParam) {
-					case SORT_PARAM_TITLE:
-						if (ascending) return c1.getTitle().compareToIgnoreCase(c2.getTitle());
-						else return c2.getTitle().compareToIgnoreCase(c1.getTitle());
-					case SORT_PARAM_CREATED:
-						if (ascending) return c1.getCreatedDate().compareTo(c2.getCreatedDate());
-						else return  c2.getCreatedDate().compareTo(c1.getCreatedDate());
-					case SORT_PARAM_EDITED:
-						if (ascending) return c1.getEditedDate().compareTo(c2.getEditedDate());
-						else return c2.getEditedDate().compareTo(c1.getEditedDate());
-					case SORT_PARAM_VIEWED:
-						if (ascending) return c1.getViewedDate().compareTo(c2.getViewedDate());
-						else return c2.getViewedDate().compareTo(c1.getViewedDate());
-					default:
-						return 0;
-				}
+		AsyncTask task = new AsyncTask<Object, Float, Void>() {
 
+			@Override
+			protected void onPreExecute() {
+				if (mListener != null) {
+					mListener.onSortStart();
+				}
 			}
-		});
-		notifyDataSetChanged();
+
+			@Override
+			protected Void doInBackground(Object[] params) {
+				Collections.sort(mFiltered, new Comparator<ColorItem>() {
+					@Override
+					public int compare(ColorItem c1, ColorItem c2) {
+						switch (sortParam) {
+							case SORT_PARAM_TITLE:
+								if (ascending) return c1.getTitle().compareToIgnoreCase(c2.getTitle());
+								else return c2.getTitle().compareToIgnoreCase(c1.getTitle());
+							case SORT_PARAM_CREATED:
+								if (ascending) return c1.getCreatedDate().compareTo(c2.getCreatedDate());
+								else return  c2.getCreatedDate().compareTo(c1.getCreatedDate());
+							case SORT_PARAM_EDITED:
+								if (ascending) return c1.getEditedDate().compareTo(c2.getEditedDate());
+								else return c2.getEditedDate().compareTo(c1.getEditedDate());
+							case SORT_PARAM_VIEWED:
+								if (ascending) return c1.getViewedDate().compareTo(c2.getViewedDate());
+								else return c2.getViewedDate().compareTo(c1.getViewedDate());
+							default:
+								return 0;
+						}
+
+					}
+				});
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void aVoid) {
+				notifyDataSetChanged();
+				if (mListener != null) {
+					mListener.onSortFinish();
+				}
+			}
+		};
+		task.execute();
 	}
 
 	public void resort() {

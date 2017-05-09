@@ -10,13 +10,15 @@ import ru.yandex.mobile_school.data.DataStorage;
 
 public class ColorsListAsyncActor {
 
-	private static final int GENERATOR_OBJECTS_COUNT = 1000;
+	private static final int GENERATOR_OBJECTS_COUNT = 10000;
 
 
 
 	public interface ColorsListAsyncActorListener {
 		void onItemsAddProgress(float percent);
 		void onItemsAddFinish();
+		void onItemsExportFinish(boolean result);
+		void onItemsImportFinish(boolean result);
 	}
 
 	private ColorsListAsyncActorListener mListener;
@@ -62,42 +64,39 @@ public class ColorsListAsyncActor {
 		task.execute();
 	}
 
-	/*
-	private class AsyncBatchAdd extends AsyncTask<ArrayList<ColorItem>, Float, Boolean> {
-
-		AsyncBatchAdd(Context context, ColorsListAdapterBatchAddListener callback) {
-			mStorage = DataStorage.get(context);
-			mCallback = callback;
-		}
-
-		private ColorsListAdapterBatchAddListener mCallback;
-		private DataStorage mStorage;
-
-		@Override
-		protected Boolean doInBackground(ArrayList<ColorItem>... params) {
-			int progress = 0;
-			int total = params[0].size();
-			for (ColorItem item: params[0]) {
-				mStorage.addColorItem(item);
-				progress++;
-				publishProgress((float)progress / total);
+	public void exportItems(final String destination) {
+		AsyncTask task = new AsyncTask<Object, Float, Boolean>() {
+			@Override
+			protected Boolean doInBackground(Object... params) {
+				return mStorage.exportColorItems(destination);
 			}
-			return null;
-		}
 
-		@Override
-		protected void onProgressUpdate(Float... values) {
-			if (mCallback != null) {
-				mCallback.onAdapterBatchAddProgress(values[0]);
+			@Override
+			protected void onPostExecute(Boolean aBoolean) {
+				if (mListener != null) {
+					mListener.onItemsExportFinish(aBoolean);
+				}
 			}
-		}
+		};
+		task.execute();
+	}
 
-		@Override
-		protected void onPostExecute(Boolean aBoolean) {
-			super.onPostExecute(aBoolean);
-			if (mCallback != null) {
-				mCallback.onAdapterBatchAddFinish();
+	public void importItems(final String source) {
+		AsyncTask<Void, Float, Boolean> task = new AsyncTask<Void, Float, Boolean>() {
+			@Override
+			protected Boolean doInBackground(Void... params) {
+				return mStorage.importColorItems(source);
 			}
-		}
-		*/
+
+			@Override
+			protected void onPostExecute(Boolean aBoolean) {
+				if (mListener != null) {
+					mListener.onItemsImportFinish(aBoolean);
+				}
+			}
+		};
+		task.execute();
+	}
+
+
 }

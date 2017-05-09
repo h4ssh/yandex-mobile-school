@@ -35,6 +35,9 @@
         <item>@string/colors_list_sort_order_ascending</item>
         <item>@string/colors_list_sort_order_descending</item>
     </string-array>
+    <string name="colors_list_sort_started">Sorting, please wait</string>
+    <string name="colors_list_sort_finished">Sorting finished</string>
+
     <string name="colors_list_filter_title">Filter list</string>
     <string name="colors_list_filter_param">Filter by:</string>
     <string name="colors_list_filter_start_date">Start date:</string>

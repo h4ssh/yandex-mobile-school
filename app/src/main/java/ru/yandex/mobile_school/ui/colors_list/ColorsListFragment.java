@@ -34,7 +34,8 @@ public class ColorsListFragment extends Fragment implements
 		ColorsListFilterFragment.ColorsListFilterDialogListener,
 		ColorsListExportFragment.ColorsListExportDialogListener,
 		ColorsListSearchFragment.ColorsListSearchDialogListener,
-		ColorsListAsyncActor.ColorsListAsyncActorListener {
+		ColorsListAsyncActor.ColorsListAsyncActorListener,
+		ColorsListAdapter.AdapterSortListener {
 
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
@@ -43,6 +44,7 @@ public class ColorsListFragment extends Fragment implements
 
 	private int mEditPosition = 0;
 	private ColorsListAsyncActor mAsyncActor;
+	private ColorsListAdapter mListAdapter;
 
 	@BindView(R.id.colors_list_fab)	FloatingActionButton addColorFAB;
 	@BindView(R.id.colors_list_view) ListView colorsListView;
@@ -71,9 +73,10 @@ public class ColorsListFragment extends Fragment implements
 		View view = inflater.inflate(R.layout.fragment_colors_list, container, false);
 		ButterKnife.bind(this, view);
 
-		final ColorsListAdapter adapter = new ColorsListAdapter(getContext(), DataStorage.get(getContext()).getColorItems());
-		mAsyncActor = new ColorsListAsyncActor(getContext(), adapter);
-		colorsListView.setAdapter(adapter);
+		mListAdapter = new ColorsListAdapter(getContext(), DataStorage.get(getContext()).getColorItems());
+		mListAdapter.setAdapterSortListener(this);
+		mAsyncActor = new ColorsListAsyncActor(getContext(), mListAdapter);
+		colorsListView.setAdapter(mListAdapter);
 		colorsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -113,9 +116,8 @@ public class ColorsListFragment extends Fragment implements
 		builder.setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
-				ColorItem item = adapter.getColorItem(position);
-				adapter.deleteItem(item);
+				ColorItem item = mListAdapter.getColorItem(position);
+				mListAdapter.deleteItem(item);
 				DataStorage.get(getContext()).deleteColorItem(item);
 			}
 		});
@@ -135,8 +137,7 @@ public class ColorsListFragment extends Fragment implements
 			addColorItem(item);
 		}
 		if (requestCode == REQUEST_CODE_EDIT) {
-			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
-			ColorItem old = adapter.getColorItem(mEditPosition);
+			ColorItem old = mListAdapter.getColorItem(mEditPosition);
 			ColorItem updated;
 			if (resultCode == RESULT_OK) {
 				updated = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
@@ -145,15 +146,14 @@ public class ColorsListFragment extends Fragment implements
 				updated.setViewed();
 			}
 			old.updateWith(updated);
-			adapter.resort();
+			mListAdapter.resort();
 			DataStorage.get(getContext()).updateColorItem(updated);
 		}
 	}
 
 	private void addColorItem(ColorItem item) {
 		DataStorage.get(getContext()).addColorItem(item);
-		ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
-		adapter.addItem(item);
+		mListAdapter.addItem(item);
 	}
 
 	@Override
@@ -186,8 +186,7 @@ public class ColorsListFragment extends Fragment implements
 				searchFragment.show(getActivity().getSupportFragmentManager(), "");
 				break;
 			case R.id.colors_list_menu_reset:
-				ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
-				adapter.resetFilters();
+				mListAdapter.resetFilters();
 				break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -198,15 +197,14 @@ public class ColorsListFragment extends Fragment implements
 		Resources res = getResources();
 		String[] sortParams = res.getStringArray(R.array.colors_list_sort_by_items);
 		String selectedParam = sortParams[sortParam];
-		ColorsListAdapter adapter =  (ColorsListAdapter) colorsListView.getAdapter();
 		if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_title)))
-			adapter.sortBy(ColorsListAdapter.SORT_PARAM_TITLE, ascending);
+			mListAdapter.sortBy(ColorsListAdapter.SORT_PARAM_TITLE, ascending);
 		else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_created)))
-			adapter.sortBy(ColorsListAdapter.SORT_PARAM_CREATED, ascending);
+			mListAdapter.sortBy(ColorsListAdapter.SORT_PARAM_CREATED, ascending);
 		else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_edited)))
-			adapter.sortBy(ColorsListAdapter.SORT_PARAM_EDITED, ascending);
+			mListAdapter.sortBy(ColorsListAdapter.SORT_PARAM_EDITED, ascending);
 		else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_viewed)))
-			adapter.sortBy(ColorsListAdapter.SORT_PARAM_VIEWED, ascending);
+			mListAdapter.sortBy(ColorsListAdapter.SORT_PARAM_VIEWED, ascending);
 	}
 
 	@Override
@@ -221,30 +219,17 @@ public class ColorsListFragment extends Fragment implements
 			filterName = ColorsListAdapter.FILTER_PARAM_EDITED;
 		else if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_viewed)))
 			filterName = ColorsListAdapter.FILTER_PARAM_VIEWED;
-		ColorsListAdapter adapter =  (ColorsListAdapter) colorsListView.getAdapter();
-		adapter.getFilter().filter(DateUtils.getFilterString(filterName, startDate, endDate));
+		mListAdapter.getFilter().filter(DateUtils.getFilterString(filterName, startDate, endDate));
 	}
 
 	@Override
 	public void onExportClick(String path) {
-		boolean result = DataStorage.get(getContext()).exportColorItems(path);
-		if (result) {
-			alert(getString(R.string.colors_list_export_success));
-		} else {
-			alert(getString(R.string.colors_list_export_error));
-		}
+		mAsyncActor.exportItems(path);
 	}
 
 	@Override
 	public void onImportClick(String path) {
-		boolean result = DataStorage.get(getContext()).importColorItems(path);
-		if (result) {
-			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
-			adapter.changeData(DataStorage.get(getContext()).getColorItems());
-			alert(getString(R.string.colors_list_import_success));
-		} else {
-			alert(getString(R.string.colors_list_import_error));
-		}
+		mAsyncActor.importItems(path);
 	}
 
 	private void alert(String text) {
@@ -253,17 +238,45 @@ public class ColorsListFragment extends Fragment implements
 
 	@Override
 	public void onSearchClick(String query) {
-		ColorsListAdapter adapter =  (ColorsListAdapter) colorsListView.getAdapter();
-		adapter.search(query);
+		mListAdapter.search(query);
 	}
 
 	@Override
 	public void onItemsAddProgress(float percent) {
-		((ColorsListAdapter)colorsListView.getAdapter()).notifyDataSetChanged();
+		//
 	}
 
 	@Override
 	public void onItemsAddFinish() {
-		colorsListView.setAdapter(new ColorsListAdapter(getContext(), DataStorage.get(getContext()).getColorItems()));
+		mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
+	}
+
+	@Override
+	public void onItemsExportFinish(boolean result) {
+		if (result) {
+			alert(getString(R.string.colors_list_export_success));
+		} else {
+			alert(getString(R.string.colors_list_export_error));
+		}
+	}
+
+	@Override
+	public void onItemsImportFinish(boolean result) {
+		if (result) {
+			mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
+			alert(getString(R.string.colors_list_import_success));
+		} else {
+			alert(getString(R.string.colors_list_import_error));
+		}
+	}
+
+	@Override
+	public void onSortStart() {
+		alert(getString(R.string.colors_list_sort_started));
+	}
+
+	@Override
+	public void onSortFinish() {
+		alert(getString(R.string.colors_list_sort_finished));
 	}
 }
