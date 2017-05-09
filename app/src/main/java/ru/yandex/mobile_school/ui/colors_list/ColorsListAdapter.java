@@ -23,6 +23,7 @@ import ru.yandex.mobile_school.utils.DateFilter;
 import ru.yandex.mobile_school.utils.DateUtils;
 
 public class ColorsListAdapter extends BaseAdapter implements Filterable {
+
 	private ArrayList<ColorItem> mColors;
 	private ArrayList<ColorItem> mFiltered;
 	private ItemFilter mItemFilter = new ItemFilter();
@@ -36,7 +37,6 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	static final String FILTER_PARAM_CREATED = "filter_param_created";
 	static final String FILTER_PARAM_EDITED = "filter_param_edited";
 	static final String FILTER_PARAM_VIEWED = "filter_param_viewed";
-
 
 	ColorsListAdapter(Context context, ArrayList<ColorItem> items) {
 		mWeakContext = new WeakReference<>(context);
@@ -132,6 +132,12 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	@Override
 	public Filter getFilter() {
 		return mItemFilter;
+	}
+
+	public void addItem(ColorItem item) {
+		mColors.add(item);
+		mFiltered.add(item);
+		notifyDataSetChanged();
 	}
 
 	public void changeData(ArrayList<ColorItem> items) {
