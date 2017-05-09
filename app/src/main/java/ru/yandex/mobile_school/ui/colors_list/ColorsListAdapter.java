@@ -23,10 +23,6 @@ import ru.yandex.mobile_school.utils.DateFilter;
 import ru.yandex.mobile_school.utils.DateUtils;
 
 public class ColorsListAdapter extends BaseAdapter implements Filterable {
-	private ArrayList<ColorItem> mColors;
-	private ArrayList<ColorItem> mFiltered;
-	private ItemFilter mItemFilter = new ItemFilter();
-	private final WeakReference<Context> mWeakContext;
 
 	static final String SORT_PARAM_TITLE = "sort_param_title";
 	static final String SORT_PARAM_CREATED = "sort_param_created";
@@ -37,6 +33,12 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	static final String FILTER_PARAM_EDITED = "filter_param_edited";
 	static final String FILTER_PARAM_VIEWED = "filter_param_viewed";
 
+	private ArrayList<ColorItem> mColors;
+	private ArrayList<ColorItem> mFiltered;
+	private ItemFilter mItemFilter = new ItemFilter();
+	private final WeakReference<Context> mWeakContext;
+	private String mSortParam;
+	private boolean mSortAscending;
 
 	ColorsListAdapter(Context context, ArrayList<ColorItem> items) {
 		mWeakContext = new WeakReference<>(context);
@@ -91,6 +93,8 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	}
 
 	public void sortBy(final String sortParam, final boolean ascending) {
+		mSortParam = sortParam;
+		mSortAscending = ascending;
 		Collections.sort(mFiltered, new Comparator<ColorItem>() {
 			@Override
 			public int compare(ColorItem c1, ColorItem c2) {
@@ -113,6 +117,13 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 
 			}
 		});
+		notifyDataSetChanged();
+	}
+
+	public void resort() {
+		if (mSortParam != null) {
+			sortBy(mSortParam, mSortAscending);
+		}
 		notifyDataSetChanged();
 	}
 

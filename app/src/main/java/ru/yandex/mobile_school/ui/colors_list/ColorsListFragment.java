@@ -131,6 +131,7 @@ public class ColorsListFragment extends Fragment implements
 			mColors.add(item);
 			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
 			adapter.resetFilters();
+			adapter.resort();
 		}
 		if (requestCode == REQUEST_CODE_EDIT) {
 			ColorsListAdapter adapter = (ColorsListAdapter) colorsListView.getAdapter();
@@ -143,7 +144,7 @@ public class ColorsListFragment extends Fragment implements
 				updated.setViewed();
 			}
 			old.updateWith(updated);
-			adapter.notifyDataSetChanged();
+			adapter.resort();
 			DataStorage.get(getContext()).updateColorItem(updated);
 		}
 	}
