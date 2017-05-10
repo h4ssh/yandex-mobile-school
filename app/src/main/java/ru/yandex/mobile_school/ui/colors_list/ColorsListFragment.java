@@ -270,6 +270,10 @@ public class ColorsListFragment extends Fragment implements
 		}
 	}
 
+	private void alert(String text) {
+		Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+	}
+
 	@Override
 	public void onSortStart() {
 		alert(getString(R.string.colors_list_sort_started));
