@@ -232,10 +232,6 @@ public class ColorsListFragment extends Fragment implements
 		mAsyncActor.importItems(path);
 	}
 
-	private void alert(String text) {
-		Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
-	}
-
 	@Override
 	public void onSearchClick(String query) {
 		mListAdapter.search(query);
