@@ -14,6 +14,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,9 +26,9 @@ import ru.yandex.mobile_school.utils.DateUtils;
 
 public class ColorsListAdapter extends BaseAdapter implements Filterable {
 
-	public interface AdapterSortListener {
-		void onSortStart();
+	public interface AdapterAsyncActionsListener {
 		void onSortFinish();
+		void onFilterFinish();
 	}
 
 	static final String SORT_PARAM_TITLE = "sort_param_title";
@@ -45,7 +46,7 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	private final WeakReference<Context> mWeakContext;
 	private String mSortParam;
 	private boolean mSortAscending;
-	private AdapterSortListener mListener;
+	private AdapterAsyncActionsListener mListener;
 
 	ColorsListAdapter(Context context, ArrayList<ColorItem> items) {
 		mWeakContext = new WeakReference<>(context);
@@ -53,7 +54,7 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 		mFiltered = items;
 	}
 
-	public void setAdapterSortListener(AdapterSortListener listener) {
+	public void setAdapterSortListener(AdapterAsyncActionsListener listener) {
 		mListener = listener;
 	}
 
@@ -107,13 +108,6 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 		mSortParam = sortParam;
 		mSortAscending = ascending;
 		AsyncTask task = new AsyncTask<Object, Float, Void>() {
-
-			@Override
-			protected void onPreExecute() {
-				if (mListener != null) {
-					mListener.onSortStart();
-				}
-			}
 
 			@Override
 			protected Void doInBackground(Object[] params) {
@@ -205,28 +199,50 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 		return mFiltered.get(position);
 	}
 
+
+	public void filter(String paramName, Date startDate, Date endDate) {
+		AsyncTask task = new AsyncTask<String, Void, Void>() {
+			@Override
+			protected Void doInBackground(String... params) {
+				getFilter().filter(params[0]);
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void aVoid) {
+				if (mListener != null) {
+					mListener.onFilterFinish();
+				}
+			}
+		};
+		task.execute(new String[] {DateUtils.getFilterString(paramName, startDate, endDate)});
+	}
+
 	private class ItemFilter extends Filter {
 
 		@Override
 		protected FilterResults performFiltering(CharSequence constraint) {
 			FilterResults results = new FilterResults();
+
 			DateFilter filter = DateUtils.getDateFilter(constraint.toString());
 			ArrayList<ColorItem> filtered = new ArrayList<>();
 			for (int i = 0; i < mColors.size(); i++) {
-				if (filter.getParamName().equals(FILTER_PARAM_CREATED)) {
-					if (filter.match(mColors.get(i).getCreatedDate())) {
-						filtered.add(mColors.get(i));
-					}
-				} else
-				if (filter.getParamName().equals(FILTER_PARAM_EDITED)) {
-					if (filter.match(mColors.get(i).getEditedDate())) {
-						filtered.add(mColors.get(i));
-					}
-				} else
-				if (filter.getParamName().equals(FILTER_PARAM_VIEWED)) {
-					if (filter.match(mColors.get(i).getViewedDate())) {
-						filtered.add(mColors.get(i));
-					}
+				switch (filter.getParamName()) {
+					case FILTER_PARAM_CREATED:
+						if (filter.match(mColors.get(i).getCreatedDate())) {
+							filtered.add(mColors.get(i));
+						}
+						break;
+					case FILTER_PARAM_EDITED:
+						if (filter.match(mColors.get(i).getEditedDate())) {
+							filtered.add(mColors.get(i));
+						}
+						break;
+					case FILTER_PARAM_VIEWED:
+						if (filter.match(mColors.get(i).getViewedDate())) {
+							filtered.add(mColors.get(i));
+						}
+						break;
 				}
 			}
 			results.count = filtered.size();

@@ -10,24 +10,18 @@ import ru.yandex.mobile_school.data.DataStorage;
 
 public class ColorsListAsyncActor {
 
-	private static final int GENERATOR_OBJECTS_COUNT = 10000;
-
-
-
 	public interface ColorsListAsyncActorListener {
-		void onItemsAddProgress(float percent);
 		void onItemsAddFinish();
+		void onItemsAddProgress(int percent);
 		void onItemsExportFinish(boolean result);
 		void onItemsImportFinish(boolean result);
 	}
 
 	private ColorsListAsyncActorListener mListener;
 
-	private ColorsListAdapter mListAdapter;
 	private DataStorage mStorage;
 
-	public ColorsListAsyncActor(Context context, ColorsListAdapter adapter) {
-		mListAdapter = adapter;
+	public ColorsListAsyncActor(Context context) {
 		mStorage = DataStorage.get(context);
 	}
 
@@ -35,20 +29,28 @@ public class ColorsListAsyncActor {
 		mListener = listener;
 	}
 
-	public void generateItems() {
-		AsyncTask task = new AsyncTask<Object, Float, Void>() {
+	public void generateItems(final int quantity) {
+		AsyncTask task = new AsyncTask<Object, Integer, Void>() {
+
+			private int oldProgress = 0;
+			private int newProgress = 0;
+
 			@Override
 			protected Void doInBackground(Object... params) {
-				for (int i = 0; i < GENERATOR_OBJECTS_COUNT; i++) {
+				for (int i = 0; i < quantity; i++) {
 					ColorItem item = ColorItemGenerator.generate();
 					mStorage.addColorItem(item);
-					publishProgress((float)i/GENERATOR_OBJECTS_COUNT);
+					newProgress = 100*i/quantity;
+					if (newProgress > oldProgress) {
+						oldProgress = newProgress;
+						publishProgress(newProgress);
+					}
 				}
 				return null;
 			}
 
 			@Override
-			protected void onProgressUpdate(Float... values) {
+			protected void onProgressUpdate(Integer... values) {
 				if (mListener != null) {
 					mListener.onItemsAddProgress(values[0]);
 				}

@@ -1,11 +1,14 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.Date;
@@ -25,7 +29,6 @@ import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.data.DataStorage;
 import ru.yandex.mobile_school.ui.color_picker.ColorPickerActivity;
-import ru.yandex.mobile_school.utils.DateUtils;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -34,20 +37,27 @@ public class ColorsListFragment extends Fragment implements
 		ColorsListFilterFragment.ColorsListFilterDialogListener,
 		ColorsListExportFragment.ColorsListExportDialogListener,
 		ColorsListSearchFragment.ColorsListSearchDialogListener,
+		ColorsListGenerateFragment.ColorsListGenerateDialogListener,
 		ColorsListAsyncActor.ColorsListAsyncActorListener,
-		ColorsListAdapter.AdapterSortListener {
+		ColorsListAdapter.AdapterAsyncActionsListener {
 
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
+	private static final int ASYNC_ACTION_NOTIFICATION_ID = 111;
 
 	private static final String EXTRA_EDIT_POSITION = "extra_edit_position";
 
 	private int mEditPosition = 0;
+	private int mPendingOperations = 0;
 	private ColorsListAsyncActor mAsyncActor;
 	private ColorsListAdapter mListAdapter;
+	private NotificationManager mNotifyManager;
+	private NotificationCompat.Builder mBuilder;
 
-	@BindView(R.id.colors_list_fab)	FloatingActionButton addColorFAB;
-	@BindView(R.id.colors_list_view) ListView colorsListView;
+
+	@BindView(R.id.colors_list_fab)	FloatingActionButton mAddColorFAB;
+	@BindView(R.id.colors_list_progress_bar) ProgressBar mProgressBar;
+	@BindView(R.id.colors_list_view) ListView mColorsListView;
 
 	static ColorsListFragment newInstance() {
 		return new ColorsListFragment();
@@ -73,40 +83,47 @@ public class ColorsListFragment extends Fragment implements
 		View view = inflater.inflate(R.layout.fragment_colors_list, container, false);
 		ButterKnife.bind(this, view);
 
+		displayProgressBarIfNeeded(null);
 		mListAdapter = new ColorsListAdapter(getContext(), DataStorage.get(getContext()).getColorItems());
 		mListAdapter.setAdapterSortListener(this);
-		mAsyncActor = new ColorsListAsyncActor(getContext(), mListAdapter);
-		colorsListView.setAdapter(mListAdapter);
-		colorsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		mAsyncActor = new ColorsListAsyncActor(getContext());
+		mColorsListView.setAdapter(mListAdapter);
+		mColorsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				mEditPosition = position;
-				ColorItem item = ((ColorsListAdapter)colorsListView.getAdapter()).getColorItem(position);
+				ColorItem item = ((ColorsListAdapter) mColorsListView.getAdapter()).getColorItem(position);
 				startActivityForResult(ColorPickerActivity.newIntent(getContext(), item), REQUEST_CODE_EDIT);
 			}
 		});
-		colorsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+		mColorsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 				getDeleteAlertDialog(position).show();
 				return true;
 			}
 		});
-		addColorFAB.setOnClickListener(new View.OnClickListener() {
+		mAddColorFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startActivityForResult(ColorPickerActivity.newIntent(getContext()), REQUEST_CODE_ADD);
 			}
 		});
-		addColorFAB.setOnLongClickListener(new View.OnLongClickListener() {
+		mAddColorFAB.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				mAsyncActor.generateItems();
+				ColorsListGenerateFragment filterFragment = new ColorsListGenerateFragment();
+				filterFragment.setTargetFragment(getFragment(), 0);
+				filterFragment.show(getActivity().getSupportFragmentManager(), "");
 				return true;
 			}
 		});
 		mAsyncActor.setListener(this);
 		return view;
+	}
+
+	private ColorsListFragment getFragment() {
+		return this;
 	}
 
 	private AlertDialog getDeleteAlertDialog(final int position) {
@@ -146,6 +163,8 @@ public class ColorsListFragment extends Fragment implements
 				updated.setViewed();
 			}
 			old.updateWith(updated);
+			displayProgressBarIfNeeded(true);
+			alert(getString(R.string.colors_list_sort_started));
 			mListAdapter.resort();
 			DataStorage.get(getContext()).updateColorItem(updated);
 		}
@@ -154,6 +173,34 @@ public class ColorsListFragment extends Fragment implements
 	private void addColorItem(ColorItem item) {
 		DataStorage.get(getContext()).addColorItem(item);
 		mListAdapter.addItem(item);
+	}
+
+	private void alert(String text) {
+		Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+	}
+
+	private void displayProgressBarIfNeeded(Boolean opStart) {
+		if (opStart != null) {
+			if (opStart) {
+				mPendingOperations++;
+			} else {
+				mPendingOperations--;
+			}
+		}
+		if (mPendingOperations > 0) {
+			mProgressBar.setVisibility(View.VISIBLE);
+		} else {
+			mProgressBar.setVisibility(View.GONE);
+		}
+	}
+
+	private void showGenerateNotification() {
+		mNotifyManager =
+				(NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+		mBuilder = new NotificationCompat.Builder(getContext());
+		mBuilder.setContentTitle("Generate items")
+				.setContentText("Generating in progress")
+				.setSmallIcon(R.drawable.ic_add_white_24dp);
 	}
 
 	@Override
@@ -194,6 +241,8 @@ public class ColorsListFragment extends Fragment implements
 
 	@Override
 	public void onSortPositiveClick(int sortParam, boolean ascending) {
+		displayProgressBarIfNeeded(true);
+		alert(getString(R.string.colors_list_sort_started));
 		Resources res = getResources();
 		String[] sortParams = res.getStringArray(R.array.colors_list_sort_by_items);
 		String selectedParam = sortParams[sortParam];
@@ -209,6 +258,8 @@ public class ColorsListFragment extends Fragment implements
 
 	@Override
 	public void onFilterPositiveClick(int filterParam, Date startDate, Date endDate) {
+		displayProgressBarIfNeeded(true);
+		alert(getString(R.string.colors_list_filter_started));
 		Resources res = getResources();
 		String[] filterParams = res.getStringArray(R.array.colors_list_filter_by_items);
 		String selectedParam = filterParams[filterParam];
@@ -219,16 +270,18 @@ public class ColorsListFragment extends Fragment implements
 			filterName = ColorsListAdapter.FILTER_PARAM_EDITED;
 		else if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_viewed)))
 			filterName = ColorsListAdapter.FILTER_PARAM_VIEWED;
-		mListAdapter.getFilter().filter(DateUtils.getFilterString(filterName, startDate, endDate));
+		mListAdapter.filter(filterName, startDate, endDate);
 	}
 
 	@Override
 	public void onExportClick(String path) {
+		displayProgressBarIfNeeded(true);
 		mAsyncActor.exportItems(path);
 	}
 
 	@Override
 	public void onImportClick(String path) {
+		displayProgressBarIfNeeded(true);
 		mAsyncActor.importItems(path);
 	}
 
@@ -238,17 +291,23 @@ public class ColorsListFragment extends Fragment implements
 	}
 
 	@Override
-	public void onItemsAddProgress(float percent) {
-		//
+	public void onItemsAddFinish() {
+		displayProgressBarIfNeeded(false);
+		mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
+		alert(getString(R.string.colors_list_generator_finish));
+		mBuilder.setContentText("Generating complete").setProgress(0,0,false);
+		mNotifyManager.notify(ASYNC_ACTION_NOTIFICATION_ID, mBuilder.build());
 	}
 
 	@Override
-	public void onItemsAddFinish() {
-		mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
+	public void onItemsAddProgress(int percent) {
+		mBuilder.setProgress(100, percent, false);
+		mNotifyManager.notify(ASYNC_ACTION_NOTIFICATION_ID, mBuilder.build());
 	}
 
 	@Override
 	public void onItemsExportFinish(boolean result) {
+		displayProgressBarIfNeeded(false);
 		if (result) {
 			alert(getString(R.string.colors_list_export_success));
 		} else {
@@ -258,6 +317,7 @@ public class ColorsListFragment extends Fragment implements
 
 	@Override
 	public void onItemsImportFinish(boolean result) {
+		displayProgressBarIfNeeded(false);
 		if (result) {
 			mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
 			alert(getString(R.string.colors_list_import_success));
@@ -266,17 +326,23 @@ public class ColorsListFragment extends Fragment implements
 		}
 	}
 
-	private void alert(String text) {
-		Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	public void onSortStart() {
-		alert(getString(R.string.colors_list_sort_started));
-	}
-
 	@Override
 	public void onSortFinish() {
+		displayProgressBarIfNeeded(false);
 		alert(getString(R.string.colors_list_sort_finished));
+	}
+
+	@Override
+	public void onFilterFinish() {
+		displayProgressBarIfNeeded(false);
+		alert(getString(R.string.colors_list_filter_finished));
+	}
+
+	@Override
+	public void onGenerate(int quantity) {
+		alert(getString(R.string.colors_list_generator_start));
+		displayProgressBarIfNeeded(true);
+		showGenerateNotification();
+		mAsyncActor.generateItems(quantity);
 	}
 }
