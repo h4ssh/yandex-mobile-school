@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/colors_list_item_height">
-        <ru.yandex.mobile_school.ColorView
+        <ru.yandex.mobile_school.ui.views.ColorView
             android:id="@+id/colors_list_item_color_view"
             android:layout_width="@dimen/colors_list_item_preview_size"
             android:layout_height="@dimen/colors_list_item_preview_size"

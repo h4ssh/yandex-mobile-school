@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ru.yandex.mobile_school.LockableScrollView
+<ru.yandex.mobile_school.ui.views.LockableScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/colors_picker_main_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="@dimen/color_fragment_default_margin"
     android:layout_marginRight="@dimen/color_fragment_default_margin"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     >
     <LinearLayout
         android:orientation="vertical"
@@ -31,7 +33,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="@dimen/color_fragment_between_margin">
-        <ru.yandex.mobile_school.ColorView
+        <ru.yandex.mobile_school.ui.views.ColorView
             android:id="@+id/current_color_view"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -76,7 +78,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ru.yandex.mobile_school.LockableHorizontalScrollView
+    <ru.yandex.mobile_school.ui.views.LockableHorizontalScrollView
         android:orientation="horizontal"
         android:id="@+id/colors_scroll_view"
         android:layout_width="wrap_content"
@@ -89,14 +91,33 @@
             android:orientation="horizontal"
             android:background="@drawable/hue">
         </LinearLayout>
-    </ru.yandex.mobile_school.LockableHorizontalScrollView>
+    </ru.yandex.mobile_school.ui.views.LockableHorizontalScrollView>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/color_picker_date_created"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/color_picker_date_edited"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/color_picker_date_viewed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
 
     <TextView
         android:id="@+id/textView"
         android:layout_marginTop="@dimen/color_fragment_between_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/favorite_colors_title"
+        android:text="@string/color_picker_favorite_colors_title"
         android:textSize="@dimen/color_fragment_title_font_size"/>
 
     <HorizontalScrollView
@@ -112,4 +133,4 @@
         </LinearLayout>
     </HorizontalScrollView>
     </LinearLayout>
-</ru.yandex.mobile_school.LockableScrollView>
+</ru.yandex.mobile_school.ui.views.LockableScrollView>
