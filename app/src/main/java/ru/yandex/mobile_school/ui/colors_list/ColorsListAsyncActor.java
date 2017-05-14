@@ -13,8 +13,8 @@ public class ColorsListAsyncActor {
 	public interface ColorsListAsyncActorListener {
 		void onItemsAddFinish();
 		void onItemsAddProgress(int percent);
-		void onItemsExportFinish(boolean result);
-		void onItemsImportFinish(boolean result);
+//		void onItemsExportFinish(boolean result);
+//		void onItemsImportFinish(boolean result);
 	}
 
 	private ColorsListAsyncActorListener mListener;
@@ -66,39 +66,39 @@ public class ColorsListAsyncActor {
 		task.execute();
 	}
 
-	public void exportItems(final String destination) {
-		AsyncTask task = new AsyncTask<Object, Float, Boolean>() {
-			@Override
-			protected Boolean doInBackground(Object... params) {
-				return mStorage.exportColorItems(destination);
-			}
-
-			@Override
-			protected void onPostExecute(Boolean aBoolean) {
-				if (mListener != null) {
-					mListener.onItemsExportFinish(aBoolean);
-				}
-			}
-		};
-		task.execute();
-	}
-
-	public void importItems(final String source) {
-		AsyncTask<Void, Float, Boolean> task = new AsyncTask<Void, Float, Boolean>() {
-			@Override
-			protected Boolean doInBackground(Void... params) {
-				return mStorage.importColorItems(source);
-			}
-
-			@Override
-			protected void onPostExecute(Boolean aBoolean) {
-				if (mListener != null) {
-					mListener.onItemsImportFinish(aBoolean);
-				}
-			}
-		};
-		task.execute();
-	}
+//	public void exportItems(final String destination) {
+//		AsyncTask task = new AsyncTask<Object, Float, Boolean>() {
+//			@Override
+//			protected Boolean doInBackground(Object... params) {
+//				return mStorage.exportColorItems(destination);
+//			}
+//
+//			@Override
+//			protected void onPostExecute(Boolean aBoolean) {
+//				if (mListener != null) {
+//					mListener.onItemsExportFinish(aBoolean);
+//				}
+//			}
+//		};
+//		task.execute();
+//	}
+//
+//	public void importItems(final String source) {
+//		AsyncTask<Void, Float, Boolean> task = new AsyncTask<Void, Float, Boolean>() {
+//			@Override
+//			protected Boolean doInBackground(Void... params) {
+//				return mStorage.importColorItems(source);
+//			}
+//
+//			@Override
+//			protected void onPostExecute(Boolean aBoolean) {
+//				if (mListener != null) {
+//					mListener.onItemsImportFinish(aBoolean);
+//				}
+//			}
+//		};
+//		task.execute();
+//	}
 
 
 }

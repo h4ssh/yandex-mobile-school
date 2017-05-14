@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
@@ -39,7 +40,8 @@ public class ColorsListFragment extends Fragment implements
 		ColorsListSearchFragment.ColorsListSearchDialogListener,
 		ColorsListGenerateFragment.ColorsListGenerateDialogListener,
 		ColorsListAsyncActor.ColorsListAsyncActorListener,
-		ColorsListAdapter.AdapterAsyncActionsListener {
+		ColorsListAdapter.AdapterAsyncActionsListener,
+		ColorsListLooperThread.Callback {
 
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
@@ -53,6 +55,7 @@ public class ColorsListFragment extends Fragment implements
 	private ColorsListAdapter mListAdapter;
 	private NotificationManager mNotifyManager;
 	private NotificationCompat.Builder mBuilder;
+	private ColorsListLooperThread mLooperThread;
 
 
 	@BindView(R.id.colors_list_fab)	FloatingActionButton mAddColorFAB;
@@ -71,6 +74,15 @@ public class ColorsListFragment extends Fragment implements
 		if (savedInstanceState != null) {
 			mEditPosition = savedInstanceState.getInt(EXTRA_EDIT_POSITION);
 		}
+		mLooperThread = new ColorsListLooperThread(getContext(), new Handler(), this);
+		mLooperThread.start();
+		mLooperThread.prepareHandler();
+	}
+
+	@Override
+	public void onDestroy() {
+		mLooperThread.quit();
+		super.onDestroy();
 	}
 
 	@Override
@@ -276,13 +288,15 @@ public class ColorsListFragment extends Fragment implements
 	@Override
 	public void onExportClick(String path) {
 		displayProgressBarIfNeeded(true);
-		mAsyncActor.exportItems(path);
+		//mAsyncActor.exportItems(path);
+		mLooperThread.queueTask(path, ColorsListLooperThread.WHAT_EXPORT);
 	}
 
 	@Override
 	public void onImportClick(String path) {
 		displayProgressBarIfNeeded(true);
-		mAsyncActor.importItems(path);
+		//mAsyncActor.importItems(path);
+		mLooperThread.queueTask(path, ColorsListLooperThread.WHAT_IMPORT);
 	}
 
 	@Override
@@ -305,26 +319,26 @@ public class ColorsListFragment extends Fragment implements
 		mNotifyManager.notify(ASYNC_ACTION_NOTIFICATION_ID, mBuilder.build());
 	}
 
-	@Override
-	public void onItemsExportFinish(boolean result) {
-		displayProgressBarIfNeeded(false);
-		if (result) {
-			alert(getString(R.string.colors_list_export_success));
-		} else {
-			alert(getString(R.string.colors_list_export_error));
-		}
-	}
-
-	@Override
-	public void onItemsImportFinish(boolean result) {
-		displayProgressBarIfNeeded(false);
-		if (result) {
-			mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
-			alert(getString(R.string.colors_list_import_success));
-		} else {
-			alert(getString(R.string.colors_list_import_error));
-		}
-	}
+//	@Override
+//	public void onItemsExportFinish(boolean result) {
+//		displayProgressBarIfNeeded(false);
+//		if (result) {
+//			alert(getString(R.string.colors_list_export_success));
+//		} else {
+//			alert(getString(R.string.colors_list_export_error));
+//		}
+//	}
+//
+//	@Override
+//	public void onItemsImportFinish(boolean result) {
+//		displayProgressBarIfNeeded(false);
+//		if (result) {
+//			mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
+//			alert(getString(R.string.colors_list_import_success));
+//		} else {
+//			alert(getString(R.string.colors_list_import_error));
+//		}
+//	}
 
 	@Override
 	public void onSortFinish() {
@@ -344,5 +358,26 @@ public class ColorsListFragment extends Fragment implements
 		displayProgressBarIfNeeded(true);
 		showGenerateNotification();
 		mAsyncActor.generateItems(quantity);
+	}
+
+	@Override
+	public void onColorsExported(boolean result) {
+		displayProgressBarIfNeeded(false);
+		if (result) {
+			alert(getString(R.string.colors_list_export_success));
+		} else {
+			alert(getString(R.string.colors_list_export_error));
+		}
+	}
+
+	@Override
+	public void onColorsImported(boolean result) {
+		displayProgressBarIfNeeded(false);
+		if (result) {
+			mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
+			alert(getString(R.string.colors_list_import_success));
+		} else {
+			alert(getString(R.string.colors_list_import_error));
+		}
 	}
 }
