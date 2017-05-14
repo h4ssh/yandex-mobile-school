@@ -150,6 +150,8 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	public void resort() {
 		if (mSortParam != null) {
 			sortBy(mSortParam, mSortAscending);
+		} else  if (mListener != null){
+			mListener.onSortFinish();
 		}
 		notifyDataSetChanged();
 	}
