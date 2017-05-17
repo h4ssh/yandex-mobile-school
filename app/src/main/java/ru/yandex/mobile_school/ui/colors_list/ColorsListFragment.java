@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,10 +24,14 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.yandex.mobile_school.R;
+import ru.yandex.mobile_school.api.Note;
+import ru.yandex.mobile_school.api.NotesAPIClient;
 import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.data.DataStorage;
 import ru.yandex.mobile_school.ui.color_picker.ColorPickerActivity;
@@ -41,7 +46,8 @@ public class ColorsListFragment extends Fragment implements
 		ColorsListGenerateFragment.ColorsListGenerateDialogListener,
 		ColorsListAsyncActor.ColorsListAsyncActorListener,
 		ColorsListAdapter.AdapterAsyncActionsListener,
-		ColorsListLooperThread.Callback {
+		ColorsListLooperThread.Callback,
+		NotesAPIClient.NotesAPICallbacks {
 
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
@@ -184,6 +190,7 @@ public class ColorsListFragment extends Fragment implements
 
 	private void addColorItem(ColorItem item) {
 		DataStorage.get(getContext()).addColorItem(item);
+		NotesAPIClient.get().addUserNote(DataStorage.DEFAULT_USER_ID, item.getId(), item.toNote(), this);
 		mListAdapter.addItem(item);
 	}
 
@@ -379,5 +386,26 @@ public class ColorsListFragment extends Fragment implements
 		} else {
 			alert(getString(R.string.colors_list_import_error));
 		}
+	}
+
+	private static final String TAG_API = "API CALLBACKS";
+
+	@Override
+	public void onGetUserNotes(int user, List<ColorItem> items) {
+
+	}
+
+	@Override
+	public void onAddUserNote(int user, UUID id, int noteId) {
+		Log.d(TAG_API, "On add user note: " + user + " UUID: " + id.toString() + " noteId: " + noteId);
+		DataStorage storage = DataStorage.get(getContext());
+		ColorItem item = storage.getColorItem(id);
+		item.setServerId(noteId);
+		storage.updateColorItem(item);
+	}
+
+	@Override
+	public void onError(String message) {
+		Log.d(TAG_API, "Error: " + message);
 	}
 }

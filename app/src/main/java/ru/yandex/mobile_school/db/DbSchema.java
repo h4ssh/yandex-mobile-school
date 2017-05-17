@@ -12,6 +12,7 @@ public class DbSchema {
 			public static final String CREATED = "created";
 			public static final String EDITED = "edited";
 			public static final String VIEWED = "viewed";
+			public static final String SERVER_ID = "server_id";
 		}
 	}
 

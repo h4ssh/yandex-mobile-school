@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import ru.yandex.mobile_school.db.BaseHelper;
 import ru.yandex.mobile_school.db.ColorItemCursorWrapper;
@@ -23,6 +24,8 @@ import ru.yandex.mobile_school.db.DbSchema;
 import ru.yandex.mobile_school.db.DbSchema.ColorsTable;
 
 public class DataStorage {
+
+	public static final int DEFAULT_USER_ID = 223322;
 
 	private static DataStorage sDataStorage;
 	private SQLiteDatabase mDatabase;
@@ -58,10 +61,10 @@ public class DataStorage {
 		return colorItems;
 	}
 
-	public ColorItem getColorItem(int id) {
+	public ColorItem getColorItem(UUID id) {
 		ColorItemCursorWrapper itemCursor = queryColorItems(
 				ColorsTable.Cols.ID + " = ?",
-				new String[] {Integer.toString(id)}
+				new String[] {id.toString()}
 		);
 		if (itemCursor.getCount() == 0) return null;
 

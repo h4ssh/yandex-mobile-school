@@ -7,4 +7,5 @@ public class ColorItemJson {
 	String created;
 	String edited;
 	String viewed;
+	int serverId;
 }
