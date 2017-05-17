@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -154,6 +155,10 @@ public class ColorsListFragment extends Fragment implements
 				ColorItem item = mListAdapter.getColorItem(position);
 				mListAdapter.deleteItem(item);
 				DataStorage.get(getContext()).deleteColorItem(item);
+				if (item.getServerId() != 0) {
+					NotesAPIClient.get().deleteUserNote(DataStorage.DEFAULT_USER_ID, item.getId(),
+							item.getServerId(), getFragment());
+				}
 			}
 		});
 		builder.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
@@ -185,6 +190,8 @@ public class ColorsListFragment extends Fragment implements
 			alert(getString(R.string.colors_list_sort_started));
 			mListAdapter.resort();
 			DataStorage.get(getContext()).updateColorItem(updated);
+			NotesAPIClient.get().updateUserNote(DataStorage.DEFAULT_USER_ID, updated.getId(),
+					updated.getServerId(), updated.toNote(), this);
 		}
 	}
 
@@ -231,6 +238,10 @@ public class ColorsListFragment extends Fragment implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+			case R.id.colors_list_cloud_download:
+				NotesAPIClient.get().getUserNotes(DataStorage.DEFAULT_USER_ID, this);
+				alert(getString(R.string.colors_list_download_start));
+				break;
 			case R.id.colors_list_menu_sort:
 				ColorsListSortFragment sortFragment = new ColorsListSortFragment();
 				sortFragment.setTargetFragment(this, 0);
@@ -391,21 +402,33 @@ public class ColorsListFragment extends Fragment implements
 	private static final String TAG_API = "API CALLBACKS";
 
 	@Override
-	public void onGetUserNotes(int user, List<ColorItem> items) {
-
+	public void onGetUserNotes(int user, ArrayList<ColorItem> items) {
+		DataStorage.get(getContext()).replaceColorItems(items);
+		mListAdapter.changeData(items);
 	}
 
 	@Override
-	public void onAddUserNote(int user, UUID id, int noteId) {
-		Log.d(TAG_API, "On add user note: " + user + " UUID: " + id.toString() + " noteId: " + noteId);
+	public void onAddUserNote(int user, UUID itemId, int noteId) {
+		Log.d(TAG_API, "On add user note: " + user + " UUID: " + itemId.toString() + " noteId: " + noteId);
 		DataStorage storage = DataStorage.get(getContext());
-		ColorItem item = storage.getColorItem(id);
+		ColorItem item = storage.getColorItem(itemId);
 		item.setServerId(noteId);
 		storage.updateColorItem(item);
+		mListAdapter.getColorItem(itemId).setServerId(noteId);
+	}
+
+	@Override
+	public void onDeleteUserNote(int user, UUID itemId) {
+		// TODO: synchronize
+	}
+
+	@Override
+	public void onUpdateUserNote(int user, UUID itemId) {
+		Log.d(TAG_API, "update");
 	}
 
 	@Override
 	public void onError(String message) {
-		Log.d(TAG_API, "Error: " + message);
+		alert("API error: " + message);
 	}
 }

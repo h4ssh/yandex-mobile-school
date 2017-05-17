@@ -35,7 +35,7 @@ public class BaseHelper extends SQLiteOpenHelper {
 				")"
 		);
 
-		fillWithPreloadData();
+		//fillWithPreloadData();
 	}
 
 	private void fillWithPreloadData() {

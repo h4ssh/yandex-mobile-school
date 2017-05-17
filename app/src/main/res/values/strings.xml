@@ -10,6 +10,7 @@
     <string name="color_picker_edited_date">Edited:\t %1$s</string>
     <string name="color_picker_viewed_date">Viewed:\t %1$s</string>
 
+    <string name="colors_list_menu_cloud_download">Download from server</string>
     <string name="colors_list_menu_search">Search</string>
     <string name="colors_list_menu_filter">Filter</string>
     <string name="colors_list_menu_reset">Reset search\\filter</string>
@@ -82,6 +83,8 @@
     <string name="colors_list_generator_hint">Enter quantity</string>
     <string name="colors_list_generator_start">Generating items, please wait</string>
     <string name="colors_list_generator_finish">Generating finished</string>
+
+    <string name="colors_list_download_start">Downloading items…</string>
 
     <string name="delete_dialog_title">Confirm delete</string>
     <string name="delete_dialog_text">Do you really want to delete this item?</string>

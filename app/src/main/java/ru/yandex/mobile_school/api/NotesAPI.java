@@ -21,9 +21,9 @@ public interface NotesAPI {
 	Call<ResponseAddNote> addUserNote(@Path("user_id") int userId, @Body Note note);
 
 	@POST("user/{user_id}/note/{note_id}")
-	Call<ResponseBody> updateUserNote(@Path("user_id") int userId, @Path("note_id") int noteId, @Body RequestBody body);
+	Call<ResponseBase> updateUserNote(@Path("user_id") int userId, @Path("note_id") int noteId, @Body Note note);
 
 	@DELETE("user/{user_id}/note/{note_id}")
-	Call<ResponseBody> deleteUserNote(@Path("user_id") int userId, @Path("note_id") int noteId);
+	Call<ResponseBase> deleteUserNote(@Path("user_id") int userId, @Path("note_id") int noteId);
 
 }

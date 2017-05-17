@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -201,6 +202,14 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 
 	public ColorItem getColorItem(int position) {
 		return mFiltered.get(position);
+	}
+
+	public ColorItem getColorItem(UUID id) {
+		for (ColorItem item: mColors) {
+			if (item.getId().equals(id))
+				return item;
+		}
+		return null;
 	}
 
 

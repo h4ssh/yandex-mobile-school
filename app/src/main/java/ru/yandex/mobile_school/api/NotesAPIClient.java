@@ -16,8 +16,10 @@ import ru.yandex.mobile_school.data.ColorItem;
 public class NotesAPIClient {
 
 	public interface NotesAPICallbacks {
-		void onGetUserNotes(int user, List<ColorItem> items);
-		void onAddUserNote(int user, UUID id, int serverId);
+		void onGetUserNotes(int user, ArrayList<ColorItem> items);
+		void onAddUserNote(int user, UUID itemId, int serverId);
+		void onDeleteUserNote(int user, UUID itemId);
+		void onUpdateUserNote(int user, UUID itemId);
 		void onError(String message);
 	}
 
@@ -25,7 +27,6 @@ public class NotesAPIClient {
 	private NotesAPI mNotesAPI;
 
 	private static final String BASE_URL = "https://notesbackend-yufimtsev.rhcloud.com/";
-	private static final String STATUS_OK = "ok";
 	private static final String ERROR = "unknown error";
 
 	public static NotesAPIClient get() {
@@ -48,7 +49,7 @@ public class NotesAPIClient {
 			@Override
 			public void onResponse(@NonNull Call<ResponseNotes> call, @NonNull Response<ResponseNotes> response) {
 				ResponseNotes responseNotes = response.body();
-				if (responseNotes != null && responseNotes.status.equals(STATUS_OK)) {
+				if (responseNotes != null && responseNotes.isSuccessful()) {
 					ArrayList<ColorItem> results = new ArrayList<>();
 					for (Note note: responseNotes.data) {
 						results.add(new ColorItem(note));
@@ -72,16 +73,16 @@ public class NotesAPIClient {
 		});
 	}
 
-	public void addUserNote(final int userId, final UUID noteId, Note note,
+	public void addUserNote(final int userId, final UUID itemId, Note note,
 							final NotesAPICallbacks callbacks) {
 		Call<ResponseAddNote> call = mNotesAPI.addUserNote(userId, note);
 		call.enqueue(new Callback<ResponseAddNote>() {
 			@Override
 			public void onResponse(Call<ResponseAddNote> call, Response<ResponseAddNote> response) {
 				ResponseAddNote responseAddNote = response.body();
-				if (responseAddNote != null && responseAddNote.status.equals(STATUS_OK)) {
+				if (responseAddNote != null && responseAddNote.isSuccessful()) {
 					if (callbacks != null) {
-						callbacks.onAddUserNote(userId, noteId, responseAddNote.data);
+						callbacks.onAddUserNote(userId, itemId, responseAddNote.data);
 					}
 				} else {
 					if (callbacks != null) {
@@ -97,5 +98,60 @@ public class NotesAPIClient {
 				}
 			}
 		});
+	}
+
+	public void deleteUserNote(final int userId, final UUID itemId, int noteId,
+							   final NotesAPICallbacks callbacks) {
+		Call<ResponseBase> call = mNotesAPI.deleteUserNote(userId, noteId);
+		call.enqueue(new Callback<ResponseBase>() {
+			@Override
+			public void onResponse(Call<ResponseBase> call, Response<ResponseBase> response) {
+				ResponseBase responseBase = response.body();
+				if (responseBase != null & responseBase.isSuccessful()) {
+					if (callbacks != null) {
+						callbacks.onDeleteUserNote(userId, itemId);
+					}
+				} else {
+					if (callbacks != null) {
+						callbacks.onError(ERROR);
+					}
+				}
+			}
+
+			@Override
+			public void onFailure(Call<ResponseBase> call, Throwable t) {
+				if (callbacks != null) {
+					callbacks.onError(ERROR);
+				}
+			}
+		});
+	}
+
+	public void updateUserNote(final int userId, final UUID itemId, int noteId, Note note,
+							   final NotesAPICallbacks callbacks) {
+		Call<ResponseBase> call = mNotesAPI.updateUserNote(userId, noteId, note);
+		call.enqueue(new Callback<ResponseBase>() {
+			@Override
+			public void onResponse(Call<ResponseBase> call, Response<ResponseBase> response) {
+				ResponseBase responseBase = response.body();
+				if (responseBase != null & responseBase.isSuccessful()) {
+					if (callbacks != null) {
+						callbacks.onUpdateUserNote(userId, itemId);
+					}
+				} else {
+					if (callbacks != null) {
+						callbacks.onError(ERROR);
+					}
+				}
+			}
+
+			@Override
+			public void onFailure(Call<ResponseBase> call, Throwable t) {
+				if (callbacks != null) {
+					callbacks.onError(ERROR);
+				}
+			}
+		});
+
 	}
 }

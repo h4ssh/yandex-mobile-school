@@ -162,6 +162,13 @@ public class DataStorage {
 		return true;
 	}
 
+	public void replaceColorItems(ArrayList<ColorItem> items) {
+		mBaseHelper.clearColors();
+		for (ColorItem item : items) {
+			addColorItem(item);
+		}
+	}
+
 	private void saveCloseReader(BufferedReader br) {
 		try {
 			if (br != null) {
