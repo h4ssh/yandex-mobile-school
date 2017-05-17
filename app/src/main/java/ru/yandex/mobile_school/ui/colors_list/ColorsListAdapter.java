@@ -176,7 +176,9 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 
 	public void addItem(ColorItem item) {
 		mColors.add(item);
-		mFiltered.add(item);
+		if (mFiltered != mColors) {
+			mFiltered.add(item);
+		}
 		notifyDataSetChanged();
 	}
 
