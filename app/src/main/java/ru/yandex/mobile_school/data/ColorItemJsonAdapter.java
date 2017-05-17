@@ -16,7 +16,8 @@ public class ColorItemJsonAdapter {
 				json.description,
 				json.created,
 				json.edited,
-				json.viewed);
+				json.viewed,
+				json.serverId);
 	}
 
 	@ToJson ColorItemJson colorItemToJson(ColorItem colorItem) {
@@ -27,6 +28,7 @@ public class ColorItemJsonAdapter {
 		itemJson.created = colorItem.getCreated();
 		itemJson.edited = colorItem.getEdited();
 		itemJson.viewed = colorItem.getViewed();
+		itemJson.serverId = colorItem.getServerId();
 		return itemJson;
 	}
 }
