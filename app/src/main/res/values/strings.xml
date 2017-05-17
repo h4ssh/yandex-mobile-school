@@ -35,6 +35,9 @@
         <item>@string/colors_list_sort_order_ascending</item>
         <item>@string/colors_list_sort_order_descending</item>
     </string-array>
+    <string name="colors_list_sort_started">Sorting, please wait…</string>
+    <string name="colors_list_sort_finished">Sorting finished!</string>
+
     <string name="colors_list_filter_title">Filter list</string>
     <string name="colors_list_filter_param">Filter by:</string>
     <string name="colors_list_filter_start_date">Start date:</string>
@@ -47,6 +50,8 @@
         <item>@string/colors_list_filter_by_edited</item>
         <item>@string/colors_list_filter_by_viewed</item>
     </string-array>
+    <string name="colors_list_filter_started">Filtering, please wait…</string>
+    <string name="colors_list_filter_finished">Filtering finished!</string>
 
     <string name="colors_list_export_title">Import\\Export</string>
     <string name="colors_list_export_export">Export</string>
@@ -73,10 +78,14 @@
     <string name="color_description_s">S: %1$f</string>
     <string name="color_description_v">V: %1$f</string>
 
+    <string name="colors_list_generator_title">Generate items</string>
+    <string name="colors_list_generator_hint">Enter quantity</string>
+    <string name="colors_list_generator_start">Generating items, please wait</string>
+    <string name="colors_list_generator_finish">Generating finished</string>
 
     <string name="delete_dialog_title">Confirm delete</string>
-    <string name="delete_dialog_text">Do you realy want to delete this item?</string>
+    <string name="delete_dialog_text">Do you really want to delete this item?</string>
     <string name="button_delete">Delete</string>
-    <string name="button_ok">Ok</string>
+    <string name="button_ok">OK</string>
     <string name="button_cancel">Cancel</string>
 </resources>
