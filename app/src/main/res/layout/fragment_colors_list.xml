@@ -3,10 +3,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 xmlns:app="http://schemas.android.com/apk/res-auto">
-    <ListView
-        android:id="@+id/colors_list_view"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <ProgressBar
+            android:id="@+id/colors_list_progress_bar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:indeterminate="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+        <ListView
+            android:id="@+id/colors_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/colors_list_fab"
         android:layout_width="wrap_content"

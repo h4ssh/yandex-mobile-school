@@ -1,6 +1,7 @@
 package ru.yandex.mobile_school.data;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import ru.yandex.mobile_school.db.BaseHelper;
 import ru.yandex.mobile_school.db.ColorItemCursorWrapper;
@@ -23,9 +25,16 @@ import ru.yandex.mobile_school.db.DbSchema;
 import ru.yandex.mobile_school.db.DbSchema.ColorsTable;
 
 public class DataStorage {
+
+	private static final String SHARED_PREFS_NAME = "data_storage_shared_prefs";
+	private static final String SHARED_PREFS_USER = "data_storage_shared_user";
+	private static final int DEFAULT_USER_ID = 223322;
+
 	private static DataStorage sDataStorage;
 	private SQLiteDatabase mDatabase;
 	private BaseHelper mBaseHelper;
+	private int mUserId = DEFAULT_USER_ID;
+	private SharedPreferences mSharedPreferences;
 
 	public static DataStorage get(Context context) {
 		if (sDataStorage == null) {
@@ -37,6 +46,8 @@ public class DataStorage {
 	private DataStorage(Context context) {
 		mBaseHelper = new BaseHelper(context.getApplicationContext());
 		mDatabase = mBaseHelper.getWritableDatabase();
+		mSharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+		mUserId = mSharedPreferences.getInt(SHARED_PREFS_USER, DEFAULT_USER_ID);
 	}
 
 	public ArrayList<ColorItem> getColorItems() {
@@ -57,10 +68,10 @@ public class DataStorage {
 		return colorItems;
 	}
 
-	public ColorItem getColorItem(int id) {
+	public ColorItem getColorItem(UUID id) {
 		ColorItemCursorWrapper itemCursor = queryColorItems(
 				ColorsTable.Cols.ID + " = ?",
-				new String[] {Integer.toString(id)}
+				new String[] {id.toString()}
 		);
 		if (itemCursor.getCount() == 0) return null;
 
@@ -158,6 +169,13 @@ public class DataStorage {
 		return true;
 	}
 
+	public void replaceColorItems(ArrayList<ColorItem> items) {
+		mBaseHelper.clearColors();
+		for (ColorItem item : items) {
+			addColorItem(item);
+		}
+	}
+
 	private void saveCloseReader(BufferedReader br) {
 		try {
 			if (br != null) {
@@ -174,4 +192,15 @@ public class DataStorage {
 		Type type = Types.newParameterizedType(List.class, ColorItem.class);
 		return moshi.adapter(type);
 	}
+
+	public int getUserId() {
+		return mUserId;
+	}
+
+	public void setUserId(int userId) {
+		mSharedPreferences.edit().putInt(SHARED_PREFS_USER, userId).apply();
+		mUserId = userId;
+	}
 }
+
+
