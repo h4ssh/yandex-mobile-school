@@ -45,6 +45,7 @@ public class ColorsListFragment extends Fragment implements
 		ColorsListExportFragment.ColorsListExportDialogListener,
 		ColorsListSearchFragment.ColorsListSearchDialogListener,
 		ColorsListGenerateFragment.ColorsListGenerateDialogListener,
+		ColorsListUserFragment.ColorsListUserDialogListener,
 		ColorsListAsyncActor.ColorsListAsyncActorListener,
 		ColorsListAdapter.AdapterAsyncActionsListener,
 		ColorsListLooperThread.Callback,
@@ -154,9 +155,10 @@ public class ColorsListFragment extends Fragment implements
 			public void onClick(DialogInterface dialog, int which) {
 				ColorItem item = mListAdapter.getColorItem(position);
 				mListAdapter.deleteItem(item);
-				DataStorage.get(getContext()).deleteColorItem(item);
+				DataStorage storage = DataStorage.get(getContext());
+				storage.deleteColorItem(item);
 				if (item.getServerId() != 0) {
-					NotesAPIClient.get().deleteUserNote(DataStorage.DEFAULT_USER_ID, item.getId(),
+					NotesAPIClient.get().deleteUserNote(storage.getUserId(), item.getId(),
 							item.getServerId(), getFragment());
 				}
 			}
@@ -189,15 +191,17 @@ public class ColorsListFragment extends Fragment implements
 			displayProgressBarIfNeeded(true);
 			alert(getString(R.string.colors_list_sort_started));
 			mListAdapter.resort();
-			DataStorage.get(getContext()).updateColorItem(updated);
-			NotesAPIClient.get().updateUserNote(DataStorage.DEFAULT_USER_ID, updated.getId(),
+			DataStorage storage = DataStorage.get(getContext());
+			storage.updateColorItem(updated);
+			NotesAPIClient.get().updateUserNote(storage.getUserId(), updated.getId(),
 					updated.getServerId(), updated.toNote(), this);
 		}
 	}
 
 	private void addColorItem(ColorItem item) {
-		DataStorage.get(getContext()).addColorItem(item);
-		NotesAPIClient.get().addUserNote(DataStorage.DEFAULT_USER_ID, item.getId(), item.toNote(), this);
+		DataStorage storage = DataStorage.get(getContext());
+		storage.addColorItem(item);
+		NotesAPIClient.get().addUserNote(storage.getUserId(), item.getId(), item.toNote(), this);
 		mListAdapter.addItem(item);
 	}
 
@@ -239,8 +243,9 @@ public class ColorsListFragment extends Fragment implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.colors_list_cloud_download:
-				NotesAPIClient.get().getUserNotes(DataStorage.DEFAULT_USER_ID, this);
-				alert(getString(R.string.colors_list_download_start));
+				ColorsListUserFragment userFragment = new ColorsListUserFragment();
+				userFragment.setTargetFragment(this, 0);
+				userFragment.show(getActivity().getSupportFragmentManager(), "");
 				break;
 			case R.id.colors_list_menu_sort:
 				ColorsListSortFragment sortFragment = new ColorsListSortFragment();
@@ -430,5 +435,12 @@ public class ColorsListFragment extends Fragment implements
 	@Override
 	public void onError(String message) {
 		alert("API error: " + message);
+	}
+
+	@Override
+	public void onUserChanged(int newUser) {
+		DataStorage.get(getContext()).setUserId(newUser);
+		NotesAPIClient.get().getUserNotes(newUser, this);
+		alert(getString(R.string.colors_list_download_start));
 	}
 }

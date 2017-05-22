@@ -68,6 +68,8 @@
     <string name="colors_list_search_title">Search</string>
     <string name="colors_list_search_search">Search</string>
 
+    <string name="colors_list_user_title">Select user to sync</string>
+
     <string name="color_fragment_title_hint">Enter title</string>
     <string name="color_fragment_description_hint">Enter description</string>
     <string name="color_fragment_menu_done">Done</string>

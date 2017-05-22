@@ -1,6 +1,7 @@
 package ru.yandex.mobile_school.data;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -25,11 +26,15 @@ import ru.yandex.mobile_school.db.DbSchema.ColorsTable;
 
 public class DataStorage {
 
-	public static final int DEFAULT_USER_ID = 223322;
+	private static final String SHARED_PREFS_NAME = "data_storage_shared_prefs";
+	private static final String SHARED_PREFS_USER = "data_storage_shared_user";
+	private static final int DEFAULT_USER_ID = 223322;
 
 	private static DataStorage sDataStorage;
 	private SQLiteDatabase mDatabase;
 	private BaseHelper mBaseHelper;
+	private int mUserId = DEFAULT_USER_ID;
+	private SharedPreferences mSharedPreferences;
 
 	public static DataStorage get(Context context) {
 		if (sDataStorage == null) {
@@ -41,6 +46,8 @@ public class DataStorage {
 	private DataStorage(Context context) {
 		mBaseHelper = new BaseHelper(context.getApplicationContext());
 		mDatabase = mBaseHelper.getWritableDatabase();
+		mSharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+		mUserId = mSharedPreferences.getInt(SHARED_PREFS_USER, DEFAULT_USER_ID);
 	}
 
 	public ArrayList<ColorItem> getColorItems() {
@@ -184,6 +191,15 @@ public class DataStorage {
 				.build();
 		Type type = Types.newParameterizedType(List.class, ColorItem.class);
 		return moshi.adapter(type);
+	}
+
+	public int getUserId() {
+		return mUserId;
+	}
+
+	public void setUserId(int userId) {
+		mSharedPreferences.edit().putInt(SHARED_PREFS_USER, userId).apply();
+		mUserId = userId;
 	}
 }
 
