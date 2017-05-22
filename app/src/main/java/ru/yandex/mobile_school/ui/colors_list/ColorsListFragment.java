@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,7 +36,8 @@ import ru.yandex.mobile_school.api.Note;
 import ru.yandex.mobile_school.api.NotesAPIClient;
 import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.data.DataStorage;
-import ru.yandex.mobile_school.ui.color_picker.ColorPickerActivity;
+import ru.yandex.mobile_school.ui.base.SingleFragmentActivity;
+import ru.yandex.mobile_school.ui.color_picker.ColorPickerFragment;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -103,6 +105,8 @@ public class ColorsListFragment extends Fragment implements
 		View view = inflater.inflate(R.layout.fragment_colors_list, container, false);
 		ButterKnife.bind(this, view);
 
+		((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.app_name);
+
 		displayProgressBarIfNeeded(null);
 		mListAdapter = new ColorsListAdapter(getContext(), DataStorage.get(getContext()).getColorItems());
 		mListAdapter.setAdapterSortListener(this);
@@ -113,7 +117,9 @@ public class ColorsListFragment extends Fragment implements
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				mEditPosition = position;
 				ColorItem item = ((ColorsListAdapter) mColorsListView.getAdapter()).getColorItem(position);
-				startActivityForResult(ColorPickerActivity.newIntent(getContext(), item), REQUEST_CODE_EDIT);
+				ColorPickerFragment fragment = ColorPickerFragment.newInstance(item);
+				fragment.setTargetFragment(getFragment(), REQUEST_CODE_EDIT);
+				((SingleFragmentActivity) getActivity()).replaceFragment(fragment);
 			}
 		});
 		mColorsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -126,7 +132,9 @@ public class ColorsListFragment extends Fragment implements
 		mAddColorFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivityForResult(ColorPickerActivity.newIntent(getContext()), REQUEST_CODE_ADD);
+				ColorPickerFragment fragment = ColorPickerFragment.newInstance(null);
+				fragment.setTargetFragment(getFragment(), REQUEST_CODE_ADD);
+				((SingleFragmentActivity) getActivity()).replaceFragment(fragment);
 			}
 		});
 		mAddColorFAB.setOnLongClickListener(new View.OnLongClickListener() {
@@ -175,14 +183,14 @@ public class ColorsListFragment extends Fragment implements
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK) {
-			ColorItem item = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
+			ColorItem item = data.getParcelableExtra(ColorPickerFragment.EXTRA_COLOR_ITEM);
 			addColorItem(item);
 		}
 		if (requestCode == REQUEST_CODE_EDIT) {
 			ColorItem old = mListAdapter.getColorItem(mEditPosition);
 			ColorItem updated;
 			if (resultCode == RESULT_OK) {
-				updated = data.getParcelableExtra(ColorPickerActivity.EXTRA_COLOR_ITEM);
+				updated = data.getParcelableExtra(ColorPickerFragment.EXTRA_COLOR_ITEM);
 			} else {
 				updated = old;
 				updated.setViewed();

@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">mobile-school</string>
 
-    <string name="color_picker_activity_add_title">Pick a color</string>
-    <string name="color_picker_activity_edit_title">Edit color</string>
+    <string name="color_picker_fragment_add_title">Pick a color</string>
+    <string name="color_picker_fragment_edit_title">Edit color</string>
 
     <string name="color_picker_current_color_title">Current color:</string>
     <string name="color_picker_favorite_colors_title">Favorite colors:</string>
