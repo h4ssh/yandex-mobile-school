@@ -2,6 +2,7 @@ package ru.yandex.mobile_school.ui.colors_list;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +26,16 @@ import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.utils.DateFilter;
 import ru.yandex.mobile_school.utils.DateUtils;
 
-public class ColorsListAdapter extends BaseAdapter implements Filterable {
+public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.ViewHolder> implements Filterable {
 
 	public interface AdapterAsyncActionsListener {
 		void onSortFinish();
 		void onFilterFinish();
+	}
+
+	public interface AdapterOnClickListener {
+		void onClick(int position, ColorItem colorItem);
+		void onLongClick(int position, ColorItem colorItem);
 	}
 
 	static final String SORT_PARAM_TITLE = "sort_param_title";
@@ -44,13 +50,12 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	private ArrayList<ColorItem> mColors;
 	private ArrayList<ColorItem> mFiltered;
 	private ItemFilter mItemFilter = new ItemFilter();
-	private final WeakReference<Context> mWeakContext;
 	private String mSortParam;
 	private boolean mSortAscending;
 	private AdapterAsyncActionsListener mListener;
+	private AdapterOnClickListener mClickListener;
 
-	ColorsListAdapter(Context context, ArrayList<ColorItem> items) {
-		mWeakContext = new WeakReference<>(context);
+	ColorsListAdapter(ArrayList<ColorItem> items) {
 		mColors = items;
 		mFiltered = items;
 	}
@@ -59,13 +64,43 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 		mListener = listener;
 	}
 
-	static class ViewHolder {
-		@BindView(R.id.colors_list_item_color_view)
-		ColorView mColorView;
-		@BindView(R.id.colors_list_item_color_title)
-		TextView mTitleView;
-		@BindView(R.id.colors_list_item_color_description) TextView mDescriptionView;
+	public void setAdapterOnClickListener(AdapterOnClickListener listener) {
+		mClickListener = listener;
 	}
+
+	class ViewHolder extends RecyclerView.ViewHolder {
+		@BindView(R.id.colors_list_item_color_view) ColorView mColorView;
+		@BindView(R.id.colors_list_item_color_title) TextView mTitleView;
+		@BindView(R.id.colors_list_item_color_description) TextView mDescriptionView;
+
+		public ViewHolder(View itemView) {
+			super(itemView);
+			ButterKnife.bind(this, itemView);
+
+			if (mClickListener != null) {
+				itemView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						int position = getAdapterPosition();
+						ColorItem item = getColorItem(position);
+						mClickListener.onClick(position, item);
+					}
+				});
+				itemView.setOnLongClickListener(new View.OnLongClickListener() {
+					@Override
+					public boolean onLongClick(View v) {
+						int position = getAdapterPosition();
+						ColorItem item = getColorItem(position);
+						mClickListener.onLongClick(position, item);
+						return true;
+					}
+				});
+			}
+		}
+	}
+
+	/*
+	ListView's Base Adapter with ViewHolder
 
 	@Override
 	public int getCount() {
@@ -75,11 +110,6 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	@Override
 	public Object getItem(int position) {
 		return mFiltered.get(position);
-	}
-
-	@Override
-	public long getItemId(int position) {
-		return position;
 	}
 
 	@Override
@@ -103,6 +133,31 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 		viewHolder.mDescriptionView.setText(colorItem.getDescription());
 
 		return convertView;
+	}
+*/
+	@Override
+	public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		View view = LayoutInflater.from(parent.getContext())
+				.inflate(R.layout.colors_list_item,	parent,	false);
+		return new ViewHolder(view);
+	}
+
+	@Override
+	public void onBindViewHolder(ViewHolder holder, int position) {
+		ColorItem colorItem = mFiltered.get(position);
+		holder.mColorView.setCurrentColor(colorItem.getColor());
+		holder.mTitleView.setText(colorItem.getTitle());
+		holder.mDescriptionView.setText(colorItem.getDescription());
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public int getItemCount() {
+		return mFiltered.size();
 	}
 
 	public void sortBy(final String sortParam, final boolean ascending) {
@@ -213,7 +268,7 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 	}
 
 
-	public void filter(String paramName, Date startDate, Date endDate) {
+	public 	void filter(String paramName, Date startDate, Date endDate) {
 		AsyncTask task = new AsyncTask<String, Void, Void>() {
 			@Override
 			protected Void doInBackground(String... params) {
@@ -228,7 +283,7 @@ public class ColorsListAdapter extends BaseAdapter implements Filterable {
 				}
 			}
 		};
-		task.execute(new String[] {DateUtils.getFilterString(paramName, startDate, endDate)});
+		task.execute(DateUtils.getFilterString(paramName, startDate, endDate));
 	}
 
 	private class ItemFilter extends Filter {

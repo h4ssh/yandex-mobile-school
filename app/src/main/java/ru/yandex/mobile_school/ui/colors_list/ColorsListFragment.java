@@ -12,6 +12,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,8 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -50,6 +52,7 @@ public class ColorsListFragment extends Fragment implements
 		ColorsListUserFragment.ColorsListUserDialogListener,
 		ColorsListAsyncActor.ColorsListAsyncActorListener,
 		ColorsListAdapter.AdapterAsyncActionsListener,
+		ColorsListAdapter.AdapterOnClickListener,
 		ColorsListLooperThread.Callback,
 		NotesAPIClient.NotesAPICallbacks {
 
@@ -70,7 +73,7 @@ public class ColorsListFragment extends Fragment implements
 
 	@BindView(R.id.colors_list_fab)	FloatingActionButton mAddColorFAB;
 	@BindView(R.id.colors_list_progress_bar) ProgressBar mProgressBar;
-	@BindView(R.id.colors_list_view) ListView mColorsListView;
+	@BindView(R.id.colors_list_view) RecyclerView mColorsListView;
 
 	static ColorsListFragment newInstance() {
 		return new ColorsListFragment();
@@ -108,27 +111,13 @@ public class ColorsListFragment extends Fragment implements
 		((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.app_name);
 
 		displayProgressBarIfNeeded(null);
-		mListAdapter = new ColorsListAdapter(getContext(), DataStorage.get(getContext()).getColorItems());
+		mListAdapter = new ColorsListAdapter(DataStorage.get(getContext()).getColorItems());
 		mListAdapter.setAdapterSortListener(this);
+		mListAdapter.setAdapterOnClickListener(this);
 		mAsyncActor = new ColorsListAsyncActor(getContext());
+		mColorsListView.setLayoutManager(new LinearLayoutManager(getContext()));
+		mColorsListView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 		mColorsListView.setAdapter(mListAdapter);
-		mColorsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				mEditPosition = position;
-				ColorItem item = ((ColorsListAdapter) mColorsListView.getAdapter()).getColorItem(position);
-				ColorPickerFragment fragment = ColorPickerFragment.newInstance(item);
-				fragment.setTargetFragment(getFragment(), REQUEST_CODE_EDIT);
-				((SingleFragmentActivity) getActivity()).replaceFragment(fragment);
-			}
-		});
-		mColorsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-				getDeleteAlertDialog(position).show();
-				return true;
-			}
-		});
 		mAddColorFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -154,14 +143,26 @@ public class ColorsListFragment extends Fragment implements
 		return this;
 	}
 
-	private AlertDialog getDeleteAlertDialog(final int position) {
+	@Override
+	public void onClick(int position, ColorItem colorItem) {
+		mEditPosition = position;
+		ColorPickerFragment fragment = ColorPickerFragment.newInstance(colorItem);
+		fragment.setTargetFragment(getFragment(), REQUEST_CODE_EDIT);
+		((SingleFragmentActivity) getActivity()).replaceFragment(fragment);
+	}
+
+	@Override
+	public void onLongClick(int position, ColorItem colorItem) {
+		getDeleteAlertDialog(colorItem).show();
+	}
+
+	private AlertDialog getDeleteAlertDialog(final ColorItem item) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 		builder.setTitle(R.string.delete_dialog_title);
 		builder.setMessage(R.string.delete_dialog_text);
 		builder.setPositiveButton(R.string.button_delete, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				ColorItem item = mListAdapter.getColorItem(position);
 				mListAdapter.deleteItem(item);
 				DataStorage storage = DataStorage.get(getContext());
 				storage.deleteColorItem(item);
