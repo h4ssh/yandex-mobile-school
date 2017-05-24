@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.ColorInt;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -297,9 +298,13 @@ public class ColorPickerFragment extends BaseFragment {
 				mColorItem.setDescription(mDescriptionEdit.getText().toString());
 				Intent intent = new Intent();
 				intent.putExtra(EXTRA_COLOR_ITEM, mColorItem);
-				InputMethodManager mImm = (InputMethodManager) getContext()
-						.getSystemService(Context.INPUT_METHOD_SERVICE);
-				mImm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
+				View view = getView();
+				if (view != null) {
+					InputMethodManager mImm = (InputMethodManager) getContext()
+							.getSystemService(Context.INPUT_METHOD_SERVICE);
+					mImm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+				}
 				getActivity().getSupportFragmentManager().popBackStack();
 				getTargetFragment().onActivityResult(getTargetRequestCode(), RESULT_OK, intent);
 				break;
@@ -308,9 +313,14 @@ public class ColorPickerFragment extends BaseFragment {
 	}
 
 	@Override
-	protected void onBackPressed() {
-		getTargetFragment().onActivityResult(getTargetRequestCode(), RESULT_CANCELED, null);
-
+	protected boolean onBackPressed() {
+		Fragment targetFragment = getTargetFragment();
+		int requestCode = getTargetRequestCode();
+		getActivity().getSupportFragmentManager().popBackStackImmediate();
+		if (targetFragment != null) {
+			targetFragment.onActivityResult(requestCode, RESULT_CANCELED, null);
+		}
+		return true;
 	}
 
 	@Override

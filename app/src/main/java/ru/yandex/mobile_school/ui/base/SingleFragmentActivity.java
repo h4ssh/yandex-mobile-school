@@ -1,5 +1,6 @@
 package ru.yandex.mobile_school.ui.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
@@ -45,11 +46,24 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {
-		Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+		Fragment currentFragment = getFragment();
 		if (currentFragment instanceof BaseFragment) {
-			((BaseFragment) currentFragment).onBackPressed();
+			if (!((BaseFragment) currentFragment).onBackPressed()) {
+				super.onBackPressed();
+			}
 		}
-		super.onBackPressed();
+	}
+
+	public void replaceFragmentForResult() {
+
+	}
+
+	public void onFragmentResult(int requestCode, int result, Intent data) {
+
+	}
+
+	public Fragment getFragment() {
+		return getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 	}
 
 	protected void restoreFragmentState(Fragment fragment) {

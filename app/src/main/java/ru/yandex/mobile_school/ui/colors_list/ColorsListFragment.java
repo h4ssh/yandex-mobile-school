@@ -8,7 +8,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,33 +16,29 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.yandex.mobile_school.R;
-import ru.yandex.mobile_school.api.Note;
 import ru.yandex.mobile_school.api.NotesAPIClient;
 import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.data.DataStorage;
+import ru.yandex.mobile_school.ui.base.BaseFragment;
 import ru.yandex.mobile_school.ui.base.SingleFragmentActivity;
 import ru.yandex.mobile_school.ui.color_picker.ColorPickerFragment;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ColorsListFragment extends Fragment implements
+public class ColorsListFragment extends BaseFragment implements
 		ColorsListSortFragment.ColorsListSortDialogListener,
 		ColorsListFilterFragment.ColorsListFilterDialogListener,
 		ColorsListExportFragment.ColorsListExportDialogListener,
@@ -70,7 +65,6 @@ public class ColorsListFragment extends Fragment implements
 	private NotificationCompat.Builder mBuilder;
 	private ColorsListLooperThread mLooperThread;
 
-
 	@BindView(R.id.colors_list_fab)	FloatingActionButton mAddColorFAB;
 	@BindView(R.id.colors_list_progress_bar) ProgressBar mProgressBar;
 	@BindView(R.id.colors_list_view) RecyclerView mColorsListView;
@@ -90,6 +84,10 @@ public class ColorsListFragment extends Fragment implements
 		mLooperThread = new ColorsListLooperThread(getContext(), new Handler(), this);
 		mLooperThread.start();
 		mLooperThread.prepareHandler();
+
+		mListAdapter = new ColorsListAdapter(DataStorage.get(getContext()).getColorItems());
+		mListAdapter.setAdapterSortListener(this);
+		mListAdapter.setAdapterOnClickListener(this);
 	}
 
 	@Override
@@ -99,21 +97,15 @@ public class ColorsListFragment extends Fragment implements
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.colors_list_menu, menu);
-	}
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_colors_list, container, false);
 		ButterKnife.bind(this, view);
 
-		((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.app_name);
+		ColorsListActivity activity = (ColorsListActivity) getActivity();
+		activity.getSupportActionBar().setTitle(R.string.app_name);
+		activity.setNavBarItemsEnabled(true);
 
 		displayProgressBarIfNeeded(null);
-		mListAdapter = new ColorsListAdapter(DataStorage.get(getContext()).getColorItems());
-		mListAdapter.setAdapterSortListener(this);
-		mListAdapter.setAdapterOnClickListener(this);
 		mAsyncActor = new ColorsListAsyncActor(getContext());
 		mColorsListView.setLayoutManager(new LinearLayoutManager(getContext()));
 		mColorsListView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
@@ -123,7 +115,9 @@ public class ColorsListFragment extends Fragment implements
 			public void onClick(View v) {
 				ColorPickerFragment fragment = ColorPickerFragment.newInstance(null);
 				fragment.setTargetFragment(getFragment(), REQUEST_CODE_ADD);
-				((SingleFragmentActivity) getActivity()).replaceFragment(fragment);
+				ColorsListActivity listActivity = (ColorsListActivity) getActivity();
+				listActivity.replaceFragment(fragment);
+				listActivity.setNavBarItemsEnabled(false);
 			}
 		});
 		mAddColorFAB.setOnLongClickListener(new View.OnLongClickListener() {
@@ -148,7 +142,9 @@ public class ColorsListFragment extends Fragment implements
 		mEditPosition = position;
 		ColorPickerFragment fragment = ColorPickerFragment.newInstance(colorItem);
 		fragment.setTargetFragment(getFragment(), REQUEST_CODE_EDIT);
-		((SingleFragmentActivity) getActivity()).replaceFragment(fragment);
+		ColorsListActivity listActivity = (ColorsListActivity) getActivity();
+		listActivity.replaceFragment(fragment);
+		listActivity.setNavBarItemsEnabled(false);
 	}
 
 	@Override
@@ -198,8 +194,8 @@ public class ColorsListFragment extends Fragment implements
 			}
 			old.updateWith(updated);
 			displayProgressBarIfNeeded(true);
-			alert(getString(R.string.colors_list_sort_started));
 			mListAdapter.resort();
+			alert(getString(R.string.colors_list_sort_started));
 			DataStorage storage = DataStorage.get(getContext());
 			storage.updateColorItem(updated);
 			NotesAPIClient.get().updateUserNote(storage.getUserId(), updated.getId(),
@@ -433,7 +429,6 @@ public class ColorsListFragment extends Fragment implements
 
 	@Override
 	public void onDeleteUserNote(int user, UUID itemId) {
-		// TODO: synchronize
 	}
 
 	@Override

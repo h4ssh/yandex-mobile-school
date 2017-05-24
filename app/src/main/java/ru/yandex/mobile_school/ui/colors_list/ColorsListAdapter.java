@@ -3,6 +3,7 @@ package ru.yandex.mobile_school.ui.colors_list;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,8 @@ import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.utils.DateFilter;
 import ru.yandex.mobile_school.utils.DateUtils;
+
+import static android.support.v7.widget.RecyclerView.NO_ID;
 
 public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.ViewHolder> implements Filterable {
 
@@ -194,7 +197,7 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 
 			@Override
 			protected void onPostExecute(Void aVoid) {
-				notifyDataSetChanged();
+				notifyItemRangeChanged(0, mFiltered.size());
 				if (mListener != null) {
 					mListener.onSortFinish();
 				}
@@ -209,7 +212,6 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 		} else  if (mListener != null){
 			mListener.onSortFinish();
 		}
-		notifyDataSetChanged();
 	}
 
 	public void search(String query) {
@@ -283,7 +285,7 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 				}
 			}
 		};
-		task.execute(DateUtils.getFilterString(paramName, startDate, endDate));
+		task.execute(new String[] {DateUtils.getFilterString(paramName, startDate, endDate)});
 	}
 
 	private class ItemFilter extends Filter {
