@@ -1,5 +1,7 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.internal.NavigationMenu;
@@ -12,6 +14,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,6 +26,7 @@ public class ColorsListActivity extends SingleFragmentActivity {
 
 	@BindView(R.id.colors_list_drawer_layout) DrawerLayout mDrawerLayout;
 	@BindView(R.id.colors_list_nav_view) NavigationView mNavigationView;
+	@BindView(R.id.fragment_container) LinearLayout mFragmentContainer;
 
 	private ActionBarDrawerToggle mToggle;
 
@@ -80,6 +84,22 @@ public class ColorsListActivity extends SingleFragmentActivity {
 		Menu menu = mNavigationView.getMenu();
 		for (int i = 0; i < menu.size(); i++) {
 			menu.getItem(i).setEnabled(enabled);
+		}
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
+			mDrawerLayout.setScrimColor(Color.TRANSPARENT);
+			mDrawerLayout.setFocusableInTouchMode(false);
+			//mFragmentContainer.setPadding(mDrawerLayout.getWidth(), 0,0,0);
+		} else {
+			mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+			mDrawerLayout.closeDrawers();
+			//mFragmentContainer.setPadding(0,0,0,0);
+			mDrawerLayout.setFocusableInTouchMode(true);
 		}
 	}
 }

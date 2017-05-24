@@ -24,9 +24,6 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.color_picker.ColorPickerActivity"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
     </application>
 
 
