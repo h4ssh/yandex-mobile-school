@@ -2,6 +2,7 @@ package ru.yandex.mobile_school.ui.colors_list;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -151,6 +152,7 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 		holder.mColorView.setCurrentColor(colorItem.getColor());
 		holder.mTitleView.setText(colorItem.getTitle());
 		holder.mDescriptionView.setText(colorItem.getDescription());
+		ViewCompat.setTransitionName(holder.mColorView, colorItem.getId().toString());
 	}
 
 	@Override

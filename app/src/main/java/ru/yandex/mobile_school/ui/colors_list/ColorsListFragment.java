@@ -143,7 +143,9 @@ public class ColorsListFragment extends BaseFragment implements
 		ColorPickerFragment fragment = ColorPickerFragment.newInstance(colorItem);
 		fragment.setTargetFragment(getFragment(), REQUEST_CODE_EDIT);
 		ColorsListActivity listActivity = (ColorsListActivity) getActivity();
-		listActivity.replaceFragment(fragment);
+		View itemView = mColorsListView.getLayoutManager().findViewByPosition(position);
+		View sharedView = itemView.findViewById(R.id.colors_list_item_color_view);
+		listActivity.replaceFragmentWithShared(fragment, sharedView, colorItem.getId().toString());
 		listActivity.setNavBarItemsEnabled(false);
 	}
 

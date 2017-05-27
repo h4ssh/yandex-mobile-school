@@ -3,6 +3,7 @@ package ru.yandex.mobile_school.ui.color_picker;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.ColorInt;
@@ -10,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.TransitionInflater;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -91,6 +93,10 @@ public class ColorPickerFragment extends BaseFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		postponeEnterTransition();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			setSharedElementEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+		}
 		setHasOptionsMenu(true);
 	}
 
@@ -108,6 +114,9 @@ public class ColorPickerFragment extends BaseFragment {
 		} else {
 			mColorItem = new ColorItem();
 			((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(R.string.color_picker_fragment_edit_title);
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			mCurrentColorView.setTransitionName(mColorItem.getId().toString());
 		}
 		mColorItem.setViewed();
 		mCurrentColorView.setCurrentColor(mColorItem.getColor());
