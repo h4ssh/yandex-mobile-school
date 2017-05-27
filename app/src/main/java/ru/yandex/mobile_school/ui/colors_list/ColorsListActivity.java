@@ -1,16 +1,18 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,16 +21,24 @@ import android.widget.LinearLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.yandex.mobile_school.R;
-import ru.yandex.mobile_school.ui.base.BaseFragment;
 import ru.yandex.mobile_school.ui.base.SingleFragmentActivity;
+import ru.yandex.mobile_school.ui.views.LockableDrawer;
+
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 public class ColorsListActivity extends SingleFragmentActivity {
 
-	@BindView(R.id.colors_list_drawer_layout) DrawerLayout mDrawerLayout;
+	private static final int DEFAULT_SCRIM_COLOR = 0x99000000;
+
+	@BindView(R.id.colors_list_drawer_layout) LockableDrawer mDrawerLayout;
 	@BindView(R.id.colors_list_nav_view) NavigationView mNavigationView;
 	@BindView(R.id.fragment_container) LinearLayout mFragmentContainer;
 
 	private ActionBarDrawerToggle mToggle;
+	private int mDrawableLeftPadding;
+	private int mDrawableTopPadding;
+	private int mDrawableRightPadding;
+	private int mDrawableBottomPadding;
 
 	@Override
 	protected int getLayoutResId() {
@@ -58,6 +68,20 @@ public class ColorsListActivity extends SingleFragmentActivity {
 			}
 		});
 		mNavigationView.inflateMenu(R.menu.colors_list_menu);
+		mDrawableLeftPadding = mDrawerLayout.getPaddingLeft();
+		mDrawableTopPadding = mDrawerLayout.getPaddingTop();
+		mDrawableRightPadding = mDrawerLayout.getPaddingRight();
+		mDrawableBottomPadding = mDrawerLayout.getPaddingBottom();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE) {
+			setDrawerLandscape();
+		} else {
+			setDrawerPortrait();
+		}
 	}
 
 	@Override
@@ -67,7 +91,8 @@ public class ColorsListActivity extends SingleFragmentActivity {
 
 	@Override
 	public void onBackPressed() {
-		if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+		if (mDrawerLayout.isDrawerOpen(GravityCompat.START) &&
+				mDrawerLayout.getDrawerLockMode(Gravity.START) != DrawerLayout.LOCK_MODE_LOCKED_OPEN) {
 			mDrawerLayout.closeDrawer(GravityCompat.START);
 		} else {
 			super.onBackPressed();
@@ -90,16 +115,36 @@ public class ColorsListActivity extends SingleFragmentActivity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
-			mDrawerLayout.setScrimColor(Color.TRANSPARENT);
-			mDrawerLayout.setFocusableInTouchMode(false);
-			//mFragmentContainer.setPadding(mDrawerLayout.getWidth(), 0,0,0);
+		if (newConfig.orientation == ORIENTATION_LANDSCAPE) {
+			setDrawerLandscape();
 		} else {
-			mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-			mDrawerLayout.closeDrawers();
-			//mFragmentContainer.setPadding(0,0,0,0);
-			mDrawerLayout.setFocusableInTouchMode(true);
+			setDrawerPortrait();
+		}
+	}
+
+	private void setDrawerPortrait() {
+		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		mDrawerLayout.setScrimColor(DEFAULT_SCRIM_COLOR);
+		mDrawerLayout.closeDrawers();
+		mFragmentContainer.setPadding(mDrawableLeftPadding, mDrawableTopPadding,
+				mDrawableRightPadding, mDrawableBottomPadding);
+	}
+
+	private void setDrawerLandscape() {
+		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
+		mDrawerLayout.setScrimColor(Color.TRANSPARENT);
+		int width = mNavigationView.getWidth();
+		if (width == 0) {
+			mNavigationView.post(new Runnable() {
+				@Override
+				public void run() {
+					mFragmentContainer.setPadding(mNavigationView.getWidth(), mDrawableTopPadding,
+							mDrawableRightPadding, mDrawableBottomPadding);
+				}
+			});
+		} else {
+			mFragmentContainer.setPadding(width, mDrawableTopPadding,
+					mDrawableRightPadding, mDrawableBottomPadding);
 		}
 	}
 }
