@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <dimen name="navigation_drawer_width">260dp</dimen>
+
     <dimen name="color_fragment_title_font_size">18sp</dimen>
     <dimen name="color_fragment_description_font_size">16sp</dimen>
     <dimen name="color_fragment_default_margin">16dp</dimen>
