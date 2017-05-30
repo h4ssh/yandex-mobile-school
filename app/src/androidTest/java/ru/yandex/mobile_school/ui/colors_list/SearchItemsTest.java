@@ -26,13 +26,13 @@ import static org.hamcrest.Matchers.allOf;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class ColorsListActivityTest {
+public class SearchItemsTest {
 
 	@Rule
 	public ActivityTestRule<ColorsListActivity> mActivityTestRule = new ActivityTestRule<>(ColorsListActivity.class);
 
 	@Test
-	public void colorsListActivityTest() {
+	public void searchItemsTest() {
 		ViewInteraction appCompatImageButton = onView(
 				allOf(withContentDescription("Open menu"),
 						withParent(allOf(withId(R.id.action_bar),
@@ -67,10 +67,6 @@ public class ColorsListActivityTest {
 				allOf(withId(R.id.colors_list_search_query), isDisplayed()));
 		appCompatEditText2.perform(replaceText("Test"), closeSoftKeyboard());
 
-		ViewInteraction appCompatEditText3 = onView(
-				allOf(withId(R.id.colors_list_search_query), withText("Test"), isDisplayed()));
-		appCompatEditText3.perform(click());
-
 		ViewInteraction appCompatButton2 = onView(
 				allOf(withId(android.R.id.button1), withText("Search")));
 		appCompatButton2.perform(scrollTo(), click());
@@ -83,46 +79,8 @@ public class ColorsListActivityTest {
 		appCompatImageButton3.perform(click());
 
 		ViewInteraction appCompatCheckedTextView3 = onView(
-				allOf(withId(R.id.design_menu_item_text), withText("Filter"), isDisplayed()));
-		appCompatCheckedTextView3.perform(click());
-
-		ViewInteraction appCompatCheckBox = onView(
-				allOf(withId(R.id.colors_list_filter_start_date_check), withText("Start date:")));
-		appCompatCheckBox.perform(scrollTo(), click());
-
-		ViewInteraction appCompatCheckBox2 = onView(
-				allOf(withId(R.id.colors_list_filter_end_date_check), withText("End date:")));
-		appCompatCheckBox2.perform(scrollTo(), click());
-
-		ViewInteraction appCompatButton3 = onView(
-				allOf(withId(android.R.id.button1), withText("OK")));
-		appCompatButton3.perform(scrollTo(), click());
-
-		ViewInteraction appCompatImageButton4 = onView(
-				allOf(withContentDescription("Open menu"),
-						withParent(allOf(withId(R.id.action_bar),
-								withParent(withId(R.id.action_bar_container)))),
-						isDisplayed()));
-		appCompatImageButton4.perform(click());
-
-		ViewInteraction appCompatCheckedTextView4 = onView(
 				allOf(withId(R.id.design_menu_item_text), withText("Reset search\\filter"), isDisplayed()));
-		appCompatCheckedTextView4.perform(click());
-
-		ViewInteraction appCompatImageButton5 = onView(
-				allOf(withContentDescription("Open menu"),
-						withParent(allOf(withId(R.id.action_bar),
-								withParent(withId(R.id.action_bar_container)))),
-						isDisplayed()));
-		appCompatImageButton5.perform(click());
-
-		ViewInteraction appCompatCheckedTextView5 = onView(
-				allOf(withId(R.id.design_menu_item_text), withText("Sort"), isDisplayed()));
-		appCompatCheckedTextView5.perform(click());
-
-		ViewInteraction appCompatButton4 = onView(
-				allOf(withId(android.R.id.button1), withText("OK")));
-		appCompatButton4.perform(scrollTo(), click());
+		appCompatCheckedTextView3.perform(click());
 
 	}
 
