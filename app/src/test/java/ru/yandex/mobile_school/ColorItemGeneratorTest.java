@@ -8,9 +8,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-/**
- * Created by hash on 29/05/2017.
- */
 
 public class ColorItemGeneratorTest {
 
