@@ -28,7 +28,8 @@ import static org.hamcrest.Matchers.allOf;
 public class AddItemTest {
 
 	@Rule
-	public ActivityTestRule<ColorsListActivity> mActivityTestRule = new ActivityTestRule<>(ColorsListActivity.class);
+	public ActivityTestRule<ColorsListActivity> mActivityTestRule =
+			new ActivityTestRule<>(ColorsListActivity.class);
 
 	@Test
 	public void addColorTest() {
@@ -51,7 +52,8 @@ public class AddItemTest {
 		appCompatEditText2.perform(replaceText("testing"), closeSoftKeyboard());
 
 		ViewInteraction actionMenuItemView = onView(
-				allOf(withId(R.id.color_fragment_menu_done), withContentDescription("Done"), isDisplayed()));
+				allOf(withId(R.id.color_fragment_menu_done), withContentDescription("Done"),
+						isDisplayed()));
 		actionMenuItemView.perform(click());
 
 		onView(withId(R.id.colors_list_view)).check(new RecyclerViewItemCountAssertion(itemsCount + 1));

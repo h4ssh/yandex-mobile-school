@@ -3,9 +3,7 @@ package ru.yandex.mobile_school.data;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.provider.ContactsContract;
 import android.support.annotation.ColorInt;
-import android.support.annotation.Nullable;
 
 import java.util.Date;
 import java.util.UUID;
@@ -15,6 +13,7 @@ import ru.yandex.mobile_school.utils.DateUtils;
 
 public class ColorItem implements Parcelable {
 
+	public static final int COLOR_MASK = 0xFFFFFF;
 	private UUID mId;
 	private @ColorInt int mColor;
 	private String mTitle;
@@ -38,8 +37,12 @@ public class ColorItem implements Parcelable {
 	public ColorItem(@ColorInt int color, String title, String description) {
 		this();
 		mColor = color;
-		if (title != null) mTitle = title;
-		if (description != null) mDescription = description;
+		if (title != null) {
+			mTitle = title;
+		}
+		if (description != null) {
+			mDescription = description;
+		}
 	}
 
 	public ColorItem(String id, int color, String title, String description,
@@ -130,7 +133,7 @@ public class ColorItem implements Parcelable {
 	}
 
 	public String getColorAsHexString() {
-		return String.format("#%06X", (0xFFFFFF & mColor));
+		return String.format("#%06X", (COLOR_MASK & mColor));
 	}
 
 	public void setViewed() {
@@ -149,13 +152,21 @@ public class ColorItem implements Parcelable {
 		return mViewed;
 	}
 
-	public Date getCreatedDate() { return DateUtils.parseDateString(mCreated); }
+	public Date getCreatedDate() {
+		return DateUtils.parseDateString(mCreated);
+	}
 
-	public Date getEditedDate() {return  DateUtils.parseDateString(mEdited);}
+	public Date getEditedDate() {
+		return  DateUtils.parseDateString(mEdited);
+	}
 
-	public Date getViewedDate() { return DateUtils.parseDateString(mViewed);}
+	public Date getViewedDate() {
+		return DateUtils.parseDateString(mViewed);
+	}
 
-	public int getServerId() {return mServerId; }
+	public int getServerId() {
+		return mServerId;
+	}
 
 	public void setServerId(int serverId) {
 		mServerId = serverId;

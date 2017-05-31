@@ -3,16 +3,17 @@ package ru.yandex.mobile_school.data;
 
 import android.graphics.Color;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class ColorItemGenerator {
 
-	private static Random RANDOM = new Random();
+	private static final int COLOR_COMPONENT_MAX = 255;
+	private static Random sRandom = new Random();
 
-	private static List<String> TITLES = Arrays.asList(
+	private static List<String> sTitles = Arrays.asList(
 			"Indian red", "Light coral", "Salmon", "Dark salmon", "Light salmon",
 			"Crimson", "Red", "Fire brick", "Dark red", "Pink",
 			"Light pink", "Hot pink",	"Deep pink",	"Medium violet red", "Pale violet red",
@@ -23,12 +24,12 @@ public class ColorItemGenerator {
 	);
 
 	public static ColorItem generate() {
-		int red = RANDOM.nextInt(255);
-		int green = RANDOM.nextInt(255);
-		int blue = RANDOM.nextInt(255);
-		int color = Color.argb(255, red, green, blue);
-		String title = TITLES.get(RANDOM.nextInt(TITLES.size()));
-		String description = String.format("Description of %s color", title.toLowerCase());
+		int red = sRandom.nextInt(COLOR_COMPONENT_MAX);
+		int green = sRandom.nextInt(COLOR_COMPONENT_MAX);
+		int blue = sRandom.nextInt(COLOR_COMPONENT_MAX);
+		int color = Color.argb(COLOR_COMPONENT_MAX, red, green, blue);
+		String title = sTitles.get(sRandom.nextInt(sTitles.size()));
+		String description = String.format("Description of %s color", title.toLowerCase(Locale.getDefault()));
 		return new ColorItem(color, title, description);
 	}
 

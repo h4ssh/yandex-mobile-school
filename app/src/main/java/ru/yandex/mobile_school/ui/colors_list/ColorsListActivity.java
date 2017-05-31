@@ -1,6 +1,5 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
-import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,11 +10,9 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.LinearLayout;
 
 import butterknife.BindView;
@@ -92,7 +89,8 @@ public class ColorsListActivity extends SingleFragmentActivity {
 	@Override
 	public void onBackPressed() {
 		if (mDrawerLayout.isDrawerOpen(GravityCompat.START) &&
-				mDrawerLayout.getDrawerLockMode(Gravity.START) != DrawerLayout.LOCK_MODE_LOCKED_OPEN) {
+				mDrawerLayout.getDrawerLockMode(Gravity.START) !=
+						DrawerLayout.LOCK_MODE_LOCKED_OPEN) {
 			mDrawerLayout.closeDrawer(GravityCompat.START);
 		} else {
 			super.onBackPressed();

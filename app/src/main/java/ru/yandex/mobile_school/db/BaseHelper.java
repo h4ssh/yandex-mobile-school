@@ -42,15 +42,18 @@ public class BaseHelper extends SQLiteOpenHelper {
 		ColorItem crimson = new ColorItem(Color.parseColor("#DC143C"), "Crimson",
 				"Crimson is a strong, red color, inclining to purple");
 		ColorItem azure = new ColorItem(Color.parseColor("#007FFF"), "Azure",
-				"Azure is a variation of blue that is often described as the color of the sky on a clear day");
+				"Azure is a variation of blue that is often described as the color of the sky " +
+						"on a clear day");
 		ColorItem aureolin = new ColorItem(Color.parseColor("#FDEE00"), "Aureolin",
 				"Aureolin is a pigment sparingly used in oil and watercolor painting");
 		ColorItem amethyst = new ColorItem(Color.parseColor("#9966CC"), "Amethyst",
-				"amethyst is a moderate, transparent violet. Its name is derived from the stone amethyst, a form of quartz.");
+				"amethyst is a moderate, transparent violet. Its name is derived from the stone " +
+						"amethyst, a form of quartz.");
 		ColorItem charcoal = new ColorItem(Color.parseColor("#36454F"), "Charcoal",
 				"Charcoal is a color that is a representation of the dark gray color of burned wood.");
 		ColorItem jade = new ColorItem(Color.parseColor("#00A86B"), "Jade",
-				"Jade, also called jade green is a representation of the color of the gemstone called jade, although the stone itself varies widely in hue.");
+				"Jade, also called jade green is a representation of the color of the gemstone " +
+						"called jade, although the stone itself varies widely in hue.");
 
 		insertColor(crimson);
 		insertColor(azure);
@@ -104,7 +107,7 @@ public class BaseHelper extends SQLiteOpenHelper {
 	}
 
 	private void openForWriting() {
-		if (mDatabase == null ) {
+		if (mDatabase == null) {
 			mDatabase = getWritableDatabase();
 		}
 	}

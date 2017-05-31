@@ -73,7 +73,9 @@ public class DataStorage {
 				ColorsTable.Cols.ID + " = ?",
 				new String[] {id.toString()}
 		);
-		if (itemCursor.getCount() == 0) return null;
+		if (itemCursor.getCount() == 0) {
+			return null;
+		}
 
 		itemCursor.moveToFirst();
 		ColorItem colorItem = itemCursor.getColorItem();
@@ -122,8 +124,7 @@ public class DataStorage {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
-		}
-		finally {
+		} finally {
 			safeCloseWriter(file);
 		}
 		return true;
@@ -133,7 +134,7 @@ public class DataStorage {
 		if (file != null) {
 			try {
 				file.close();
-			} catch (IOException ignored){
+			} catch (IOException ignored) {
 			}
 		}
 	}
@@ -148,7 +149,7 @@ public class DataStorage {
 			while ((line = br.readLine()) != null) {
 				text.append(line).append('\n');
 			}
-		} catch (IOException e){
+		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		} finally {

@@ -36,18 +36,19 @@ public class ExportImportItemsTest {
 	public void grantPhonePermission() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			getInstrumentation().getUiAutomation().executeShellCommand(
-					"pm grant " + getTargetContext().getPackageName()
-							+ " android.permission.READ_EXTERNAL_STORAGE");
+					"pm grant " + getTargetContext().getPackageName() +
+							" android.permission.READ_EXTERNAL_STORAGE");
 		}
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			getInstrumentation().getUiAutomation().executeShellCommand(
-					"pm grant " + getTargetContext().getPackageName()
-							+ " android.permission.WRITE_EXTERNAL_STORAGE");
+					"pm grant " + getTargetContext().getPackageName() +
+							" android.permission.WRITE_EXTERNAL_STORAGE");
 		}
 	}
 
 	@Rule
-	public ActivityTestRule<ColorsListActivity> mActivityTestRule = new ActivityTestRule<>(ColorsListActivity.class);
+	public ActivityTestRule<ColorsListActivity> mActivityTestRule =
+			new ActivityTestRule<>(ColorsListActivity.class);
 
 	@Test
 	public void exportImportItemsTest() {
@@ -59,7 +60,8 @@ public class ExportImportItemsTest {
 		appCompatImageButton.perform(click());
 
 		ViewInteraction appCompatCheckedTextView = onView(
-				allOf(withId(R.id.design_menu_item_text), withText("Download from server"), isDisplayed()));
+				allOf(withId(R.id.design_menu_item_text),
+						withText("Download from server"), isDisplayed()));
 		appCompatCheckedTextView.perform(click());
 
 		ViewInteraction appCompatButton = onView(

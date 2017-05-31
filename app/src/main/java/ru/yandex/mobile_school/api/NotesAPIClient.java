@@ -3,7 +3,6 @@ package ru.yandex.mobile_school.api;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import retrofit2.Call;
@@ -23,17 +22,17 @@ public class NotesAPIClient {
 		void onError(String message);
 	}
 
-	private static NotesAPIClient INSTANCE;
+	private static NotesAPIClient sInstance;
 	private NotesAPI mNotesAPI;
 
 	private static final String BASE_URL = "https://notesbackend-yufimtsev.rhcloud.com/";
 	private static final String ERROR = "unknown error";
 
 	public static NotesAPIClient get() {
-		if (INSTANCE == null) {
-			INSTANCE = new NotesAPIClient();
+		if (sInstance == null) {
+			sInstance = new NotesAPIClient();
 		}
-		return INSTANCE;
+		return sInstance;
 	}
 
 	private NotesAPIClient() {
@@ -47,7 +46,8 @@ public class NotesAPIClient {
 		Call<ResponseNotes> call = mNotesAPI.getUserNotes(userId);
 		call.enqueue(new Callback<ResponseNotes>() {
 			@Override
-			public void onResponse(@NonNull Call<ResponseNotes> call, @NonNull Response<ResponseNotes> response) {
+			public void onResponse(@NonNull Call<ResponseNotes> call,
+								   @NonNull Response<ResponseNotes> response) {
 				ResponseNotes responseNotes = response.body();
 				if (responseNotes != null && responseNotes.isSuccessful()) {
 					ArrayList<ColorItem> results = new ArrayList<>();

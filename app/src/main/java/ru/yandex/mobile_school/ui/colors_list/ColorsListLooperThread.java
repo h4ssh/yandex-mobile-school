@@ -50,8 +50,9 @@ public class ColorsListLooperThread extends HandlerThread {
 		final boolean result;
 		if (what == WHAT_EXPORT) {
 			result = DataStorage.get(mContext).exportColorItems(path);
-		} else
+		} else {
 			result = what == WHAT_IMPORT && DataStorage.get(mContext).importColorItems(path);
+		}
 
 		mResponseHandler.post(new Runnable() {
 			@Override

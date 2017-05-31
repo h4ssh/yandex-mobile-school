@@ -1,23 +1,20 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 import butterknife.BindView;
@@ -28,9 +25,8 @@ import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.utils.DateFilter;
 import ru.yandex.mobile_school.utils.DateUtils;
 
-import static android.support.v7.widget.RecyclerView.NO_ID;
-
-public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.ViewHolder> implements Filterable {
+public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.ViewHolder>
+		implements Filterable {
 
 	public interface AdapterAsyncActionsListener {
 		void onSortFinish();
@@ -177,17 +173,29 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 					public int compare(ColorItem c1, ColorItem c2) {
 						switch (sortParam) {
 							case SORT_PARAM_TITLE:
-								if (ascending) return c1.getTitle().compareToIgnoreCase(c2.getTitle());
-								else return c2.getTitle().compareToIgnoreCase(c1.getTitle());
+								if (ascending) {
+									return c1.getTitle().compareToIgnoreCase(c2.getTitle());
+								} else {
+									return c2.getTitle().compareToIgnoreCase(c1.getTitle());
+								}
 							case SORT_PARAM_CREATED:
-								if (ascending) return c1.getCreatedDate().compareTo(c2.getCreatedDate());
-								else return  c2.getCreatedDate().compareTo(c1.getCreatedDate());
+								if (ascending) {
+									return c1.getCreatedDate().compareTo(c2.getCreatedDate());
+								} else {
+									return  c2.getCreatedDate().compareTo(c1.getCreatedDate());
+								}
 							case SORT_PARAM_EDITED:
-								if (ascending) return c1.getEditedDate().compareTo(c2.getEditedDate());
-								else return c2.getEditedDate().compareTo(c1.getEditedDate());
+								if (ascending) {
+									return c1.getEditedDate().compareTo(c2.getEditedDate());
+								} else {
+									return c2.getEditedDate().compareTo(c1.getEditedDate());
+								}
 							case SORT_PARAM_VIEWED:
-								if (ascending) return c1.getViewedDate().compareTo(c2.getViewedDate());
-								else return c2.getViewedDate().compareTo(c1.getViewedDate());
+								if (ascending) {
+									return c1.getViewedDate().compareTo(c2.getViewedDate());
+								} else {
+									return c2.getViewedDate().compareTo(c1.getViewedDate());
+								}
 							default:
 								return 0;
 						}
@@ -211,19 +219,20 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 	public void resort() {
 		if (mSortParam != null) {
 			sortBy(mSortParam, mSortAscending);
-		} else  if (mListener != null){
+		} else  if (mListener != null) {
 			mListener.onSortFinish();
 		}
 	}
 
 	public void search(String query) {
-		query = query.toLowerCase();
+		query = query.toLowerCase(Locale.getDefault());
 		ArrayList<ColorItem> filtered = new ArrayList<>();
 		for (int i = 0; i < mColors.size(); i++) {
 			ColorItem item = mColors.get(i);
-			if (item.getTitle().toLowerCase().contains(query) ||
-					item.getDescription().toLowerCase().contains(query))
+			if (item.getTitle().toLowerCase(Locale.getDefault()).contains(query) ||
+					item.getDescription().toLowerCase(Locale.getDefault()).contains(query)) {
 				filtered.add(item);
+			}
 		}
 		mFiltered = filtered;
 		notifyDataSetChanged();
@@ -265,8 +274,9 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 
 	public ColorItem getColorItem(UUID id) {
 		for (ColorItem item: mColors) {
-			if (item.getId().equals(id))
+			if (item.getId().equals(id)) {
 				return item;
+			}
 		}
 		return null;
 	}
@@ -322,9 +332,10 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 			return results;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		protected void publishResults(CharSequence constraint, FilterResults results) {
-			mFiltered = (ArrayList<ColorItem>)results.values;
+			mFiltered = (ArrayList<ColorItem>) results.values;
 			notifyDataSetChanged();
 		}
 	}

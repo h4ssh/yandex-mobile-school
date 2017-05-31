@@ -1,7 +1,5 @@
 package ru.yandex.mobile_school.ui.colors_list;
 
-
-import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -19,7 +17,6 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
-import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -32,7 +29,8 @@ import static org.hamcrest.Matchers.allOf;
 public class DeleteItemTest {
 
 	@Rule
-	public ActivityTestRule<ColorsListActivity> mActivityTestRule = new ActivityTestRule<>(ColorsListActivity.class);
+	public ActivityTestRule<ColorsListActivity> mActivityTestRule =
+			new ActivityTestRule<>(ColorsListActivity.class);
 
 	@Test
 	public void deleteItemTest() {

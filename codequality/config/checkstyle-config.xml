@@ -63,7 +63,7 @@
 
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-    <module name="FileTabCharacter"/>
+    <!-- <module name="FileTabCharacter"/> -->
     <!-- Miscellaneous other checks.                   -->
     <!-- See http://checkstyle.sf.net/config_misc.html -->
     <module name="RegexpSingleline">
@@ -129,7 +129,7 @@
             <property name="max" value="120"/>
         </module>
         <module name="MethodLength">
-            <property name="max" value="50"/>
+            <property name="max" value="80"/>
         </module>
         <module name="ParameterNumber">
             <property name="ignoreOverriddenMethods" value="true"/>
@@ -190,7 +190,7 @@
         <!-- <module name="FinalClass"/> -->
         <!-- <module name="FinalLocalVariable"/> -->
         <!-- <module name="FinalParameters"/> -->
-        <module name="HideUtilityClassConstructor"/>
+        <!--<module name="HideUtilityClassConstructor"/> -->
         <!--<module name="InterfaceIsType"/>-->
         <!--<module name="VisibilityModifier"/>-->
 

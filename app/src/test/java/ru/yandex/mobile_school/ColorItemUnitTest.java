@@ -5,10 +5,10 @@ import android.graphics.Color;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.assertThat;
 
-import ru.yandex.mobile_school.api.Note;
 import ru.yandex.mobile_school.data.ColorItem;
 
 /**
@@ -21,7 +21,7 @@ public class ColorItemUnitTest {
 	private static final String TEST_DESCRIPTION = "Test description";
 
 	@Test
-	public void constructorTest_Simple() throws Exception {
+	public void constructorTestSimple() throws Exception {
 		ColorItem colorItem = new ColorItem(Color.WHITE, TEST_TITLE, TEST_DESCRIPTION);
 		assertEquals(Color.WHITE, colorItem.getColor());
 		assertEquals(TEST_TITLE, colorItem.getTitle());
@@ -29,7 +29,7 @@ public class ColorItemUnitTest {
 	}
 
 	@Test
-	public void constructorTest_NullTitle() throws Exception {
+	public void constructorTestNullTitle() throws Exception {
 		ColorItem colorItem = new ColorItem(Color.YELLOW, null, TEST_DESCRIPTION);
 		assertEquals(Color.YELLOW, colorItem.getColor());
 		assertEquals("", colorItem.getTitle());
@@ -37,7 +37,7 @@ public class ColorItemUnitTest {
 	}
 
 	@Test
-	public void constructorTest_NullDescription() throws Exception {
+	public void constructorTestNullDescription() throws Exception {
 		ColorItem colorItem = new ColorItem(Color.RED, TEST_TITLE, null);
 		assertEquals(Color.RED, colorItem.getColor());
 		assertEquals(TEST_TITLE, colorItem.getTitle());

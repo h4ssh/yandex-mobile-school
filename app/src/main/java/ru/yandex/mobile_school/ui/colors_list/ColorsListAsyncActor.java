@@ -40,7 +40,7 @@ public class ColorsListAsyncActor {
 				for (int i = 0; i < quantity; i++) {
 					ColorItem item = ColorItemGenerator.generate();
 					mStorage.addColorItem(item);
-					newProgress = 100*i/quantity;
+					newProgress = 100 * i / quantity;
 					if (newProgress > oldProgress) {
 						oldProgress = newProgress;
 						publishProgress(newProgress);

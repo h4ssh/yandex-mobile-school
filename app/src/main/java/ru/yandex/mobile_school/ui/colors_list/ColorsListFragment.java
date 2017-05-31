@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,7 +32,6 @@ import ru.yandex.mobile_school.api.NotesAPIClient;
 import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.data.DataStorage;
 import ru.yandex.mobile_school.ui.base.BaseFragment;
-import ru.yandex.mobile_school.ui.base.SingleFragmentActivity;
 import ru.yandex.mobile_school.ui.color_picker.ColorPickerFragment;
 
 import static android.app.Activity.RESULT_OK;
@@ -97,7 +95,8 @@ public class ColorsListFragment extends BaseFragment implements
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_colors_list, container, false);
 		ButterKnife.bind(this, view);
 
@@ -108,7 +107,8 @@ public class ColorsListFragment extends BaseFragment implements
 		displayProgressBarIfNeeded(null);
 		mAsyncActor = new ColorsListAsyncActor(getContext());
 		mColorsListView.setLayoutManager(new LinearLayoutManager(getContext()));
-		mColorsListView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+		mColorsListView.addItemDecoration(new DividerItemDecoration(getContext(),
+				DividerItemDecoration.VERTICAL));
 		mColorsListView.setAdapter(mListAdapter);
 		mAddColorFAB.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -277,6 +277,8 @@ public class ColorsListFragment extends BaseFragment implements
 			case R.id.colors_list_menu_reset:
 				mListAdapter.resetFilters();
 				break;
+			default:
+				break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -288,14 +290,15 @@ public class ColorsListFragment extends BaseFragment implements
 		Resources res = getResources();
 		String[] sortParams = res.getStringArray(R.array.colors_list_sort_by_items);
 		String selectedParam = sortParams[sortParam];
-		if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_title)))
+		if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_title))) {
 			mListAdapter.sortBy(ColorsListAdapter.SORT_PARAM_TITLE, ascending);
-		else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_created)))
+		} else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_created))) {
 			mListAdapter.sortBy(ColorsListAdapter.SORT_PARAM_CREATED, ascending);
-		else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_edited)))
+		} else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_edited))) {
 			mListAdapter.sortBy(ColorsListAdapter.SORT_PARAM_EDITED, ascending);
-		else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_viewed)))
+		} else if (selectedParam.equals(res.getString(R.string.colors_list_sort_by_viewed))) {
 			mListAdapter.sortBy(ColorsListAdapter.SORT_PARAM_VIEWED, ascending);
+		}
 	}
 
 	@Override
@@ -306,12 +309,13 @@ public class ColorsListFragment extends BaseFragment implements
 		String[] filterParams = res.getStringArray(R.array.colors_list_filter_by_items);
 		String selectedParam = filterParams[filterParam];
 		String filterName = "";
-		if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_created)))
+		if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_created))) {
 			filterName = ColorsListAdapter.FILTER_PARAM_CREATED;
-		else if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_edited)))
+		} else if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_edited))) {
 			filterName = ColorsListAdapter.FILTER_PARAM_EDITED;
-		else if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_viewed)))
+		} else if (selectedParam.equals(res.getString(R.string.colors_list_filter_by_viewed))) {
 			filterName = ColorsListAdapter.FILTER_PARAM_VIEWED;
+		}
 		mListAdapter.filter(filterName, startDate, endDate);
 	}
 
@@ -339,7 +343,7 @@ public class ColorsListFragment extends BaseFragment implements
 		displayProgressBarIfNeeded(false);
 		mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
 		alert(getString(R.string.colors_list_generator_finish));
-		mBuilder.setContentText("Generating complete").setProgress(0,0,false);
+		mBuilder.setContentText("Generating complete").setProgress(0, 0, false);
 		mNotifyManager.notify(ASYNC_ACTION_NOTIFICATION_ID, mBuilder.build());
 	}
 

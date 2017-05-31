@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class ColorItemGeneratorTest {
 
 	@Test
-	public void dummyConstructorTest() throws Exception{
+	public void dummyConstructorTest() throws Exception {
 		ColorItemGenerator mGenerator = new ColorItemGenerator();
 		assertThat(mGenerator, not(equalTo(null)));
 	}

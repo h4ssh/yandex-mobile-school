@@ -30,7 +30,8 @@ import static org.hamcrest.Matchers.allOf;
 public class GenerateItemsTest {
 
 	@Rule
-	public ActivityTestRule<ColorsListActivity> mActivityTestRule = new ActivityTestRule<>(ColorsListActivity.class);
+	public ActivityTestRule<ColorsListActivity> mActivityTestRule =
+			new ActivityTestRule<>(ColorsListActivity.class);
 
 	@Test
 	public void generate5ItemsTest() {

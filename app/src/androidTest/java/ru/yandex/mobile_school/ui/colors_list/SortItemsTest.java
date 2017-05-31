@@ -27,7 +27,8 @@ import static org.hamcrest.Matchers.allOf;
 public class SortItemsTest {
 
 	@Rule
-	public ActivityTestRule<ColorsListActivity> mActivityTestRule = new ActivityTestRule<>(ColorsListActivity.class);
+	public ActivityTestRule<ColorsListActivity> mActivityTestRule
+			= new ActivityTestRule<>(ColorsListActivity.class);
 
 	@Test
 	public void sortItemsTest() {
@@ -39,7 +40,8 @@ public class SortItemsTest {
 		appCompatImageButton.perform(click());
 
 		ViewInteraction appCompatCheckedTextView = onView(
-				allOf(withId(R.id.design_menu_item_text), withText("Download from server"), isDisplayed()));
+				allOf(withId(R.id.design_menu_item_text),
+						withText("Download from server"), isDisplayed()));
 		appCompatCheckedTextView.perform(click());
 
 		ViewInteraction appCompatButton = onView(

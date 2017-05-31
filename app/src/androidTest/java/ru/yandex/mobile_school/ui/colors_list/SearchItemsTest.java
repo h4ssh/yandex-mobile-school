@@ -29,7 +29,8 @@ import static org.hamcrest.Matchers.allOf;
 public class SearchItemsTest {
 
 	@Rule
-	public ActivityTestRule<ColorsListActivity> mActivityTestRule = new ActivityTestRule<>(ColorsListActivity.class);
+	public ActivityTestRule<ColorsListActivity> mActivityTestRule =
+			new ActivityTestRule<>(ColorsListActivity.class);
 
 	@Test
 	public void searchItemsTest() {
@@ -41,7 +42,8 @@ public class SearchItemsTest {
 		appCompatImageButton.perform(click());
 
 		ViewInteraction appCompatCheckedTextView = onView(
-				allOf(withId(R.id.design_menu_item_text), withText("Download from server"), isDisplayed()));
+				allOf(withId(R.id.design_menu_item_text),
+						withText("Download from server"), isDisplayed()));
 		appCompatCheckedTextView.perform(click());
 
 		ViewInteraction appCompatButton = onView(
@@ -79,7 +81,8 @@ public class SearchItemsTest {
 		appCompatImageButton3.perform(click());
 
 		ViewInteraction appCompatCheckedTextView3 = onView(
-				allOf(withId(R.id.design_menu_item_text), withText("Reset search\\filter"), isDisplayed()));
+				allOf(withId(R.id.design_menu_item_text),
+						withText("Reset search\\filter"), isDisplayed()));
 		appCompatCheckedTextView3.perform(click());
 
 	}

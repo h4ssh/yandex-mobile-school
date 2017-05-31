@@ -16,7 +16,7 @@ import static junit.framework.Assert.assertEquals;
 public class DateUtilsUnitTest {
 
 	@Test
-	public void DateFilterTest() throws Exception {
+	public void dateFilterTest() throws Exception {
 		String paramName = "TEST";
 		Date now = new Date();
 		String filterString = DateUtils.getFilterString(paramName, now, now);

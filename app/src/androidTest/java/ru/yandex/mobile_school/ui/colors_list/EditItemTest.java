@@ -34,7 +34,8 @@ import static org.hamcrest.Matchers.allOf;
 public class EditItemTest {
 
 	@Rule
-	public ActivityTestRule<ColorsListActivity> mActivityTestRule = new ActivityTestRule<>(ColorsListActivity.class);
+	public ActivityTestRule<ColorsListActivity> mActivityTestRule =
+			new ActivityTestRule<>(ColorsListActivity.class);
 
 	@Test
 	public void editItemTest() {
@@ -44,7 +45,8 @@ public class EditItemTest {
 				isDisplayed()))
 				.perform(click());
 
-		onView(allOf(withId(R.id.design_menu_item_text), withText("Download from server"), isDisplayed()))
+		onView(allOf(withId(R.id.design_menu_item_text),
+				withText("Download from server"), isDisplayed()))
 				.perform(click());
 
 		onView(allOf(withId(android.R.id.button1), withText("OK")))
@@ -67,7 +69,8 @@ public class EditItemTest {
 		appCompatEditText2.perform(replaceText("edited"), closeSoftKeyboard());
 
 		ViewInteraction actionMenuItemView = onView(
-				allOf(withId(R.id.color_fragment_menu_done), withContentDescription("Done"), isDisplayed()));
+				allOf(withId(R.id.color_fragment_menu_done),
+						withContentDescription("Done"), isDisplayed()));
 		actionMenuItemView.perform(click());
 	}
 }
