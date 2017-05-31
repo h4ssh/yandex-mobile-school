@@ -4,6 +4,7 @@ package ru.yandex.mobile_school.ui.colors_list;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v7.widget.RecyclerView;
 import android.test.suitebuilder.annotation.LargeTest;
 
 import org.junit.Rule;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import ru.yandex.mobile_school.R;
+import ru.yandex.mobile_school.ui.colors_list.helpers.RecyclerViewItemCountAssertion;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -32,6 +34,11 @@ public class GenerateItemsTest {
 
 	@Test
 	public void generate5ItemsTest() {
+
+		RecyclerView recyclerView = (RecyclerView)
+				mActivityTestRule.getActivity().findViewById(R.id.colors_list_view);
+		int itemsCount = recyclerView.getAdapter().getItemCount();
+
 		ViewInteraction floatingActionButton = onView(
 				allOf(withId(R.id.colors_list_fab), isDisplayed()));
 		floatingActionButton.perform(longClick());
@@ -48,6 +55,7 @@ public class GenerateItemsTest {
 				allOf(withId(android.R.id.button1), withText("OK")));
 		appCompatButton.perform(scrollTo(), click());
 
+		onView(withId(R.id.colors_list_view)).check(new RecyclerViewItemCountAssertion(itemsCount + 5));
 	}
 
 }
