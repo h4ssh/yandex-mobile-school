@@ -1,6 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'jacoco'
 
+apply from: "${rootProject.projectDir}/codequality/codequality.gradle"
+apply from: "${rootProject.projectDir}/codequality/codequality-android.gradle"
+
 task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'createDebugCoverageReport']) {
 
     reports {
