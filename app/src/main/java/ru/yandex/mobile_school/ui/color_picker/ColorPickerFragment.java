@@ -343,6 +343,8 @@ public class ColorPickerFragment extends BaseFragment {
 				getActivity().getSupportFragmentManager().popBackStack();
 				getTargetFragment().onActivityResult(getTargetRequestCode(), RESULT_OK, intent);
 				break;
+			default:
+				break;
 		}
 		return super.onOptionsItemSelected(item);
 	}

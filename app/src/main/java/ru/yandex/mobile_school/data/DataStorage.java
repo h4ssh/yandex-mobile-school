@@ -24,7 +24,7 @@ import ru.yandex.mobile_school.db.ColorItemCursorWrapper;
 import ru.yandex.mobile_school.db.DbSchema;
 import ru.yandex.mobile_school.db.DbSchema.ColorsTable;
 
-public class DataStorage {
+public final class DataStorage {
 
 	private static final String SHARED_PREFS_NAME = "data_storage_shared_prefs";
 	private static final String SHARED_PREFS_USER = "data_storage_shared_user";

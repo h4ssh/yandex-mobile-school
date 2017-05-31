@@ -225,12 +225,12 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 	}
 
 	public void search(String query) {
-		query = query.toLowerCase(Locale.getDefault());
+		String lowerQuery = query.toLowerCase(Locale.getDefault());
 		ArrayList<ColorItem> filtered = new ArrayList<>();
 		for (int i = 0; i < mColors.size(); i++) {
 			ColorItem item = mColors.get(i);
-			if (item.getTitle().toLowerCase(Locale.getDefault()).contains(query) ||
-					item.getDescription().toLowerCase(Locale.getDefault()).contains(query)) {
+			if (item.getTitle().toLowerCase(Locale.getDefault()).contains(lowerQuery) ||
+					item.getDescription().toLowerCase(Locale.getDefault()).contains(lowerQuery)) {
 				filtered.add(item);
 			}
 		}
