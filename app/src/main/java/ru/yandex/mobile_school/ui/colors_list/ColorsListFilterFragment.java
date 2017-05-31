@@ -50,14 +50,17 @@ public class ColorsListFilterFragment extends DialogFragment {
 		View view = inflater.inflate(R.layout.fragment_colors_list_filter, null);
 		ButterKnife.bind(this, view);
 		builder.setTitle(getString(R.string.colors_list_filter_title));
-		String[] filterParamItems = getResources().getStringArray(R.array.colors_list_filter_by_items);
+		String[] filterParamItems = getResources().
+				getStringArray(R.array.colors_list_filter_by_items);
 		builder.setView(view)
 				.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						int pos = mFilterParamSpinner.getSelectedItemPosition();
-						Date start = mStartDateCheck.isChecked() ? getSelectedDate(mStartDatePicker) : null;
-						Date end = mEndDateCheck.isChecked() ? getSelectedDate(mEndDatePicker) : null;
+						Date start = mStartDateCheck.isChecked() ?
+								getSelectedDate(mStartDatePicker) : null;
+						Date end = mEndDateCheck.isChecked() ?
+								getSelectedDate(mEndDatePicker) : null;
 						if (mListener != null) {
 							saveState(pos, start, end);
 							mListener.onFilterPositiveClick(pos, start, end);

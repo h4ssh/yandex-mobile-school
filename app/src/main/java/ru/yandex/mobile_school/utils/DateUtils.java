@@ -12,23 +12,23 @@ import java.util.TimeZone;
 
 public class DateUtils {
 
-	private static final String ISO8601Format = ("yyyy-MM-dd'T'HH:mm:ssZ");
+	private static final String ISO8601_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
 	public static String getCurrentDateString() {
 		Date now = new Date();
-		DateFormat dateFormat = new SimpleDateFormat(ISO8601Format, Locale.getDefault());
+		DateFormat dateFormat = new SimpleDateFormat(ISO8601_FORMAT, Locale.getDefault());
 		dateFormat.setTimeZone(TimeZone.getDefault());
 		return dateFormat.format(now);
 	}
 
 	public static String dateToDateString(Date date) {
-		DateFormat dateFormat = new SimpleDateFormat(ISO8601Format, Locale.getDefault());
+		DateFormat dateFormat = new SimpleDateFormat(ISO8601_FORMAT, Locale.getDefault());
 		dateFormat.setTimeZone(TimeZone.getDefault());
 		return dateFormat.format(date);
 	}
 
 	public static Date parseDateString(String dateString) {
-		SimpleDateFormat format = new SimpleDateFormat(ISO8601Format);
+		SimpleDateFormat format = new SimpleDateFormat(ISO8601_FORMAT);
 		try {
 			return format.parse(dateString);
 		} catch (Exception ignored) {

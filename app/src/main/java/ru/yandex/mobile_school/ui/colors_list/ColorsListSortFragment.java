@@ -69,14 +69,16 @@ public class ColorsListSortFragment extends DialogFragment {
 	}
 
 	private void saveState(int pos, boolean ascending) {
-		SharedPreferences.Editor editor = getContext().getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE).edit();
+		SharedPreferences.Editor editor = getContext().getSharedPreferences(SHARED_PREFS_NAME,
+				Context.MODE_PRIVATE).edit();
 		editor.putInt(SHARED_PREFS_PARAM, pos);
 		editor.putBoolean(SHARED_PREFS_ORDER, ascending);
 		editor.apply();
 	}
 
 	private void restoreState() {
-		SharedPreferences preferences = getContext().getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+		SharedPreferences preferences = getContext().getSharedPreferences(SHARED_PREFS_NAME,
+				Context.MODE_PRIVATE);
 		mSortBySpinner.setSelection(preferences.getInt(SHARED_PREFS_PARAM, 0));
 		mSortOrderSpinner.setSelection(preferences.getBoolean(SHARED_PREFS_ORDER, true) ? 0 : 1);
 	}

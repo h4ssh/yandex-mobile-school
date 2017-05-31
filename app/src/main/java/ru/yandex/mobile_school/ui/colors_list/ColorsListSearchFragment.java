@@ -35,8 +35,9 @@ public class ColorsListSearchFragment extends DialogFragment {
 				.setPositiveButton(R.string.colors_list_search_search, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
-						if (mListener != null)
+						if (mListener != null) {
 							mListener.onSearchClick(mSearchEditText.getText().toString());
+						}
 					}
 				})
 				.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {

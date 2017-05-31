@@ -21,7 +21,9 @@ public class ColorItemCursorWrapper extends CursorWrapper {
 		String created = getString(getColumnIndex(ColorsTable.Cols.CREATED));
 		String edited = getString(getColumnIndex(ColorsTable.Cols.EDITED));
 		String viewed = getString(getColumnIndex(ColorsTable.Cols.VIEWED));
+		int serverId = getInt(getColumnIndex(ColorsTable.Cols.SERVER_ID));
 
-		return new ColorItem(id, Color.parseColor(color), title, descr, created, edited, viewed);
+		return new ColorItem(id, Color.parseColor(color), title, descr,
+				created, edited, viewed, serverId);
 	}
 }

@@ -1,12 +1,16 @@
 package ru.yandex.mobile_school.ui.color_picker;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.annotation.ColorInt;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.VelocityTrackerCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.transition.TransitionInflater;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -18,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,13 +33,19 @@ import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.yandex.mobile_school.ui.base.BaseFragment;
 import ru.yandex.mobile_school.ui.views.ColorView;
 import ru.yandex.mobile_school.ui.views.LockableHorizontalScrollView;
 import ru.yandex.mobile_school.ui.views.LockableScrollView;
 import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.data.ColorItem;
 
-public class ColorPickerFragment extends Fragment {
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+
+public class ColorPickerFragment extends BaseFragment {
+
+	public static final String EXTRA_COLOR_ITEM = "extra_color_item";
 
 	private static final String ARG_COLOR_ITEM = "color_item";
 	private static final String SAVED_COLOR_ITEM = "saved_color_item";
@@ -44,6 +55,11 @@ public class ColorPickerFragment extends Fragment {
 	private static final int COLOR_VIEW_MARGIN_IN_DP = 25;
 	private static final int COLOR_VIEW_FAVORITE_MARGIN_IN_DP = 8;
 	private static final int COLOR_VIEWS_COUNT = 16;
+	private static final float COLOR_VIEWS_RANGE = 360f;
+
+	private static final int INDEX_HUE = 0;
+	private static final int INDEX_SAT = 1;
+	private static final int INDEX_VAL = 2;
 
 	@BindView(R.id.color_fragment_title) EditText mTitleEdit;
 	@BindView(R.id.color_fragment_description) EditText mDescriptionEdit;
@@ -63,71 +79,77 @@ public class ColorPickerFragment extends Fragment {
 	@BindView(R.id.color_picker_date_viewed) TextView mDateViewedText;
 
 	private static final ArrayList<Integer> FAVORITE_COLORS = new ArrayList<>();
-	private IColorPicker mDelegate;
 	private LinearLayout.LayoutParams defaultViewParams;
 	private LinearLayout.LayoutParams favoriteViewParams;
 	private final View.OnTouchListener defaultTouchListener = new ViewColorTouchListener();
 	private ColorItem mColorItem;
 
-	static ColorPickerFragment newInstance(ColorItem item, IColorPicker delegate) {
+	public static ColorPickerFragment newInstance(ColorItem item) {
 		ColorPickerFragment fragment = new ColorPickerFragment();
 		if (item != null) {
 			Bundle args = new Bundle();
 			args.putParcelable(ARG_COLOR_ITEM, item);
 			fragment.setArguments(args);
 		}
-		fragment.setDelegate(delegate);
 		return fragment;
-	}
-
-	public void setDelegate (IColorPicker delegate) {
-		mDelegate = delegate;
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		postponeEnterTransition();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			setSharedElementEnterTransition(TransitionInflater.from(getContext())
+					.inflateTransition(android.R.transition.move));
+		}
 		setHasOptionsMenu(true);
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+							 Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_color_picker, container, false);
-		ButterKnife.bind(this,view);
+		ButterKnife.bind(this, view);
 
 		Bundle arguments = getArguments();
 		if (savedInstanceState != null && savedInstanceState.containsKey(SAVED_COLOR_ITEM)) {
-			ColorItem colorItem = savedInstanceState.getParcelable(SAVED_COLOR_ITEM);
-			mColorItem = colorItem;
-			mColorItem.setViewed();
-			mCurrentColorView.setCurrentColor(colorItem.getColor());
-			mTitleEdit.setText(colorItem.getTitle());
-			mDescriptionEdit.setText(colorItem.getDescription());
+			mColorItem = savedInstanceState.getParcelable(SAVED_COLOR_ITEM);
 		} else if (arguments != null && arguments.containsKey(ARG_COLOR_ITEM)) {
-			ColorItem colorItem = arguments.getParcelable(ARG_COLOR_ITEM);
-			mColorItem = colorItem;
-			mColorItem.setViewed();
-			mCurrentColorView.setCurrentColor(colorItem.getColor());
-			mTitleEdit.setText(colorItem.getTitle());
-			mDescriptionEdit.setText(colorItem.getDescription());
+			mColorItem = arguments.getParcelable(ARG_COLOR_ITEM);
+			((AppCompatActivity) getActivity()).getSupportActionBar()
+					.setTitle(R.string.color_picker_fragment_add_title);
+		} else {
+			mColorItem = new ColorItem();
+			((AppCompatActivity) getActivity()).getSupportActionBar()
+					.setTitle(R.string.color_picker_fragment_edit_title);
 		}
-
-		setCurrentColorDescription(mCurrentColorView.getCurrentColor());
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			mCurrentColorView.setTransitionName(mColorItem.getId().toString());
+		}
+		mColorItem.setViewed();
+		mCurrentColorView.setCurrentColor(mColorItem.getColor());
+		mTitleEdit.setText(mColorItem.getTitle());
+		mDescriptionEdit.setText(mColorItem.getDescription());
+		setCurrentColorDescription(mColorItem.getColor());
 		setColorItemMetadata();
 
 		DisplayMetrics metrics = getResources().getDisplayMetrics();
-		int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, COLOR_VIEW_SIZE_IN_DP, metrics);
-		int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, COLOR_VIEW_MARGIN_IN_DP, metrics);
-		int favMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, COLOR_VIEW_FAVORITE_MARGIN_IN_DP, metrics);
+		int size = (int) TypedValue.applyDimension(
+				TypedValue.COMPLEX_UNIT_DIP, COLOR_VIEW_SIZE_IN_DP, metrics);
+		int margin = (int) TypedValue.applyDimension(
+				TypedValue.COMPLEX_UNIT_DIP, COLOR_VIEW_MARGIN_IN_DP, metrics);
+		int favMargin = (int) TypedValue.applyDimension(
+				TypedValue.COMPLEX_UNIT_DIP, COLOR_VIEW_FAVORITE_MARGIN_IN_DP, metrics);
 		defaultViewParams = new LinearLayout.LayoutParams(size, size);
 		defaultViewParams.setMargins(margin, margin, margin, margin);
 		favoriteViewParams = new LinearLayout.LayoutParams(size, size);
 		favoriteViewParams.setMargins(0, 0, favMargin, 0);
 
-		float colorInterval = 360f/ COLOR_VIEWS_COUNT;
+		float colorInterval = COLOR_VIEWS_RANGE / COLOR_VIEWS_COUNT;
 		for (int i = 0; i < COLOR_VIEWS_COUNT; i++) {
 
-			final ColorView colorView = newColorView(getContext(), colorInterval / 2 + (colorInterval * i));
+			final ColorView colorView = newColorView(
+					getContext(), colorInterval / 2 + (colorInterval * i));
 			colorView.setOnTouchListener(defaultTouchListener);
 			mColorScrollLayout.addView(colorView, defaultViewParams);
 		}
@@ -137,7 +159,8 @@ public class ColorPickerFragment extends Fragment {
 		mCurrentColorView.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				final ColorView view = newColorView(getContext(), mCurrentColorView.getCurrentColor());
+				final ColorView view = newColorView(getContext(),
+						mCurrentColorView.getCurrentColor());
 				view.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -150,7 +173,7 @@ public class ColorPickerFragment extends Fragment {
 					@Override
 					public boolean onLongClick(View v) {
 						ViewGroup parent = (ViewGroup) v.getParent();
-						FAVORITE_COLORS.remove((Integer)((ColorView)v).getCurrentColor());
+						FAVORITE_COLORS.remove((Integer) ((ColorView) v).getCurrentColor());
 						parent.removeView(v);
 						return true;
 					}
@@ -165,7 +188,9 @@ public class ColorPickerFragment extends Fragment {
 	}
 
 	private void setColorItemMetadata() {
-		if (mColorItem == null) return;
+		if (mColorItem == null) {
+			return;
+		}
 		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
 		format.setTimeZone(TimeZone.getDefault());
 		mDateCreatedText.setText(getString(R.string.color_picker_created_date,
@@ -191,7 +216,7 @@ public class ColorPickerFragment extends Fragment {
 				@Override
 				public boolean onLongClick(View v) {
 					ViewGroup parent = (ViewGroup) v.getParent();
-					FAVORITE_COLORS.remove((Integer)((ColorView)v).getCurrentColor());
+					FAVORITE_COLORS.remove((Integer) ((ColorView) v).getCurrentColor());
 					parent.removeView(v);
 					return true;
 				}
@@ -201,14 +226,20 @@ public class ColorPickerFragment extends Fragment {
 	}
 
 	private void setCurrentColorDescription(@ColorInt int currentColor) {
-		mCurrentColorR.setText(getResources().getString(R.string.color_description_r, Color.red(currentColor)));
-		mCurrentColorG.setText(getResources().getString(R.string.color_description_g, Color.green(currentColor)));
-		mCurrentColorB.setText(getResources().getString(R.string.color_description_b, Color.blue(currentColor)));
-		float [] hsv = new float[] {0,0,0};
+		mCurrentColorR.setText(getResources()
+				.getString(R.string.color_description_r, Color.red(currentColor)));
+		mCurrentColorG.setText(getResources()
+				.getString(R.string.color_description_g, Color.green(currentColor)));
+		mCurrentColorB.setText(getResources()
+				.getString(R.string.color_description_b, Color.blue(currentColor)));
+		float[] hsv = new float[] {0, 0, 0};
 		Color.colorToHSV(currentColor, hsv);
-		mCurrentColorH.setText(getResources().getString(R.string.color_description_h, hsv[0]));
-		mCurrentColorS.setText(getResources().getString(R.string.color_description_s, hsv[1]));
-		mCurrentColorV.setText(getResources().getString(R.string.color_description_v, hsv[2]));
+		mCurrentColorH.setText(getResources()
+				.getString(R.string.color_description_h, hsv[INDEX_HUE]));
+		mCurrentColorS.setText(getResources()
+				.getString(R.string.color_description_s, hsv[INDEX_SAT]));
+		mCurrentColorV.setText(getResources()
+				.getString(R.string.color_description_v, hsv[INDEX_VAL]));
 	}
 
 	private static ColorView newColorView(Context context, float hue) {
@@ -230,7 +261,8 @@ public class ColorPickerFragment extends Fragment {
 
 					@Override
 					public void onLongPress(MotionEvent e) {
-						Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+						Vibrator vibrator = (Vibrator) getContext()
+								.getSystemService(Context.VIBRATOR_SERVICE);
 						vibrator.vibrate(100);
 						mMainScroll.setScrollingEnabled(false);
 						mColorScroll.setScrollingEnabled(false);
@@ -245,11 +277,13 @@ public class ColorPickerFragment extends Fragment {
 								if (event.getAction() == MotionEvent.ACTION_MOVE) {
 									veloTracker.addMovement(event);
 									veloTracker.computeCurrentVelocity(10);
-									float deltaX = VelocityTrackerCompat.getXVelocity(veloTracker, pointerId);
-									float deltaY = 	VelocityTrackerCompat.getYVelocity(veloTracker,	pointerId);
-									mColorView.variateColor(deltaX * HUE_SENSIVITY, -deltaY * VALUE_SENSIVITY);
-								}
-								else if (event.getAction() == MotionEvent.ACTION_UP) {
+									float deltaX = VelocityTrackerCompat
+											.getXVelocity(veloTracker, pointerId);
+									float deltaY = 	VelocityTrackerCompat
+											.getYVelocity(veloTracker,	pointerId);
+									mColorView.variateColor(deltaX * HUE_SENSIVITY,
+											-deltaY * VALUE_SENSIVITY);
+								} else if (event.getAction() == MotionEvent.ACTION_UP) {
 									mMainScroll.setScrollingEnabled(true);
 									mColorScroll.setScrollingEnabled(true);
 									mColorView.setOnTouchListener(defaultTouchListener);
@@ -277,7 +311,9 @@ public class ColorPickerFragment extends Fragment {
 
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
-			if (v instanceof ColorView) mColorView = (ColorView) v;
+			if (v instanceof ColorView) {
+				mColorView = (ColorView) v;
+			}
 			gestureDetector.onTouchEvent(event);
 			return true;
 		}
@@ -292,15 +328,36 @@ public class ColorPickerFragment extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.color_fragment_menu_done:
-				if (mDelegate != null) {
-					mColorItem.setColor(mCurrentColorView.getCurrentColor());
-					mColorItem.setTitle(mTitleEdit.getText().toString());
-					mColorItem.setDescription(mDescriptionEdit.getText().toString());
-					mDelegate.onColorPicked(mColorItem);
+				mColorItem.setColor(mCurrentColorView.getCurrentColor());
+				mColorItem.setTitle(mTitleEdit.getText().toString());
+				mColorItem.setDescription(mDescriptionEdit.getText().toString());
+				Intent intent = new Intent();
+				intent.putExtra(EXTRA_COLOR_ITEM, mColorItem);
+
+				View view = getView();
+				if (view != null) {
+					InputMethodManager mImm = (InputMethodManager) getContext()
+							.getSystemService(Context.INPUT_METHOD_SERVICE);
+					mImm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 				}
+				getActivity().getSupportFragmentManager().popBackStack();
+				getTargetFragment().onActivityResult(getTargetRequestCode(), RESULT_OK, intent);
+				break;
+			default:
 				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected boolean onBackPressed() {
+		Fragment targetFragment = getTargetFragment();
+		int requestCode = getTargetRequestCode();
+		getActivity().getSupportFragmentManager().popBackStackImmediate();
+		if (targetFragment != null) {
+			targetFragment.onActivityResult(requestCode, RESULT_CANCELED, null);
+		}
+		return true;
 	}
 
 	@Override

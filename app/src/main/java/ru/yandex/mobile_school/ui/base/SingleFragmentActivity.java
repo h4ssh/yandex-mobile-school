@@ -1,10 +1,13 @@
 package ru.yandex.mobile_school.ui.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 import ru.yandex.mobile_school.R;
 
@@ -29,8 +32,49 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 					.add(R.id.fragment_container, fragment)
 					.commit();
 		}
-		if (savedInstanceState != null)
+		if (savedInstanceState != null) {
 			restoreFragmentState(fragment);
+		}
+	}
+
+	public void replaceFragment(Fragment fragment) {
+		FragmentManager fm = getSupportFragmentManager();
+		fm.beginTransaction()
+				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+				.replace(R.id.fragment_container, fragment)
+				.addToBackStack(null)
+				.commit();
+	}
+
+	public void replaceFragmentWithShared(Fragment fragment, View shared, String sharedName) {
+		FragmentManager fm = getSupportFragmentManager();
+		fm.beginTransaction()
+				.addSharedElement(shared, sharedName)
+				.replace(R.id.fragment_container, fragment)
+				.addToBackStack(null)
+				.commit();
+	}
+
+	@Override
+	public void onBackPressed() {
+		Fragment currentFragment = getFragment();
+		if (currentFragment instanceof BaseFragment) {
+			if (!((BaseFragment) currentFragment).onBackPressed()) {
+				super.onBackPressed();
+			}
+		}
+	}
+
+	public void replaceFragmentForResult() {
+
+	}
+
+	public void onFragmentResult(int requestCode, int result, Intent data) {
+
+	}
+
+	public Fragment getFragment() {
+		return getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 	}
 
 	protected void restoreFragmentState(Fragment fragment) {

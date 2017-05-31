@@ -4,15 +4,16 @@ import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
-import android.support.annotation.Nullable;
 
 import java.util.Date;
 import java.util.UUID;
 
+import ru.yandex.mobile_school.api.Note;
 import ru.yandex.mobile_school.utils.DateUtils;
 
 public class ColorItem implements Parcelable {
 
+	public static final int COLOR_MASK = 0xFFFFFF;
 	private UUID mId;
 	private @ColorInt int mColor;
 	private String mTitle;
@@ -20,6 +21,7 @@ public class ColorItem implements Parcelable {
 	private String mCreated;
 	private String mViewed;
 	private String mEdited;
+	private int mServerId;
 
 	public ColorItem() {
 		mId = UUID.randomUUID();
@@ -29,16 +31,22 @@ public class ColorItem implements Parcelable {
 		mCreated = DateUtils.getCurrentDateString();
 		mEdited = DateUtils.getCurrentDateString();
 		mViewed = DateUtils.getCurrentDateString();
+		mServerId = 0;
 	}
 
 	public ColorItem(@ColorInt int color, String title, String description) {
 		this();
 		mColor = color;
-		if (title != null) mTitle = title;
-		if (description != null) mDescription = description;
+		if (title != null) {
+			mTitle = title;
+		}
+		if (description != null) {
+			mDescription = description;
+		}
 	}
 
-	public ColorItem(String id, int color, String title, String description, String created, String viewed, String edited) {
+	public ColorItem(String id, int color, String title, String description,
+					 String created, String viewed, String edited, int serverId) {
 		mId = UUID.fromString(id);
 		mColor = color;
 		mTitle = title;
@@ -46,6 +54,18 @@ public class ColorItem implements Parcelable {
 		mCreated = created;
 		mViewed = viewed;
 		mEdited = edited;
+		mServerId = serverId;
+	}
+
+	public ColorItem(Note note) {
+		mId = UUID.fromString(note.extra);
+		mColor = Color.parseColor(note.color);
+		mTitle = note.title;
+		mDescription = note.description;
+		mCreated = note.created;
+		mEdited = note.edited;
+		mViewed = note.viewed;
+		mServerId = note.id;
 	}
 
 	protected ColorItem(Parcel in) {
@@ -56,6 +76,7 @@ public class ColorItem implements Parcelable {
 		mCreated = in.readString();
 		mEdited = in.readString();
 		mViewed = in.readString();
+		mServerId = in.readInt();
 	}
 
 	public void updateWith(ColorItem item) {
@@ -65,6 +86,7 @@ public class ColorItem implements Parcelable {
 		mCreated = item.getCreated();
 		mEdited = item.getEdited();
 		mViewed = item.getViewed();
+		mServerId = item.mServerId;
 	}
 
 	public static final Creator<ColorItem> CREATOR = new Creator<ColorItem>() {
@@ -111,7 +133,7 @@ public class ColorItem implements Parcelable {
 	}
 
 	public String getColorAsHexString() {
-		return String.format("#%06X", (0xFFFFFF & mColor));
+		return String.format("#%06X", (COLOR_MASK & mColor));
 	}
 
 	public void setViewed() {
@@ -130,11 +152,25 @@ public class ColorItem implements Parcelable {
 		return mViewed;
 	}
 
-	public Date getCreatedDate() { return DateUtils.parseDateString(mCreated); }
+	public Date getCreatedDate() {
+		return DateUtils.parseDateString(mCreated);
+	}
 
-	public Date getEditedDate() {return  DateUtils.parseDateString(mEdited);}
+	public Date getEditedDate() {
+		return  DateUtils.parseDateString(mEdited);
+	}
 
-	public Date getViewedDate() { return DateUtils.parseDateString(mViewed);}
+	public Date getViewedDate() {
+		return DateUtils.parseDateString(mViewed);
+	}
+
+	public int getServerId() {
+		return mServerId;
+	}
+
+	public void setServerId(int serverId) {
+		mServerId = serverId;
+	}
 
 	private void onEdit() {
 		mEdited = DateUtils.getCurrentDateString();
@@ -154,5 +190,19 @@ public class ColorItem implements Parcelable {
 		dest.writeString(mCreated);
 		dest.writeString(mEdited);
 		dest.writeString(mViewed);
+		dest.writeInt(mServerId);
+	}
+
+	public Note toNote() {
+		Note note = new Note();
+		note.id = mServerId;
+		note.color = getColorAsHexString();
+		note.title = mTitle;
+		note.description = mDescription;
+		note.created = mCreated;
+		note.edited = mEdited;
+		note.viewed = mViewed;
+		note.extra = mId.toString();
+		return note;
 	}
 }
