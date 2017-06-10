@@ -15,7 +15,6 @@ import ru.yandex.mobile_school.data.ColorItem;
 public class NotesAPIClient {
 
 	public interface NotesAPICallbacks {
-		void onGetUserNotes(int user, ArrayList<ColorItem> items);
 		void onAddUserNote(int user, UUID itemId, int serverId);
 		void onDeleteUserNote(int user, UUID itemId);
 		void onUpdateUserNote(int user, UUID itemId);
@@ -40,37 +39,6 @@ public class NotesAPIClient {
 				.addConverterFactory(MoshiConverterFactory.create());
 		Retrofit retrofit = builder.build();
 		mNotesAPI = retrofit.create(NotesAPI.class);
-	}
-
-	public void getUserNotes(final int userId, final NotesAPICallbacks callbacks) {
-		Call<ResponseNotes> call = mNotesAPI.getUserNotes(userId);
-		call.enqueue(new Callback<ResponseNotes>() {
-			@Override
-			public void onResponse(@NonNull Call<ResponseNotes> call,
-								   @NonNull Response<ResponseNotes> response) {
-				ResponseNotes responseNotes = response.body();
-				if (responseNotes != null && responseNotes.isSuccessful()) {
-					ArrayList<ColorItem> results = new ArrayList<>();
-					for (Note note: responseNotes.data) {
-						results.add(new ColorItem(note));
-					}
-					if (callbacks != null) {
-						callbacks.onGetUserNotes(userId, results);
-					}
-				} else {
-					if (callbacks != null) {
-						callbacks.onError(ERROR);
-					}
-				}
-			}
-
-			@Override
-			public void onFailure(@NonNull Call<ResponseNotes> call, @NonNull Throwable t) {
-				if (callbacks != null) {
-					callbacks.onError(t.getMessage());
-				}
-			}
-		});
 	}
 
 	public void addUserNote(final int userId, final UUID itemId, Note note,

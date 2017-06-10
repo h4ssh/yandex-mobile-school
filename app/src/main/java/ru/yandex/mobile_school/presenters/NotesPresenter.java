@@ -1,17 +1,17 @@
 package ru.yandex.mobile_school.presenters;
 
+import java.util.ArrayList;
+
 import javax.inject.Inject;
 
 import io.reactivex.disposables.Disposable;
 import ru.yandex.mobile_school.App;
+import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.model.NotesModel;
+import ru.yandex.mobile_school.model.dto.NoteDTO;
 import ru.yandex.mobile_school.model.dto.RequestNotesDTO;
 import ru.yandex.mobile_school.ui.colors_list.NotesFragment;
 import ru.yandex.mobile_school.views.IView;
-
-/**
- * Created by hash on 10/06/2017.
- */
 
 public class NotesPresenter extends BasePresenter {
     private NotesFragment view;
@@ -45,7 +45,11 @@ public class NotesPresenter extends BasePresenter {
     }
 
     private void handleReceiveNotes(RequestNotesDTO notes) {
-        //StorageModel.get(getContext()).replaceColorItems(items);
+        ArrayList<ColorItem> items = new ArrayList<>(notes.getData().size());
+        for (NoteDTO note: notes.getData()) {
+            items.add(new ColorItem(note));
+        }
+        view.onGetUserNotes(notes.getUserId(), items);
     }
 
 }

@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import ru.yandex.mobile_school.api.Note;
+import ru.yandex.mobile_school.model.dto.NoteDTO;
 import ru.yandex.mobile_school.utils.DateUtils;
 
 public class ColorItem implements Parcelable {
@@ -66,6 +67,17 @@ public class ColorItem implements Parcelable {
 		mEdited = note.edited;
 		mViewed = note.viewed;
 		mServerId = note.id;
+	}
+
+	public ColorItem(NoteDTO note) {
+		mId = UUID.fromString(note.getExtra());
+		mColor = Color.parseColor(note.getColor());
+		mTitle = note.getTitle();
+		mDescription = note.getDescription();
+		mCreated = note.getCreated();
+		mEdited = note.getEdited();
+		mViewed = note.getViewed();
+		mServerId = Integer.parseInt(note.getId());
 	}
 
 	protected ColorItem(Parcel in) {

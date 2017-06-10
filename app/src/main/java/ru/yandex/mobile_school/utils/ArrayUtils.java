@@ -16,4 +16,15 @@ public class ArrayUtils {
 		}
 		return arrayList;
 	}
+
+	public static <T> ArrayList<T> toArrayList(List<T> list) {
+		if (list == null) {
+            return null;
+        }
+        ArrayList<T> arrayList = new ArrayList<T>(list.size());
+        for (int i = 0; i < list.size(); i++) {
+            arrayList.add(list.get(i));
+        }
+        return arrayList;
+	}
 }

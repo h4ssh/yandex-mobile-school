@@ -24,7 +24,7 @@ import ru.yandex.mobile_school.views.BaseActivityCallback;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
-public class ColorsListActivity extends SingleFragmentActivity implements BaseActivityCallback {
+public class NotesActivity extends SingleFragmentActivity implements BaseActivityCallback {
 
 	private static final int DEFAULT_SCRIM_COLOR = 0x99000000;
 

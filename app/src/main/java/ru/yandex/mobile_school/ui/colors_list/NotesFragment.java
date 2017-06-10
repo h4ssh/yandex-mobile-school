@@ -25,13 +25,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.yandex.mobile_school.App;
 import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.api.NotesAPIClient;
 import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.model.StorageModel;
 import ru.yandex.mobile_school.presenters.IBasePresenter;
+import ru.yandex.mobile_school.presenters.NotesPresenter;
 import ru.yandex.mobile_school.views.BaseFragment;
 import ru.yandex.mobile_school.ui.color_picker.ColorPickerFragment;
 
@@ -56,6 +60,9 @@ public class NotesFragment extends BaseFragment implements
 
 	private static final String EXTRA_EDIT_POSITION = "extra_edit_position";
 
+	@Inject
+	NotesPresenter presenter;
+
 	private int mEditPosition = 0;
 	private int mPendingOperations = 0;
 	private ColorsListAsyncActor mAsyncActor;
@@ -72,10 +79,17 @@ public class NotesFragment extends BaseFragment implements
 		return new NotesFragment();
 	}
 
+	public NotesFragment() {
+        // Required empty public constructor
+    }
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
+        App.getComponent().inject(this);
+        presenter.onCreate(this);
+
+        setHasOptionsMenu(true);
 
 		if (savedInstanceState != null) {
 			mEditPosition = savedInstanceState.getInt(EXTRA_EDIT_POSITION);
@@ -101,7 +115,7 @@ public class NotesFragment extends BaseFragment implements
 		View view = inflater.inflate(R.layout.fragment_colors_list, container, false);
 		ButterKnife.bind(this, view);
 
-		ColorsListActivity activity = (ColorsListActivity) getActivity();
+		NotesActivity activity = (NotesActivity) getActivity();
 		activity.getSupportActionBar().setTitle(R.string.app_name);
 		activity.setNavBarItemsEnabled(true);
 
@@ -116,7 +130,7 @@ public class NotesFragment extends BaseFragment implements
 			public void onClick(View v) {
 				ColorPickerFragment fragment = ColorPickerFragment.newInstance(null);
 				fragment.setTargetFragment(getFragment(), REQUEST_CODE_ADD);
-				ColorsListActivity listActivity = (ColorsListActivity) getActivity();
+				NotesActivity listActivity = (NotesActivity) getActivity();
 				listActivity.replaceFragment(fragment);
 				listActivity.setNavBarItemsEnabled(false);
 			}
@@ -143,7 +157,7 @@ public class NotesFragment extends BaseFragment implements
 		mEditPosition = position;
 		ColorPickerFragment fragment = ColorPickerFragment.newInstance(colorItem);
 		fragment.setTargetFragment(getFragment(), REQUEST_CODE_EDIT);
-		ColorsListActivity listActivity = (ColorsListActivity) getActivity();
+		NotesActivity listActivity = (NotesActivity) getActivity();
 		View itemView = mColorsListView.getLayoutManager().findViewByPosition(position);
 		View sharedView = itemView.findViewById(R.id.colors_list_item_color_view);
 		listActivity.replaceFragmentWithShared(fragment, sharedView, colorItem.getId().toString());
@@ -418,7 +432,6 @@ public class NotesFragment extends BaseFragment implements
 
 	private static final String TAG_API = "API CALLBACKS";
 
-	@Override
 	public void onGetUserNotes(int user, ArrayList<ColorItem> items) {
 		StorageModel.get(getContext()).replaceColorItems(items);
 		mListAdapter.changeData(items);
@@ -451,7 +464,7 @@ public class NotesFragment extends BaseFragment implements
 	@Override
 	public void onUserChanged(int newUser) {
 		StorageModel.get(getContext()).setUserId(newUser);
-		NotesAPIClient.get().getUserNotes(newUser, this);
+        presenter.requestNotes(newUser);
 		alert(getString(R.string.colors_list_download_start));
 	}
 

@@ -29,8 +29,8 @@ import static org.hamcrest.Matchers.allOf;
 public class DeleteItemTest {
 
 	@Rule
-	public ActivityTestRule<ColorsListActivity> mActivityTestRule =
-			new ActivityTestRule<>(ColorsListActivity.class);
+	public ActivityTestRule<NotesActivity> mActivityTestRule =
+			new ActivityTestRule<>(NotesActivity.class);
 
 	@Test
 	public void deleteItemTest() {

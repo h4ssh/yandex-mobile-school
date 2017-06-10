@@ -6,6 +6,7 @@ import dagger.Component;
 import ru.yandex.mobile_school.model.BaseModel;
 import ru.yandex.mobile_school.model.NotesModel;
 import ru.yandex.mobile_school.presenters.BasePresenter;
+import ru.yandex.mobile_school.presenters.NotesPresenter;
 import ru.yandex.mobile_school.ui.colors_list.NotesFragment;
 
 @SuppressWarnings("WeakerAccess")
@@ -17,7 +18,7 @@ public interface AppComponent {
 
     void inject(BasePresenter basePresenter);
 
-    void inject(NotesModel notesModel);
+    void inject(NotesPresenter notesPresenter);
 
     void inject(NotesFragment notesFragment);
 }

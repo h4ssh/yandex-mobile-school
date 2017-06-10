@@ -34,8 +34,8 @@ import static org.hamcrest.Matchers.allOf;
 public class EditItemTest {
 
 	@Rule
-	public ActivityTestRule<ColorsListActivity> mActivityTestRule =
-			new ActivityTestRule<>(ColorsListActivity.class);
+	public ActivityTestRule<NotesActivity> mActivityTestRule =
+			new ActivityTestRule<>(NotesActivity.class);
 
 	@Test
 	public void editItemTest() {
