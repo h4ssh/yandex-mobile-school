@@ -13,7 +13,7 @@ import android.widget.EditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.yandex.mobile_school.R;
-import ru.yandex.mobile_school.data.DataStorage;
+import ru.yandex.mobile_school.model.StorageModel;
 
 public class ColorsListUserFragment extends DialogFragment {
 
@@ -33,7 +33,7 @@ public class ColorsListUserFragment extends DialogFragment {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View view = inflater.inflate(R.layout.fragment_colors_list_user, null);
 		ButterKnife.bind(this, view);
-		mUserEdit.setText(Integer.toString(DataStorage.get(getContext()).getUserId()));
+		mUserEdit.setText(Integer.toString(StorageModel.get(getContext()).getUserId()));
 		builder.setTitle(R.string.colors_list_user_title);
 		builder.setView(view)
 				.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {

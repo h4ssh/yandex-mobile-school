@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 
 import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.data.ColorItemGenerator;
-import ru.yandex.mobile_school.data.DataStorage;
+import ru.yandex.mobile_school.model.StorageModel;
 
 
 public class ColorsListAsyncActor {
@@ -19,10 +19,10 @@ public class ColorsListAsyncActor {
 
 	private ColorsListAsyncActorListener mListener;
 
-	private DataStorage mStorage;
+	private StorageModel mStorage;
 
 	public ColorsListAsyncActor(Context context) {
-		mStorage = DataStorage.get(context);
+		mStorage = StorageModel.get(context);
 	}
 
 	public void setListener(ColorsListAsyncActorListener listener) {

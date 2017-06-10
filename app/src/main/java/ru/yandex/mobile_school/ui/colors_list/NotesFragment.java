@@ -30,13 +30,14 @@ import butterknife.ButterKnife;
 import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.api.NotesAPIClient;
 import ru.yandex.mobile_school.data.ColorItem;
-import ru.yandex.mobile_school.data.DataStorage;
-import ru.yandex.mobile_school.ui.base.BaseFragment;
+import ru.yandex.mobile_school.model.StorageModel;
+import ru.yandex.mobile_school.presenters.IBasePresenter;
+import ru.yandex.mobile_school.views.BaseFragment;
 import ru.yandex.mobile_school.ui.color_picker.ColorPickerFragment;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ColorsListFragment extends BaseFragment implements
+public class NotesFragment extends BaseFragment implements
 		ColorsListSortFragment.ColorsListSortDialogListener,
 		ColorsListFilterFragment.ColorsListFilterDialogListener,
 		ColorsListExportFragment.ColorsListExportDialogListener,
@@ -67,8 +68,8 @@ public class ColorsListFragment extends BaseFragment implements
 	@BindView(R.id.colors_list_progress_bar) ProgressBar mProgressBar;
 	@BindView(R.id.colors_list_view) RecyclerView mColorsListView;
 
-	static ColorsListFragment newInstance() {
-		return new ColorsListFragment();
+	static NotesFragment newInstance() {
+		return new NotesFragment();
 	}
 
 	@Override
@@ -83,7 +84,7 @@ public class ColorsListFragment extends BaseFragment implements
 		mLooperThread.start();
 		mLooperThread.prepareHandler();
 
-		mListAdapter = new ColorsListAdapter(DataStorage.get(getContext()).getColorItems());
+		mListAdapter = new ColorsListAdapter(StorageModel.get(getContext()).getColorItems());
 		mListAdapter.setAdapterSortListener(this);
 		mListAdapter.setAdapterOnClickListener(this);
 	}
@@ -133,7 +134,7 @@ public class ColorsListFragment extends BaseFragment implements
 		return view;
 	}
 
-	private ColorsListFragment getFragment() {
+	private NotesFragment getFragment() {
 		return this;
 	}
 
@@ -162,7 +163,7 @@ public class ColorsListFragment extends BaseFragment implements
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				mListAdapter.deleteItem(item);
-				DataStorage storage = DataStorage.get(getContext());
+				StorageModel storage = StorageModel.get(getContext());
 				storage.deleteColorItem(item);
 				if (item.getServerId() != 0) {
 					NotesAPIClient.get().deleteUserNote(storage.getUserId(), item.getId(),
@@ -198,7 +199,7 @@ public class ColorsListFragment extends BaseFragment implements
 			displayProgressBarIfNeeded(true);
 			mListAdapter.resort();
 			alert(getString(R.string.colors_list_sort_started));
-			DataStorage storage = DataStorage.get(getContext());
+			StorageModel storage = StorageModel.get(getContext());
 			storage.updateColorItem(updated);
 			NotesAPIClient.get().updateUserNote(storage.getUserId(), updated.getId(),
 					updated.getServerId(), updated.toNote(), this);
@@ -206,7 +207,7 @@ public class ColorsListFragment extends BaseFragment implements
 	}
 
 	private void addColorItem(ColorItem item) {
-		DataStorage storage = DataStorage.get(getContext());
+		StorageModel storage = StorageModel.get(getContext());
 		storage.addColorItem(item);
 		NotesAPIClient.get().addUserNote(storage.getUserId(), item.getId(), item.toNote(), this);
 		mListAdapter.addItem(item);
@@ -341,7 +342,7 @@ public class ColorsListFragment extends BaseFragment implements
 	@Override
 	public void onItemsAddFinish() {
 		displayProgressBarIfNeeded(false);
-		mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
+		mListAdapter.changeData(StorageModel.get(getContext()).getColorItems());
 		alert(getString(R.string.colors_list_generator_finish));
 		mBuilder.setContentText("Generating complete").setProgress(0, 0, false);
 		mNotifyManager.notify(ASYNC_ACTION_NOTIFICATION_ID, mBuilder.build());
@@ -367,7 +368,7 @@ public class ColorsListFragment extends BaseFragment implements
 //	public void onItemsImportFinish(boolean result) {
 //		displayProgressBarIfNeeded(false);
 //		if (result) {
-//			mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
+//			mListAdapter.changeData(StorageModel.get(getContext()).getColorItems());
 //			alert(getString(R.string.colors_list_import_success));
 //		} else {
 //			alert(getString(R.string.colors_list_import_error));
@@ -408,7 +409,7 @@ public class ColorsListFragment extends BaseFragment implements
 	public void onColorsImported(boolean result) {
 		displayProgressBarIfNeeded(false);
 		if (result) {
-			mListAdapter.changeData(DataStorage.get(getContext()).getColorItems());
+			mListAdapter.changeData(StorageModel.get(getContext()).getColorItems());
 			alert(getString(R.string.colors_list_import_success));
 		} else {
 			alert(getString(R.string.colors_list_import_error));
@@ -419,14 +420,14 @@ public class ColorsListFragment extends BaseFragment implements
 
 	@Override
 	public void onGetUserNotes(int user, ArrayList<ColorItem> items) {
-		DataStorage.get(getContext()).replaceColorItems(items);
+		StorageModel.get(getContext()).replaceColorItems(items);
 		mListAdapter.changeData(items);
 	}
 
 	@Override
 	public void onAddUserNote(int user, UUID itemId, int noteId) {
 		Log.d(TAG_API, "On add user note: " + user + " UUID: " + itemId.toString() + " noteId: " + noteId);
-		DataStorage storage = DataStorage.get(getContext());
+		StorageModel storage = StorageModel.get(getContext());
 		ColorItem item = storage.getColorItem(itemId);
 		item.setServerId(noteId);
 		storage.updateColorItem(item);
@@ -449,8 +450,13 @@ public class ColorsListFragment extends BaseFragment implements
 
 	@Override
 	public void onUserChanged(int newUser) {
-		DataStorage.get(getContext()).setUserId(newUser);
+		StorageModel.get(getContext()).setUserId(newUser);
 		NotesAPIClient.get().getUserNotes(newUser, this);
 		alert(getString(R.string.colors_list_download_start));
+	}
+
+	@Override
+	protected IBasePresenter getPresenter() {
+		return null; // TODO: return presenter
 	}
 }

@@ -1,4 +1,4 @@
-package ru.yandex.mobile_school.db;
+package ru.yandex.mobile_school.model.db;
 
 public class DbSchema {
 	public static final class ColorsTable {

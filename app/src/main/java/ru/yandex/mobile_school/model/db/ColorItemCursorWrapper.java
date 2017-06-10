@@ -1,11 +1,11 @@
-package ru.yandex.mobile_school.db;
+package ru.yandex.mobile_school.model.db;
 
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.graphics.Color;
 
 import ru.yandex.mobile_school.data.ColorItem;
-import ru.yandex.mobile_school.db.DbSchema.ColorsTable;
+import ru.yandex.mobile_school.model.db.DbSchema.ColorsTable;
 
 public class ColorItemCursorWrapper extends CursorWrapper {
 

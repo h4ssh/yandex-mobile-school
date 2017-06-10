@@ -5,7 +5,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 
-import ru.yandex.mobile_school.data.DataStorage;
+import ru.yandex.mobile_school.model.StorageModel;
 
 public class ColorsListLooperThread extends HandlerThread {
 
@@ -49,9 +49,9 @@ public class ColorsListLooperThread extends HandlerThread {
 	private void handleRequest(final String path, final int what) {
 		final boolean result;
 		if (what == WHAT_EXPORT) {
-			result = DataStorage.get(mContext).exportColorItems(path);
+			result = StorageModel.get(mContext).exportColorItems(path);
 		} else {
-			result = what == WHAT_IMPORT && DataStorage.get(mContext).importColorItems(path);
+			result = what == WHAT_IMPORT && StorageModel.get(mContext).importColorItems(path);
 		}
 
 		mResponseHandler.post(new Runnable() {

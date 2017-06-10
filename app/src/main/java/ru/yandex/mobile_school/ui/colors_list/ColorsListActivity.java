@@ -20,10 +20,11 @@ import butterknife.ButterKnife;
 import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.ui.base.SingleFragmentActivity;
 import ru.yandex.mobile_school.ui.views.LockableDrawer;
+import ru.yandex.mobile_school.views.BaseActivityCallback;
 
 import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
-public class ColorsListActivity extends SingleFragmentActivity {
+public class ColorsListActivity extends SingleFragmentActivity implements BaseActivityCallback {
 
 	private static final int DEFAULT_SCRIM_COLOR = 0x99000000;
 
@@ -99,7 +100,7 @@ public class ColorsListActivity extends SingleFragmentActivity {
 
 	@Override
 	protected Fragment createFragment() {
-		return ColorsListFragment.newInstance();
+		return NotesFragment.newInstance();
 	}
 
 
@@ -144,5 +145,36 @@ public class ColorsListActivity extends SingleFragmentActivity {
 			mFragmentContainer.setPadding(width, mDrawableTopPadding,
 					mDrawableRightPadding, mDrawableBottomPadding);
 		}
+	}
+
+
+	@Override
+	public void setTitle(String title) {
+		// TODO: implement
+	}
+
+	@Override
+	public void showProgressBar() {
+		// TODO: implement
+	}
+
+	@Override
+	public void hideProgressBar() {
+		// TODO: implement
+	}
+
+	@Override
+	public void showError(String error) {
+		// TODO: implement
+	}
+
+	@Override
+	public void showDialog(String title, String message) {
+		// TODO: implement
+	}
+
+	@Override
+	public void showErrorDialog(String error) {
+		// TODO: implement
 	}
 }

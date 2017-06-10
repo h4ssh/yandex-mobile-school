@@ -1,4 +1,4 @@
-package ru.yandex.mobile_school.data;
+package ru.yandex.mobile_school.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,31 +19,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import ru.yandex.mobile_school.db.BaseHelper;
-import ru.yandex.mobile_school.db.ColorItemCursorWrapper;
-import ru.yandex.mobile_school.db.DbSchema;
-import ru.yandex.mobile_school.db.DbSchema.ColorsTable;
+import javax.inject.Inject;
 
-public final class DataStorage {
+import ru.yandex.mobile_school.data.ColorItem;
+import ru.yandex.mobile_school.data.ColorItemJsonAdapter;
+import ru.yandex.mobile_school.model.db.BaseHelper;
+import ru.yandex.mobile_school.model.db.ColorItemCursorWrapper;
+import ru.yandex.mobile_school.model.db.DbSchema;
+import ru.yandex.mobile_school.model.db.DbSchema.ColorsTable;
+
+public class StorageModel {
+
+	@Inject
+	Context context;
 
 	private static final String SHARED_PREFS_NAME = "data_storage_shared_prefs";
 	private static final String SHARED_PREFS_USER = "data_storage_shared_user";
 	private static final int DEFAULT_USER_ID = 223322;
 
-	private static DataStorage sDataStorage;
+	private static StorageModel sStorageModel;
 	private SQLiteDatabase mDatabase;
 	private BaseHelper mBaseHelper;
 	private int mUserId = DEFAULT_USER_ID;
 	private SharedPreferences mSharedPreferences;
 
-	public static DataStorage get(Context context) {
-		if (sDataStorage == null) {
-			sDataStorage = new DataStorage(context);
+	public static StorageModel get(Context context) {
+		if (sStorageModel == null) {
+			sStorageModel = new StorageModel(context);
 		}
-		return sDataStorage;
+		return sStorageModel;
 	}
 
-	private DataStorage(Context context) {
+	private StorageModel(Context context) {
 		mBaseHelper = new BaseHelper(context.getApplicationContext());
 		mDatabase = mBaseHelper.getWritableDatabase();
 		mSharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
