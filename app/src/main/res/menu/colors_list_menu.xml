@@ -2,39 +2,39 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/colors_list_cloud_download"
+        android:id="@+id/notes_list_cloud_download"
         android:icon="@drawable/ic_cloud_download_white_24dp"
-        android:title="@string/colors_list_menu_cloud_download"
+        android:title="@string/notes_list_menu_cloud_download"
         app:showAsAction="always"
         />
     <item
-        android:id="@+id/colors_list_menu_search"
+        android:id="@+id/notes_list_menu_search"
         android:icon="@drawable/ic_search_white_24dp"
-        android:title="@string/colors_list_menu_search"
+        android:title="@string/notes_list_menu_search"
         app:showAsAction="always"
         />
     <item
-        android:id="@+id/colors_list_menu_filter"
+        android:id="@+id/notes_list_menu_filter"
         android:icon="@drawable/ic_filter_list_white_24dp"
-        android:title="@string/colors_list_menu_filter"
+        android:title="@string/notes_list_menu_filter"
         android:orderInCategory="1"
         app:showAsAction="ifRoom"/>
     <item
-        android:id="@+id/colors_list_menu_reset"
+        android:id="@+id/notes_list_menu_reset"
         android:icon="@drawable/ic_replay_white_24dp"
-        android:title="@string/colors_list_menu_reset"
+        android:title="@string/notes_list_menu_reset"
         android:orderInCategory="2"
         app:showAsAction="ifRoom"/>
     <item
-        android:id="@+id/colors_list_menu_sort"
+        android:id="@+id/notes_list_menu_sort"
         android:icon="@drawable/ic_sort_by_alpha_white_24dp"
-        android:title="@string/colors_list_menu_sort"
+        android:title="@string/notes_list_menu_sort"
         android:orderInCategory="3"
         app:showAsAction="ifRoom"/>
     <item
-        android:id="@+id/colors_list_menu_import_export"
+        android:id="@+id/notes_list_menu_import_export"
         android:icon="@drawable/ic_import_export_white_24dp"
-        android:title="@string/colors_list_menu_import_export"
+        android:title="@string/notes_list_menu_import_export"
         android:orderInCategory="4"
         app:showAsAction="ifRoom"/>
 </menu>

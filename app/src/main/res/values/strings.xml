@@ -1,78 +1,78 @@
 <resources>
-    <string name="app_name">mobile-school</string>
+    <string name="app_name">Notes</string>
 
-    <string name="color_picker_fragment_add_title">Pick a color</string>
-    <string name="color_picker_fragment_edit_title">Edit color</string>
+    <string name="note_edit_fragment_add_title">Add a note</string>
+    <string name="note_edit_fragment_edit_title">Edit note</string>
 
-    <string name="color_picker_current_color_title">Current color:</string>
-    <string name="color_picker_favorite_colors_title">Favorite colors:</string>
-    <string name="color_picker_created_date">Created:\t %1$s</string>
-    <string name="color_picker_edited_date">Edited:\t %1$s</string>
-    <string name="color_picker_viewed_date">Viewed:\t %1$s</string>
+    <string name="note_edit_current_color_title">Current color:</string>
+    <string name="note_edit_favorite_colors_title">Favorite colors:</string>
+    <string name="note_edit_created_date">Created:\t %1$s</string>
+    <string name="note_edit_edited_date">Edited:\t %1$s</string>
+    <string name="note_edit_viewed_date">Viewed:\t %1$s</string>
 
-    <string name="colors_list_menu_cloud_download">Download from server</string>
-    <string name="colors_list_menu_search">Search</string>
-    <string name="colors_list_menu_filter">Filter</string>
-    <string name="colors_list_menu_reset">Reset search\\filter</string>
-    <string name="colors_list_menu_sort">Sort</string>
-    <string name="colors_list_menu_import_export">Import\\Export</string>
+    <string name="notes_list_menu_cloud_download">Download from server</string>
+    <string name="notes_list_menu_search">Search</string>
+    <string name="notes_list_menu_filter">Filter</string>
+    <string name="notes_list_menu_reset">Reset search\\filter</string>
+    <string name="notes_list_menu_sort">Sort</string>
+    <string name="notes_list_menu_import_export">Import\\Export</string>
 
-    <string name="colors_list_sort_title">Sort list</string>
-    <string name="colors_list_sort_order">Sort order:</string>
-    <string name="colors_list_sort_by">Sort by:</string>
-    <string name="colors_list_sort_by_title">Title</string>
-    <string name="colors_list_sort_by_created">Date created</string>
-    <string name="colors_list_sort_by_edited">Date edited</string>
-    <string name="colors_list_sort_by_viewed">Date viewed</string>
-    <string-array name="colors_list_sort_by_items">
-        <item>@string/colors_list_sort_by_title</item>
-        <item>@string/colors_list_sort_by_created</item>
-        <item>@string/colors_list_sort_by_edited</item>
-        <item>@string/colors_list_sort_by_viewed</item>
+    <string name="notes_list_sort_title">Sort list</string>
+    <string name="notes_list_sort_order">Sort order:</string>
+    <string name="notes_list_sort_by">Sort by:</string>
+    <string name="notes_list_sort_by_title">Title</string>
+    <string name="notes_list_sort_by_created">Date created</string>
+    <string name="notes_list_sort_by_edited">Date edited</string>
+    <string name="notes_list_sort_by_viewed">Date viewed</string>
+    <string-array name="notes_list_sort_by_items">
+        <item>@string/notes_list_sort_by_title</item>
+        <item>@string/notes_list_sort_by_created</item>
+        <item>@string/notes_list_sort_by_edited</item>
+        <item>@string/notes_list_sort_by_viewed</item>
     </string-array>
-    <string name="colors_list_sort_order_ascending">Ascending</string>
-    <string name="colors_list_sort_order_descending">Descending</string>
-    <string-array name="colors_list_sort_order_items">
-        <item>@string/colors_list_sort_order_ascending</item>
-        <item>@string/colors_list_sort_order_descending</item>
+    <string name="notes_list_sort_order_ascending">Ascending</string>
+    <string name="notes_list_sort_order_descending">Descending</string>
+    <string-array name="notes_list_sort_order_items">
+        <item>@string/notes_list_sort_order_ascending</item>
+        <item>@string/notes_list_sort_order_descending</item>
     </string-array>
-    <string name="colors_list_sort_started">Sorting, please wait…</string>
-    <string name="colors_list_sort_finished">Sorting finished!</string>
+    <string name="notes_list_sort_started">Sorting, please wait…</string>
+    <string name="notes_list_sort_finished">Sorting finished!</string>
 
-    <string name="colors_list_filter_title">Filter list</string>
-    <string name="colors_list_filter_param">Filter by:</string>
-    <string name="colors_list_filter_start_date">Start date:</string>
-    <string name="colors_list_filter_end_date">End date:</string>
-    <string name="colors_list_filter_by_created">Date created</string>
-    <string name="colors_list_filter_by_edited">Date edited</string>
-    <string name="colors_list_filter_by_viewed">Date viewed</string>
-    <string-array name="colors_list_filter_by_items">
-        <item>@string/colors_list_filter_by_created</item>
-        <item>@string/colors_list_filter_by_edited</item>
-        <item>@string/colors_list_filter_by_viewed</item>
+    <string name="notes_list_filter_title">Filter list</string>
+    <string name="notes_list_filter_param">Filter by:</string>
+    <string name="notes_list_filter_start_date">Start date:</string>
+    <string name="notes_list_filter_end_date">End date:</string>
+    <string name="notes_list_filter_by_created">Date created</string>
+    <string name="notes_list_filter_by_edited">Date edited</string>
+    <string name="notes_list_filter_by_viewed">Date viewed</string>
+    <string-array name="notes_list_filter_by_items">
+        <item>@string/notes_list_filter_by_created</item>
+        <item>@string/notes_list_filter_by_edited</item>
+        <item>@string/notes_list_filter_by_viewed</item>
     </string-array>
-    <string name="colors_list_filter_started">Filtering, please wait…</string>
-    <string name="colors_list_filter_finished">Filtering finished!</string>
+    <string name="notes_list_filter_started">Filtering, please wait…</string>
+    <string name="notes_list_filter_finished">Filtering finished!</string>
 
-    <string name="colors_list_export_title">Import\\Export</string>
-    <string name="colors_list_export_export">Export</string>
-    <string name="colors_list_export_import">Import</string>
-    <string name="colors_list_export_pick_title">Pick a file</string>
-    <string name="colors_list_export_intent_error">File managers not found!</string>
-    <string name="colors_list_export_filename">Filename</string>
-    <string name="colors_list_export_success">Colors exported!</string>
-    <string name="colors_list_export_error">Export colors error!</string>
-    <string name="colors_list_import_success">Colors imported!</string>
-    <string name="colors_list_import_error">Import colors error!</string>
+    <string name="notes_list_export_title">Import\\Export</string>
+    <string name="notes_list_export_export">Export</string>
+    <string name="notes_list_export_import">Import</string>
+    <string name="notes_list_export_pick_title">Pick a file</string>
+    <string name="notes_list_export_intent_error">File managers not found!</string>
+    <string name="notes_list_export_filename">Filename</string>
+    <string name="notes_list_export_success">Notes exported!</string>
+    <string name="notes_list_export_error">Export notes error!</string>
+    <string name="notes_list_import_success">Notes imported!</string>
+    <string name="notes_list_import_error">Import notes error!</string>
 
-    <string name="colors_list_search_title">Search</string>
-    <string name="colors_list_search_search">Search</string>
+    <string name="notes_list_search_title">Search</string>
+    <string name="notes_list_search_search">Search</string>
 
-    <string name="colors_list_user_title">Select user to sync</string>
+    <string name="notes_list_user_title">Select user to sync</string>
 
-    <string name="color_fragment_title_hint">Enter title</string>
-    <string name="color_fragment_description_hint">Enter description</string>
-    <string name="color_fragment_menu_done">Done</string>
+    <string name="note_fragment_title_hint">Enter title</string>
+    <string name="note_fragment_description_hint">Enter description</string>
+    <string name="note_fragment_menu_done">Done</string>
 
     <string name="color_description_r">R: %1$d</string>
     <string name="color_description_g">G: %1$d</string>
@@ -81,15 +81,15 @@
     <string name="color_description_s">S: %1$f</string>
     <string name="color_description_v">V: %1$f</string>
 
-    <string name="colors_list_generator_title">Generate items</string>
-    <string name="colors_list_generator_hint">Enter quantity</string>
-    <string name="colors_list_generator_start">Generating items, please wait</string>
-    <string name="colors_list_generator_finish">Generating finished</string>
+    <string name="notes_list_generator_title">Generate notes</string>
+    <string name="notes_list_generator_hint">Enter quantity</string>
+    <string name="notes_list_generator_start">Generating notes, please wait</string>
+    <string name="notes_list_generator_finish">Generating finished</string>
 
-    <string name="colors_list_download_start">Downloading items…</string>
+    <string name="notes_list_download_start">Downloading items…</string>
 
     <string name="delete_dialog_title">Confirm delete</string>
-    <string name="delete_dialog_text">Do you really want to delete this item?</string>
+    <string name="delete_dialog_text">Do you really want to delete this note?</string>
     <string name="button_delete">Delete</string>
     <string name="button_ok">OK</string>
     <string name="button_cancel">Cancel</string>

@@ -7,10 +7,6 @@ import ru.yandex.mobile_school.model.dto.RemoveNoteDTO;
 import ru.yandex.mobile_school.model.dto.RequestNotesDTO;
 import ru.yandex.mobile_school.model.dto.UpdateNoteDTO;
 
-/**
- * Created by hash on 10/06/2017.
- */
-
 public class NotesModel extends BaseModel {
 
     public Observable<RequestNotesDTO> requestNotes(int userId) {

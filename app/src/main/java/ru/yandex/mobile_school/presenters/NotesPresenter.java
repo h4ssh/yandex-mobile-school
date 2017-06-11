@@ -14,7 +14,7 @@ import ru.yandex.mobile_school.model.dto.PostNoteDTO;
 import ru.yandex.mobile_school.model.dto.RemoveNoteDTO;
 import ru.yandex.mobile_school.model.dto.RequestNotesDTO;
 import ru.yandex.mobile_school.model.dto.UpdateNoteDTO;
-import ru.yandex.mobile_school.ui.colors_list.NotesFragment;
+import ru.yandex.mobile_school.views.notes_list.NotesFragment;
 import ru.yandex.mobile_school.views.IView;
 
 public class NotesPresenter extends BasePresenter {

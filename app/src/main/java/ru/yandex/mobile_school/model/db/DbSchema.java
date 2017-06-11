@@ -1,8 +1,8 @@
 package ru.yandex.mobile_school.model.db;
 
 public class DbSchema {
-	public static final class ColorsTable {
-		public static final String NAME = "colors";
+	public static final class NotesTable {
+		public static final String NAME = "notes";
 
 		public static final class Cols {
 			public static final String ID = "uuid";

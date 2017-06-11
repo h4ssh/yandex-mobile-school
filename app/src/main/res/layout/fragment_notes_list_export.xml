@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/note_fragment_default_margin"
+        android:layout_marginStart="@dimen/note_fragment_default_margin"
+        android:layout_marginTop="@dimen/note_fragment_between_margin"
+        android:text="@string/notes_list_export_filename"
+        android:textSize="@dimen/notes_list_export_fragment_font"/>
+    <EditText
+        android:id="@+id/notes_list_export_path"
+        android:layout_marginEnd="@dimen/note_fragment_default_margin"
+        android:layout_marginStart="@dimen/note_fragment_default_margin"
+        android:layout_marginBottom="@dimen/note_fragment_between_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/notes_list_pick_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/note_fragment_default_margin"
+        android:layout_marginEnd="@dimen/note_fragment_default_margin"
+        android:text="@string/notes_list_export_pick_title"/>
+</LinearLayout>

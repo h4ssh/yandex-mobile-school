@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/colors_list_cloud_download"
+        android:id="@+id/notes_list_cloud_download"
         android:icon="@drawable/ic_cloud_download_white_24dp"
-        android:title="@string/colors_list_menu_cloud_download"
+        android:title="@string/notes_list_menu_cloud_download"
         />
 </menu>

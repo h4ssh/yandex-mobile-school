@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.presenters.IBasePresenter;
 
 
@@ -62,5 +63,13 @@ public abstract class BaseFragment extends Fragment implements IView {
 
     public void showDialog(String title, String message) {
         activityCallback.showDialog(title, message);
+    }
+
+    protected boolean onBackPressed() {
+        return false;
+    }
+
+    public int getMenuResId() {
+        return R.menu.fragment_menu;
     }
 }

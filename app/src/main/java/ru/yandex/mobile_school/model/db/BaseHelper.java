@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import ru.yandex.mobile_school.model.Note;
-import ru.yandex.mobile_school.model.db.DbSchema.ColorsTable;
+import ru.yandex.mobile_school.model.db.DbSchema.NotesTable;
 
 public class BaseHelper extends SQLiteOpenHelper {
 
@@ -21,16 +21,16 @@ public class BaseHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		mDatabase = db;
-		db.execSQL("create table " + ColorsTable.NAME + "("  +
+		db.execSQL("create table " + NotesTable.NAME + "("  +
 				"_id integer primary key autoincrement, "  +
-				ColorsTable.Cols.ID + " TEXT, " +
-				ColorsTable.Cols.TITLE + " TEXT, " +
-				ColorsTable.Cols.DESCRIPTION + " TEXT, " +
-				ColorsTable.Cols.COLOR + " TEXT, " +
-				ColorsTable.Cols.CREATED + " TEXT, " +
-				ColorsTable.Cols.EDITED + " TEXT, " +
-				ColorsTable.Cols.VIEWED + " TEXT, " +
-				ColorsTable.Cols.SERVER_ID + " INTEGER" +
+				NotesTable.Cols.ID + " TEXT, " +
+				NotesTable.Cols.TITLE + " TEXT, " +
+				NotesTable.Cols.DESCRIPTION + " TEXT, " +
+				NotesTable.Cols.COLOR + " TEXT, " +
+				NotesTable.Cols.CREATED + " TEXT, " +
+				NotesTable.Cols.EDITED + " TEXT, " +
+				NotesTable.Cols.VIEWED + " TEXT, " +
+				NotesTable.Cols.SERVER_ID + " INTEGER" +
 				")"
 		);
 	}
@@ -38,43 +38,43 @@ public class BaseHelper extends SQLiteOpenHelper {
 	public int insertColor(Note color) {
 		openForWriting();
 		ContentValues colorValues = getContentValues(color);
-		return (int) mDatabase.insert(ColorsTable.NAME, null, colorValues);
+		return (int) mDatabase.insert(NotesTable.NAME, null, colorValues);
 	}
 
 	public int updateColor(Note color) {
 		openForWriting();
 		ContentValues colorValues = getContentValues(color);
-		return mDatabase.update(ColorsTable.NAME, colorValues, ColorsTable.Cols.ID + " = ?",
+		return mDatabase.update(NotesTable.NAME, colorValues, NotesTable.Cols.ID + " = ?",
 				new String[] {color.getId().toString()});
 	}
 
 	public int deleteColor(Note color) {
 		openForWriting();
-		return mDatabase.delete(ColorsTable.NAME, ColorsTable.Cols.ID + " = ?",
+		return mDatabase.delete(NotesTable.NAME, NotesTable.Cols.ID + " = ?",
 				new String[] {color.getId().toString()});
 	}
 
 	public int clearColors() {
 		openForWriting();
-		return mDatabase.delete(ColorsTable.NAME, null, null);
+		return mDatabase.delete(NotesTable.NAME, null, null);
 	}
 
 	private ContentValues getContentValues(Note color) {
 		ContentValues values = new ContentValues();
-		values.put(ColorsTable.Cols.ID, color.getId().toString());
-		values.put(ColorsTable.Cols.TITLE, color.getTitle());
-		values.put(ColorsTable.Cols.DESCRIPTION, color.getDescription());
-		values.put(ColorsTable.Cols.COLOR, color.getColorAsHexString());
-		values.put(ColorsTable.Cols.CREATED, color.getCreated());
-		values.put(ColorsTable.Cols.EDITED, color.getEdited());
-		values.put(ColorsTable.Cols.VIEWED, color.getViewed());
-		values.put(ColorsTable.Cols.SERVER_ID, color.getServerId());
+		values.put(NotesTable.Cols.ID, color.getId().toString());
+		values.put(NotesTable.Cols.TITLE, color.getTitle());
+		values.put(NotesTable.Cols.DESCRIPTION, color.getDescription());
+		values.put(NotesTable.Cols.COLOR, color.getColorAsHexString());
+		values.put(NotesTable.Cols.CREATED, color.getCreated());
+		values.put(NotesTable.Cols.EDITED, color.getEdited());
+		values.put(NotesTable.Cols.VIEWED, color.getViewed());
+		values.put(NotesTable.Cols.SERVER_ID, color.getServerId());
 		return values;
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		db.execSQL("DROP TABLE IF EXISTS " + ColorsTable.NAME);
+		db.execSQL("DROP TABLE IF EXISTS " + NotesTable.NAME);
 		onCreate(db);
 	}
 

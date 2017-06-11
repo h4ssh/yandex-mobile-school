@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/notes_list_item_height">
+        <ru.yandex.mobile_school.views.custom.ColorView
+            android:id="@+id/notes_list_item_color_view"
+            android:layout_width="@dimen/notes_list_item_preview_size"
+            android:layout_height="@dimen/notes_list_item_preview_size"
+            android:layout_marginLeft="@dimen/notes_list_item_margin"
+            android:layout_marginRight="@dimen/notes_list_item_margin"
+            android:layout_centerVertical="true"/>
+        <TextView
+            android:id="@+id/notes_list_item_note_title"
+            android:textSize="@dimen/notes_list_item_title_font_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/notes_list_item_color_view"
+            android:layout_marginRight="@dimen/notes_list_item_margin"
+            android:layout_marginTop="@dimen/notes_list_item_top_margin"
+            android:ellipsize="end"
+            android:textColor="@color/colorPrimaryDark"
+            android:lines="1"/>
+        <TextView
+            android:id="@+id/notes_list_item_note_description"
+            android:textSize="@dimen/notes_list_item_description_font_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/notes_list_item_color_view"
+            android:layout_below="@id/notes_list_item_note_title"
+            android:layout_marginRight="@dimen/notes_list_item_margin"
+            android:layout_marginBottom="@dimen/notes_list_item_bottom_margin"
+            android:textColor="@color/colorSecondaryDark"
+            android:ellipsize="end"
+            android:lines="2"/>
+</RelativeLayout>

@@ -23,8 +23,7 @@ import javax.inject.Inject;
 
 import ru.yandex.mobile_school.model.db.BaseHelper;
 import ru.yandex.mobile_school.model.db.ColorItemCursorWrapper;
-import ru.yandex.mobile_school.model.db.DbSchema;
-import ru.yandex.mobile_school.model.db.DbSchema.ColorsTable;
+import ru.yandex.mobile_school.model.db.DbSchema.NotesTable;
 
 public class StorageModel {
 
@@ -75,7 +74,7 @@ public class StorageModel {
 
 	public Note getColorItem(UUID id) {
 		ColorItemCursorWrapper itemCursor = queryColorItems(
-				ColorsTable.Cols.ID + " = ?",
+				NotesTable.Cols.ID + " = ?",
 				new String[] {id.toString()}
 		);
 		if (itemCursor.getCount() == 0) {
@@ -102,7 +101,7 @@ public class StorageModel {
 
 	private ColorItemCursorWrapper queryColorItems(String whereClause, String[] whereArgs) {
 		Cursor cursor = mDatabase.query(
-				DbSchema.ColorsTable.NAME,
+				NotesTable.NAME,
 				null,
 				whereClause,
 				whereArgs,

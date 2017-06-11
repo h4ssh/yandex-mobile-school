@@ -4,10 +4,9 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 import ru.yandex.mobile_school.model.BaseModel;
-import ru.yandex.mobile_school.model.NotesModel;
 import ru.yandex.mobile_school.presenters.BasePresenter;
 import ru.yandex.mobile_school.presenters.NotesPresenter;
-import ru.yandex.mobile_school.ui.colors_list.NotesFragment;
+import ru.yandex.mobile_school.views.notes_list.NotesFragment;
 
 @SuppressWarnings("WeakerAccess")
 @Singleton
