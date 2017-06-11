@@ -30,7 +30,6 @@ import butterknife.ButterKnife;
 import ru.yandex.mobile_school.App;
 import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.model.Note;
-import ru.yandex.mobile_school.model.StorageModel;
 import ru.yandex.mobile_school.presenters.IBasePresenter;
 import ru.yandex.mobile_school.presenters.NotesPresenter;
 import ru.yandex.mobile_school.views.BaseFragment;
@@ -67,6 +66,10 @@ public class NotesFragment extends BaseFragment implements
 	private NotificationCompat.Builder mBuilder;
 	private NotesListLooperThread mLooperThread;
 
+    private Intent resultIntent;
+    private int resultCode;
+    private int requestCode = 0;
+
 	@BindView(R.id.notes_list_fab)	FloatingActionButton mAddNoteFAB;
 	@BindView(R.id.notes_list_progress_bar) ProgressBar mProgressBar;
 	@BindView(R.id.notes_list_view) RecyclerView mNotesListView;
@@ -83,23 +86,22 @@ public class NotesFragment extends BaseFragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         App.getComponent().inject(this);
-        presenter.onCreate(this);
 
         setHasOptionsMenu(true);
 
 		if (savedInstanceState != null) {
 			mEditPosition = savedInstanceState.getInt(EXTRA_EDIT_POSITION);
 		}
-		mLooperThread = new NotesListLooperThread(getContext(), new Handler(), this);
+		mLooperThread = new NotesListLooperThread(new Handler(), this);
 		mLooperThread.start();
 		mLooperThread.prepareHandler();
 
-		mListAdapter = new NotesListAdapter(StorageModel.get(getContext()).getColorItems());
+		mListAdapter = new NotesListAdapter(presenter.getLocalNotes());
 		mListAdapter.setAdapterSortListener(this);
 		mListAdapter.setAdapterOnClickListener(this);
 	}
 
-	@Override
+    @Override
 	public void onDestroy() {
 		mLooperThread.quit();
 		super.onDestroy();
@@ -110,13 +112,14 @@ public class NotesFragment extends BaseFragment implements
 							 Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_notes_list, container, false);
 		ButterKnife.bind(this, view);
+        presenter.onCreate(this);
 
 		NotesActivity activity = (NotesActivity) getActivity();
 		activity.getSupportActionBar().setTitle(R.string.app_name);
 		activity.setNavBarItemsEnabled(true);
 
 		displayProgressBarIfNeeded(null);
-		mAsyncActor = new NotesListAsyncActor(getContext());
+		mAsyncActor = new NotesListAsyncActor();
 		mNotesListView.setLayoutManager(new LinearLayoutManager(getContext()));
 		mNotesListView.addItemDecoration(new DividerItemDecoration(getContext(),
 				DividerItemDecoration.VERTICAL));
@@ -135,6 +138,11 @@ public class NotesFragment extends BaseFragment implements
             return true;
         });
 		mAsyncActor.setListener(this);
+
+        if (requestCode != 0){
+            parseResult();
+        }
+
 		return view;
 	}
 
@@ -165,10 +173,9 @@ public class NotesFragment extends BaseFragment implements
 		builder.setMessage(R.string.delete_dialog_text);
 		builder.setPositiveButton(R.string.button_delete, (dialog, which) -> {
             mListAdapter.deleteItem(item);
-            StorageModel storage = StorageModel.get(getContext());
-            storage.deleteColorItem(item);
+            presenter.deleteLocalNote(item);
             if (item.getServerId() != 0) {
-                presenter.deleteNote(storage.getUserId(), item.getServerId());
+                presenter.deleteNote(item.getServerId());
             }
         });
 		builder.setNegativeButton(R.string.button_cancel, (dialog, which) -> dialog.dismiss());
@@ -177,34 +184,38 @@ public class NotesFragment extends BaseFragment implements
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK) {
-			Note item = data.getParcelableExtra(NoteEditFragment.EXTRA_COLOR_ITEM);
-			addColorItem(item);
-		}
-		if (requestCode == REQUEST_CODE_EDIT) {
-			Note old = mListAdapter.getColorItem(mEditPosition);
-			Note updated;
-			if (resultCode == RESULT_OK) {
-				updated = data.getParcelableExtra(NoteEditFragment.EXTRA_COLOR_ITEM);
-			} else {
-				updated = old;
-				updated.setViewed();
-			}
-			old.updateWith(updated);
-			displayProgressBarIfNeeded(true);
-			mListAdapter.resort();
-			alert(getString(R.string.notes_list_sort_started));
-			StorageModel storage = StorageModel.get(getContext());
-			storage.updateColorItem(updated);
-			presenter.updateNote(storage.getUserId(),
-					updated.getServerId(), updated.toNoteDTO());
-		}
+	    this.requestCode = requestCode;
+        this.resultCode = resultCode;
+        this.resultIntent = data;
 	}
 
+	private void parseResult() {
+        if (requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK) {
+            Note item = resultIntent.getParcelableExtra(NoteEditFragment.EXTRA_COLOR_ITEM);
+            addColorItem(item);
+        }
+        if (requestCode == REQUEST_CODE_EDIT) {
+            Note old = mListAdapter.getColorItem(mEditPosition);
+            Note updated;
+            if (resultCode == RESULT_OK) {
+                updated = resultIntent.getParcelableExtra(NoteEditFragment.EXTRA_COLOR_ITEM);
+            } else {
+                updated = old;
+                updated.setViewed();
+            }
+            old.updateWith(updated);
+            displayProgressBarIfNeeded(true);
+            mListAdapter.resort();
+            alert(getString(R.string.notes_list_sort_started));
+            presenter.updateLocalNote(updated);
+            presenter.updateNote(updated.getServerId(), updated.toNoteDTO());
+        }
+        requestCode = 0;
+    }
+
 	private void addColorItem(Note item) {
-		StorageModel storage = StorageModel.get(getContext());
-		storage.addColorItem(item);
-		presenter.addNote(storage.getUserId(), item.getId(), item.toNoteDTO());
+		presenter.addLocalNote(item);
+		presenter.postNote(item.getId(), item.toNoteDTO());
 		mListAdapter.addItem(item);
 	}
 
@@ -252,6 +263,9 @@ public class NotesFragment extends BaseFragment implements
 		switch (item.getItemId()) {
 			case R.id.notes_list_cloud_download:
 				NotesListUserFragment userFragment = new NotesListUserFragment();
+                Bundle args = new Bundle();
+                args.putInt(NotesListUserFragment.EXTRA_USER, presenter.getUserId());
+                userFragment.setArguments(args);
 				userFragment.setTargetFragment(this, 0);
 				userFragment.show(getActivity().getSupportFragmentManager(), "");
 				break;
@@ -340,7 +354,7 @@ public class NotesFragment extends BaseFragment implements
 	@Override
 	public void onItemsAddFinish() {
 		displayProgressBarIfNeeded(false);
-		mListAdapter.changeData(StorageModel.get(getContext()).getColorItems());
+		mListAdapter.changeData(presenter.getLocalNotes());
 		alert(getString(R.string.notes_list_generator_finish));
 		mBuilder.setContentText("Generating complete").setProgress(0, 0, false);
 		mNotifyManager.notify(ASYNC_ACTION_NOTIFICATION_ID, mBuilder.build());
@@ -386,7 +400,7 @@ public class NotesFragment extends BaseFragment implements
 	public void onColorsImported(boolean result) {
 		displayProgressBarIfNeeded(false);
 		if (result) {
-			mListAdapter.changeData(StorageModel.get(getContext()).getColorItems());
+			mListAdapter.changeData(presenter.getLocalNotes());
 			alert(getString(R.string.notes_list_import_success));
 		} else {
 			alert(getString(R.string.notes_list_import_error));
@@ -394,29 +408,22 @@ public class NotesFragment extends BaseFragment implements
 	}
 
 	public void onGetUserNotes(ArrayList<Note> items) {
-        // TODO: move to presenter
-		StorageModel.get(getContext()).replaceColorItems(items);
 		mListAdapter.changeData(items);
 	}
 
 	public void onAddUserNote(UUID itemId, int noteId) {
-        // TODO: move to presenter
-		StorageModel storage = StorageModel.get(getContext());
-		Note item = storage.getColorItem(itemId);
-		item.setServerId(noteId);
-		storage.updateColorItem(item);
 		mListAdapter.getColorItem(itemId).setServerId(noteId);
 	}
 
 	@Override
 	public void onUserChanged(int newUser) {
-		StorageModel.get(getContext()).setUserId(newUser);
+		presenter.setUserId(newUser);
         presenter.requestNotes(newUser);
 		alert(getString(R.string.notes_list_download_start));
 	}
 
 	@Override
 	protected IBasePresenter getPresenter() {
-		return null; // TODO: return presenter
+		return presenter;
 	}
 }

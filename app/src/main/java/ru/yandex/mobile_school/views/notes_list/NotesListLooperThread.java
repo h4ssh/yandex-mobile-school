@@ -1,13 +1,17 @@
 package ru.yandex.mobile_school.views.notes_list;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 
+import javax.inject.Inject;
+
 import ru.yandex.mobile_school.model.StorageModel;
 
 public class NotesListLooperThread extends HandlerThread {
+
+	@Inject
+	StorageModel storage;
 
 	public static final int WHAT_EXPORT = 1;
 	public static final int WHAT_IMPORT = 2;
@@ -16,18 +20,16 @@ public class NotesListLooperThread extends HandlerThread {
 	private Handler mResponseHandler;
 	private static final String TAG = NotesListLooperThread.class.getSimpleName();
 	private Callback mCallback;
-	private Context mContext;
 
 	public interface Callback {
 		void onColorsExported(boolean result);
 		void onColorsImported(boolean result);
 	}
 
-	public NotesListLooperThread(Context context, Handler responseHandler, Callback callback) {
+	public NotesListLooperThread(Handler responseHandler, Callback callback) {
 		super(TAG);
 		mResponseHandler = responseHandler;
 		mCallback = callback;
-		mContext = context;
 	}
 
 	public void queueTask(String path, int what) {
@@ -49,9 +51,9 @@ public class NotesListLooperThread extends HandlerThread {
 	private void handleRequest(final String path, final int what) {
 		final boolean result;
 		if (what == WHAT_EXPORT) {
-			result = StorageModel.get(mContext).exportColorItems(path);
+			result = storage.exportNotes(path);
 		} else {
-			result = what == WHAT_IMPORT && StorageModel.get(mContext).importColorItems(path);
+			result = what == WHAT_IMPORT && storage.importNotes(path);
 		}
 
 		mResponseHandler.post(new Runnable() {

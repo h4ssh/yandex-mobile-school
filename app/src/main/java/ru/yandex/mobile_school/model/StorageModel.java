@@ -21,191 +21,183 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
+import ru.yandex.mobile_school.App;
 import ru.yandex.mobile_school.model.db.BaseHelper;
-import ru.yandex.mobile_school.model.db.ColorItemCursorWrapper;
-import ru.yandex.mobile_school.model.db.DbSchema.NotesTable;
+import ru.yandex.mobile_school.model.db.NoteCursorWrapper;
+import ru.yandex.mobile_school.model.db.DbSchema;
 
 public class StorageModel {
 
-	@Inject
-	Context context;
+    @Inject
+    Context context;
 
-	private static final String SHARED_PREFS_NAME = "data_storage_shared_prefs";
-	private static final String SHARED_PREFS_USER = "data_storage_shared_user";
-	private static final int DEFAULT_USER_ID = 223322;
+    private static final String SHARED_PREFS_NAME = "data_storage_shared_prefs";
+    private static final String SHARED_PREFS_USER = "data_storage_shared_user";
+    private static final int DEFAULT_USER_ID = 223322;
 
-	private static StorageModel sStorageModel;
-	private SQLiteDatabase mDatabase;
-	private BaseHelper mBaseHelper;
-	private int mUserId = DEFAULT_USER_ID;
-	private SharedPreferences mSharedPreferences;
+    private SQLiteDatabase mDatabase;
+    private BaseHelper mBaseHelper;
+    private int mUserId = DEFAULT_USER_ID;
+    private SharedPreferences mSharedPreferences;
 
-	public static StorageModel get(Context context) {
-		if (sStorageModel == null) {
-			sStorageModel = new StorageModel(context);
-		}
-		return sStorageModel;
-	}
+    public StorageModel() {
+        App.getComponent().inject(this);
+        mBaseHelper = new BaseHelper(context);
+        mDatabase = mBaseHelper.getWritableDatabase();
+        mSharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
+        mUserId = mSharedPreferences.getInt(SHARED_PREFS_USER, DEFAULT_USER_ID);
+    }
 
-	private StorageModel(Context context) {
-		mBaseHelper = new BaseHelper(context.getApplicationContext());
-		mDatabase = mBaseHelper.getWritableDatabase();
-		mSharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE);
-		mUserId = mSharedPreferences.getInt(SHARED_PREFS_USER, DEFAULT_USER_ID);
-	}
+    public ArrayList<Note> getNotes() {
+        ArrayList<Note> notes = new ArrayList<>();
 
-	public ArrayList<Note> getColorItems() {
-		ArrayList<Note> notes = new ArrayList<>();
+        NoteCursorWrapper cursor = queryNotes(null, null);
 
-		ColorItemCursorWrapper cursor = queryColorItems(null, null);
+        try {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                notes.add(cursor.getNote());
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
 
-		try {
-			cursor.moveToFirst();
-			while (!cursor.isAfterLast()) {
-				notes.add(cursor.getColorItem());
-				cursor.moveToNext();
-			}
-		} finally {
-			cursor.close();
-		}
+        return notes;
+    }
 
-		return notes;
-	}
+    public Note getNote(UUID id) {
+        NoteCursorWrapper itemCursor = queryNotes(
+                DbSchema.NotesTable.Cols.ID + " = ?",
+                new String[] {id.toString()}
+        );
+        if (itemCursor.getCount() == 0) {
+            return null;
+        }
 
-	public Note getColorItem(UUID id) {
-		ColorItemCursorWrapper itemCursor = queryColorItems(
-				NotesTable.Cols.ID + " = ?",
-				new String[] {id.toString()}
-		);
-		if (itemCursor.getCount() == 0) {
-			return null;
-		}
+        itemCursor.moveToFirst();
+        Note note = itemCursor.getNote();
+        itemCursor.close();
+        return note;
+    }
 
-		itemCursor.moveToFirst();
-		Note note = itemCursor.getColorItem();
-		itemCursor.close();
-		return note;
-	}
+    public int updateNote(Note item) {
+        return mBaseHelper.updateNote(item);
+    }
 
-	public int updateColorItem(Note item) {
-		return mBaseHelper.updateColor(item);
-	}
+    public int addNote(Note item) {
+        return mBaseHelper.insertNote(item);
+    }
 
-	public int addColorItem(Note item) {
-		return mBaseHelper.insertColor(item);
-	}
+    public int deleteNote(Note item) {
+        return mBaseHelper.deleteNote(item);
+    }
 
-	public int deleteColorItem(Note item) {
-		return mBaseHelper.deleteColor(item);
-	}
+    private NoteCursorWrapper queryNotes(String whereClause, String[] whereArgs) {
+        Cursor cursor = mDatabase.query(
+                DbSchema.NotesTable.NAME,
+                null,
+                whereClause,
+                whereArgs,
+                null,
+                null,
+                null
+        );
+        return new NoteCursorWrapper(cursor);
+    }
 
-	private ColorItemCursorWrapper queryColorItems(String whereClause, String[] whereArgs) {
-		Cursor cursor = mDatabase.query(
-				NotesTable.NAME,
-				null,
-				whereClause,
-				whereArgs,
-				null,
-				null,
-				null
-		);
-		return new ColorItemCursorWrapper(cursor);
-	}
+    public boolean exportNotes(String destination) {
+        File targetFile = new File(destination);
+        File parent = targetFile.getParentFile();
+        if (!parent.exists() && !parent.mkdirs()) {
+            return false;
+        }
+        JsonAdapter<List<Note>> adapter = getNotesJsonAdapter();
+        String json = adapter.toJson(getNotes());
+        FileWriter file = null;
+        try {
+            file = new FileWriter(destination);
+            file.write(json);
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            safeCloseWriter(file);
+        }
+        return true;
+    }
 
-	public boolean exportColorItems(String destination) {
-		File targetFile = new File(destination);
-		File parent = targetFile.getParentFile();
-		if (!parent.exists() && !parent.mkdirs()) {
-			return false;
-		}
-		JsonAdapter<List<Note>> adapter = getColorsListJsonAdapter();
-		String json = adapter.toJson(getColorItems());
-		FileWriter file = null;
-		try {
-			file = new FileWriter(destination);
-			file.write(json);
-			file.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			safeCloseWriter(file);
-		}
-		return true;
-	}
+    private void safeCloseWriter(FileWriter file) {
+        if (file != null) {
+            try {
+                file.close();
+            } catch (IOException ignored) {
+            }
+        }
+    }
 
-	private void safeCloseWriter(FileWriter file) {
-		if (file != null) {
-			try {
-				file.close();
-			} catch (IOException ignored) {
-			}
-		}
-	}
+    public boolean importNotes(String source) {
+        File file = new File(source);
+        StringBuilder text = new StringBuilder();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                text.append(line).append('\n');
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            saveCloseReader(br);
+        }
+        JsonAdapter<List<Note>> adapter = getNotesJsonAdapter();
+        List<Note> items = null;
+        try {
+            items = adapter.fromJson(text.toString());
+        } catch (IOException ignored) {
+        }
+        if (items != null) {
+            mBaseHelper.clearNotes();
+            for (int i = 0; i < items.size(); i++) {
+                addNote(items.get(i));
+            }
+        }
+        return true;
+    }
 
-	public boolean importColorItems(String source) {
-		File file = new File(source);
-		StringBuilder text = new StringBuilder();
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(file));
-			String line;
-			while ((line = br.readLine()) != null) {
-				text.append(line).append('\n');
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			saveCloseReader(br);
-		}
-		JsonAdapter<List<Note>> adapter = getColorsListJsonAdapter();
-		List<Note> items = null;
-		try {
-			items = adapter.fromJson(text.toString());
-		} catch (IOException ignored) {
-		}
-		if (items != null) {
-			mBaseHelper.clearColors();
-			for (int i = 0; i < items.size(); i++) {
-				addColorItem(items.get(i));
-			}
-		}
-		return true;
-	}
+    public void replaceNotes(ArrayList<Note> items) {
+        mBaseHelper.clearNotes();
+        for (Note item : items) {
+            addNote(item);
+        }
+    }
 
-	public void replaceColorItems(ArrayList<Note> items) {
-		mBaseHelper.clearColors();
-		for (Note item : items) {
-			addColorItem(item);
-		}
-	}
+    private void saveCloseReader(BufferedReader br) {
+        try {
+            if (br != null) {
+                br.close();
+            }
+        } catch (IOException ignored) {
+        }
+    }
 
-	private void saveCloseReader(BufferedReader br) {
-		try {
-			if (br != null) {
-				br.close();
-			}
-		} catch (IOException ignored) {
-		}
-	}
+    private JsonAdapter<List<Note>> getNotesJsonAdapter() {
+        Moshi moshi = new Moshi.Builder()
+                .add(new NoteJsonAdapter())
+                .build();
+        Type type = Types.newParameterizedType(List.class, Note.class);
+        return moshi.adapter(type);
+    }
 
-	private JsonAdapter<List<Note>> getColorsListJsonAdapter() {
-		Moshi moshi = new Moshi.Builder()
-				.add(new NoteJsonAdapter())
-				.build();
-		Type type = Types.newParameterizedType(List.class, Note.class);
-		return moshi.adapter(type);
-	}
+    public int getUserId() {
+        return mUserId;
+    }
 
-	public int getUserId() {
-		return mUserId;
-	}
-
-	public void setUserId(int userId) {
-		mSharedPreferences.edit().putInt(SHARED_PREFS_USER, userId).apply();
-		mUserId = userId;
-	}
+    public void setUserId(int userId) {
+        mSharedPreferences.edit().putInt(SHARED_PREFS_USER, userId).apply();
+        mUserId = userId;
+    }
 }
-
-

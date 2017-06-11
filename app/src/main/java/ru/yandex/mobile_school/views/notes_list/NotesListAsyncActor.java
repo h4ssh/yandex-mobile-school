@@ -1,8 +1,10 @@
 package ru.yandex.mobile_school.views.notes_list;
 
-import android.content.Context;
 import android.os.AsyncTask;
 
+import javax.inject.Inject;
+
+import ru.yandex.mobile_school.App;
 import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.model.NotesGenerator;
 import ru.yandex.mobile_school.model.StorageModel;
@@ -10,20 +12,19 @@ import ru.yandex.mobile_school.model.StorageModel;
 
 public class NotesListAsyncActor {
 
+	@Inject
+	StorageModel storage;
+
 	public interface NotesListAsyncActorListener {
 		void onItemsAddFinish();
 		void onItemsAddProgress(int percent);
-//		void onItemsExportFinish(boolean result);
-//		void onItemsImportFinish(boolean result);
 	}
 
 	private NotesListAsyncActorListener mListener;
 
-	private StorageModel mStorage;
-
-	public NotesListAsyncActor(Context context) {
-		mStorage = StorageModel.get(context);
-	}
+    public NotesListAsyncActor() {
+        App.getComponent().inject(this);
+    }
 
 	public void setListener(NotesListAsyncActorListener listener) {
 		mListener = listener;
@@ -38,8 +39,8 @@ public class NotesListAsyncActor {
 			@Override
 			protected Void doInBackground(Object... params) {
 				for (int i = 0; i < quantity; i++) {
-					Note item = NotesGenerator.generate();
-					mStorage.addColorItem(item);
+					Note note = NotesGenerator.generate();
+					storage.addNote(note);
 					newProgress = 100 * i / quantity;
 					if (newProgress > oldProgress) {
 						oldProgress = newProgress;
@@ -65,40 +66,4 @@ public class NotesListAsyncActor {
 		};
 		task.execute();
 	}
-
-//	public void exportItems(final String destination) {
-//		AsyncTask task = new AsyncTask<Object, Float, Boolean>() {
-//			@Override
-//			protected Boolean doInBackground(Object... params) {
-//				return mStorage.exportColorItems(destination);
-//			}
-//
-//			@Override
-//			protected void onPostExecute(Boolean aBoolean) {
-//				if (mListener != null) {
-//					mListener.onItemsExportFinish(aBoolean);
-//				}
-//			}
-//		};
-//		task.execute();
-//	}
-//
-//	public void importItems(final String source) {
-//		AsyncTask<Void, Float, Boolean> task = new AsyncTask<Void, Float, Boolean>() {
-//			@Override
-//			protected Boolean doInBackground(Void... params) {
-//				return mStorage.importColorItems(source);
-//			}
-//
-//			@Override
-//			protected void onPostExecute(Boolean aBoolean) {
-//				if (mListener != null) {
-//					mListener.onItemsImportFinish(aBoolean);
-//				}
-//			}
-//		};
-//		task.execute();
-//	}
-
-
 }

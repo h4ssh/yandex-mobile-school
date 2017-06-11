@@ -4,9 +4,11 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 import ru.yandex.mobile_school.model.BaseModel;
+import ru.yandex.mobile_school.model.StorageModel;
 import ru.yandex.mobile_school.presenters.BasePresenter;
 import ru.yandex.mobile_school.presenters.NotesPresenter;
 import ru.yandex.mobile_school.views.notes_list.NotesFragment;
+import ru.yandex.mobile_school.views.notes_list.NotesListAsyncActor;
 
 @SuppressWarnings("WeakerAccess")
 @Singleton
@@ -20,4 +22,8 @@ public interface AppComponent {
     void inject(NotesPresenter notesPresenter);
 
     void inject(NotesFragment notesFragment);
+
+    void inject(StorageModel storage);
+
+    void inject(NotesListAsyncActor notesAsyncActor);
 }

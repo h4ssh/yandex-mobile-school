@@ -35,26 +35,26 @@ public class BaseHelper extends SQLiteOpenHelper {
 		);
 	}
 
-	public int insertColor(Note color) {
+	public int insertNote(Note color) {
 		openForWriting();
 		ContentValues colorValues = getContentValues(color);
 		return (int) mDatabase.insert(NotesTable.NAME, null, colorValues);
 	}
 
-	public int updateColor(Note color) {
+	public int updateNote(Note color) {
 		openForWriting();
 		ContentValues colorValues = getContentValues(color);
 		return mDatabase.update(NotesTable.NAME, colorValues, NotesTable.Cols.ID + " = ?",
 				new String[] {color.getId().toString()});
 	}
 
-	public int deleteColor(Note color) {
+	public int deleteNote(Note color) {
 		openForWriting();
 		return mDatabase.delete(NotesTable.NAME, NotesTable.Cols.ID + " = ?",
 				new String[] {color.getId().toString()});
 	}
 
-	public int clearColors() {
+	public int clearNotes() {
 		openForWriting();
 		return mDatabase.delete(NotesTable.NAME, null, null);
 	}

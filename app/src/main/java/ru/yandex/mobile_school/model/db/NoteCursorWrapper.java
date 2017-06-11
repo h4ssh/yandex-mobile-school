@@ -7,13 +7,13 @@ import android.graphics.Color;
 import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.model.db.DbSchema.NotesTable;
 
-public class ColorItemCursorWrapper extends CursorWrapper {
+public class NoteCursorWrapper extends CursorWrapper {
 
-	public ColorItemCursorWrapper(Cursor cursor) {
+	public NoteCursorWrapper(Cursor cursor) {
 		super(cursor);
 	}
 
-	public Note getColorItem() {
+	public Note getNote() {
 		String id = getString(getColumnIndex(NotesTable.Cols.ID));
 		String title = getString(getColumnIndex(NotesTable.Cols.TITLE));
 		String descr = getString(getColumnIndex(NotesTable.Cols.DESCRIPTION));
