@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import ru.yandex.mobile_school.data.ColorItem;
+import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.model.db.DbSchema.ColorsTable;
 
 public class BaseHelper extends SQLiteOpenHelper {
@@ -35,20 +35,20 @@ public class BaseHelper extends SQLiteOpenHelper {
 		);
 	}
 
-	public int insertColor(ColorItem color) {
+	public int insertColor(Note color) {
 		openForWriting();
 		ContentValues colorValues = getContentValues(color);
 		return (int) mDatabase.insert(ColorsTable.NAME, null, colorValues);
 	}
 
-	public int updateColor(ColorItem color) {
+	public int updateColor(Note color) {
 		openForWriting();
 		ContentValues colorValues = getContentValues(color);
 		return mDatabase.update(ColorsTable.NAME, colorValues, ColorsTable.Cols.ID + " = ?",
 				new String[] {color.getId().toString()});
 	}
 
-	public int deleteColor(ColorItem color) {
+	public int deleteColor(Note color) {
 		openForWriting();
 		return mDatabase.delete(ColorsTable.NAME, ColorsTable.Cols.ID + " = ?",
 				new String[] {color.getId().toString()});
@@ -59,7 +59,7 @@ public class BaseHelper extends SQLiteOpenHelper {
 		return mDatabase.delete(ColorsTable.NAME, null, null);
 	}
 
-	private ContentValues getContentValues(ColorItem color) {
+	private ContentValues getContentValues(Note color) {
 		ContentValues values = new ContentValues();
 		values.put(ColorsTable.Cols.ID, color.getId().toString());
 		values.put(ColorsTable.Cols.TITLE, color.getTitle());

@@ -1,4 +1,4 @@
-package ru.yandex.mobile_school.data;
+package ru.yandex.mobile_school.model;
 
 
 import android.graphics.Color;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-public class ColorItemGenerator {
+public class NotesGenerator {
 
 	private static final int COLOR_COMPONENT_MAX = 255;
 	private static Random sRandom = new Random();
@@ -23,14 +23,14 @@ public class ColorItemGenerator {
 			"Khaki", "Dark khaki"
 	);
 
-	public static ColorItem generate() {
+	public static Note generate() {
 		int red = sRandom.nextInt(COLOR_COMPONENT_MAX);
 		int green = sRandom.nextInt(COLOR_COMPONENT_MAX);
 		int blue = sRandom.nextInt(COLOR_COMPONENT_MAX);
 		int color = Color.argb(COLOR_COMPONENT_MAX, red, green, blue);
 		String title = sTitles.get(sRandom.nextInt(sTitles.size()));
 		String description = String.format("Description of %s color", title.toLowerCase(Locale.getDefault()));
-		return new ColorItem(color, title, description);
+		return new Note(color, title, description);
 	}
 
 }

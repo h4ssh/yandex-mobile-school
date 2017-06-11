@@ -3,8 +3,8 @@ package ru.yandex.mobile_school.ui.colors_list;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import ru.yandex.mobile_school.data.ColorItem;
-import ru.yandex.mobile_school.data.ColorItemGenerator;
+import ru.yandex.mobile_school.model.Note;
+import ru.yandex.mobile_school.model.NotesGenerator;
 import ru.yandex.mobile_school.model.StorageModel;
 
 
@@ -38,7 +38,7 @@ public class ColorsListAsyncActor {
 			@Override
 			protected Void doInBackground(Object... params) {
 				for (int i = 0; i < quantity; i++) {
-					ColorItem item = ColorItemGenerator.generate();
+					Note item = NotesGenerator.generate();
 					mStorage.addColorItem(item);
 					newProgress = 100 * i / quantity;
 					if (newProgress > oldProgress) {

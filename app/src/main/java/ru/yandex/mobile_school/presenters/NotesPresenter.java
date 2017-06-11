@@ -7,7 +7,7 @@ import javax.inject.Inject;
 
 import io.reactivex.disposables.Disposable;
 import ru.yandex.mobile_school.App;
-import ru.yandex.mobile_school.data.ColorItem;
+import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.model.NotesModel;
 import ru.yandex.mobile_school.model.dto.NoteDTO;
 import ru.yandex.mobile_school.model.dto.PostNoteDTO;
@@ -39,27 +39,27 @@ public class NotesPresenter extends BasePresenter {
         view = null;
     }
 
+    // region API
+
     public void requestNotes(int userId) {
         Disposable subscription = model.requestNotes(userId)
                 .doOnSubscribe(this::showLoadingState)
-                .filter(p -> { p.setUserId(userId); return true; })
                 .subscribe(this::handleReceiveNotes, this::showError, this::hideLoadingState);
 
         addDisposable(subscription);
     }
 
     private void handleReceiveNotes(RequestNotesDTO notes) {
-        ArrayList<ColorItem> items = new ArrayList<>(notes.getData().size());
+        ArrayList<Note> items = new ArrayList<>(notes.getData().size());
         for (NoteDTO note: notes.getData()) {
-            items.add(new ColorItem(note));
+            items.add(new Note(note));
         }
-        view.onGetUserNotes(notes.getUserId(), items);
+        view.onGetUserNotes( items);
     }
 
     public void addNote(int userId, UUID itemId, NoteDTO note) {
         Disposable subscription = model.postNote(userId, note)
                 .doOnSubscribe(this::showLoadingState)
-                .filter(p -> { p.setUserId(userId); return true; })
                 .filter(p -> { p.setUuid(itemId.toString()); return true; })
                 .subscribe(this::handleAddNote, this::showError, this::hideLoadingState);
 
@@ -67,10 +67,10 @@ public class NotesPresenter extends BasePresenter {
     }
 
     private void handleAddNote(PostNoteDTO result) {
-        view.onAddUserNote(result.getUserId(), UUID.fromString(result.getUuid()), result.getData());
+        view.onAddUserNote(UUID.fromString(result.getUuid()), result.getData());
     }
 
-    public void updateNote(int userId, UUID itemId, int noteId, NoteDTO note) {
+    public void updateNote(int userId, int noteId, NoteDTO note) {
         Disposable subscription = model.updateNote(userId, noteId, note)
                 .doOnSubscribe(this::showLoadingState)
                 .subscribe(this::handleUpdateNote, this::showError, this::hideLoadingState);
@@ -91,4 +91,6 @@ public class NotesPresenter extends BasePresenter {
 
     private void handleDeleteNote(RemoveNoteDTO result) {
     }
+
+    // endregion API
 }

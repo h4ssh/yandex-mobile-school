@@ -4,7 +4,7 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.graphics.Color;
 
-import ru.yandex.mobile_school.data.ColorItem;
+import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.model.db.DbSchema.ColorsTable;
 
 public class ColorItemCursorWrapper extends CursorWrapper {
@@ -13,7 +13,7 @@ public class ColorItemCursorWrapper extends CursorWrapper {
 		super(cursor);
 	}
 
-	public ColorItem getColorItem() {
+	public Note getColorItem() {
 		String id = getString(getColumnIndex(ColorsTable.Cols.ID));
 		String title = getString(getColumnIndex(ColorsTable.Cols.TITLE));
 		String descr = getString(getColumnIndex(ColorsTable.Cols.DESCRIPTION));
@@ -23,7 +23,7 @@ public class ColorItemCursorWrapper extends CursorWrapper {
 		String viewed = getString(getColumnIndex(ColorsTable.Cols.VIEWED));
 		int serverId = getInt(getColumnIndex(ColorsTable.Cols.SERVER_ID));
 
-		return new ColorItem(id, Color.parseColor(color), title, descr,
+		return new Note(id, Color.parseColor(color), title, descr,
 				created, edited, viewed, serverId);
 	}
 }

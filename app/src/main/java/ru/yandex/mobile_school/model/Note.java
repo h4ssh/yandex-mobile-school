@@ -1,4 +1,4 @@
-package ru.yandex.mobile_school.data;
+package ru.yandex.mobile_school.model;
 
 import android.graphics.Color;
 import android.os.Parcel;
@@ -11,7 +11,7 @@ import java.util.UUID;
 import ru.yandex.mobile_school.model.dto.NoteDTO;
 import ru.yandex.mobile_school.utils.DateUtils;
 
-public class ColorItem implements Parcelable {
+public class Note implements Parcelable {
 
 	public static final int COLOR_MASK = 0xFFFFFF;
 	private UUID mId;
@@ -23,7 +23,7 @@ public class ColorItem implements Parcelable {
 	private String mEdited;
 	private int mServerId;
 
-	public ColorItem() {
+	public Note() {
 		mId = UUID.randomUUID();
 		mColor = Color.WHITE;
 		mTitle = "";
@@ -34,7 +34,7 @@ public class ColorItem implements Parcelable {
 		mServerId = 0;
 	}
 
-	public ColorItem(@ColorInt int color, String title, String description) {
+	public Note(@ColorInt int color, String title, String description) {
 		this();
 		mColor = color;
 		if (title != null) {
@@ -45,8 +45,8 @@ public class ColorItem implements Parcelable {
 		}
 	}
 
-	public ColorItem(String id, int color, String title, String description,
-					 String created, String viewed, String edited, int serverId) {
+	public Note(String id, int color, String title, String description,
+                String created, String viewed, String edited, int serverId) {
 		mId = UUID.fromString(id);
 		mColor = color;
 		mTitle = title;
@@ -57,18 +57,7 @@ public class ColorItem implements Parcelable {
 		mServerId = serverId;
 	}
 
-	public ColorItem(Note note) {
-		mId = UUID.fromString(note.extra);
-		mColor = Color.parseColor(note.color);
-		mTitle = note.title;
-		mDescription = note.description;
-		mCreated = note.created;
-		mEdited = note.edited;
-		mViewed = note.viewed;
-		mServerId = note.id;
-	}
-
-	public ColorItem(NoteDTO note) {
+	public Note(NoteDTO note) {
 		mId = UUID.fromString(note.getExtra());
 		mColor = Color.parseColor(note.getColor());
 		mTitle = note.getTitle();
@@ -79,7 +68,7 @@ public class ColorItem implements Parcelable {
 		mServerId = note.getId();
 	}
 
-	protected ColorItem(Parcel in) {
+	protected Note(Parcel in) {
 		mId = UUID.fromString(in.readString());
 		mColor = in.readInt();
 		mTitle = in.readString();
@@ -90,7 +79,7 @@ public class ColorItem implements Parcelable {
 		mServerId = in.readInt();
 	}
 
-	public void updateWith(ColorItem item) {
+	public void updateWith(Note item) {
 		mColor = item.getColor();
 		mTitle = item.getTitle();
 		mDescription = item.getDescription();
@@ -100,15 +89,15 @@ public class ColorItem implements Parcelable {
 		mServerId = item.mServerId;
 	}
 
-	public static final Creator<ColorItem> CREATOR = new Creator<ColorItem>() {
+	public static final Creator<Note> CREATOR = new Creator<Note>() {
 		@Override
-		public ColorItem createFromParcel(Parcel in) {
-			return new ColorItem(in);
+		public Note createFromParcel(Parcel in) {
+			return new Note(in);
 		}
 
 		@Override
-		public ColorItem[] newArray(int size) {
-			return new ColorItem[size];
+		public Note[] newArray(int size) {
+			return new Note[size];
 		}
 	};
 
@@ -214,19 +203,6 @@ public class ColorItem implements Parcelable {
 		note.setEdited(mEdited);
 		note.setViewed(mViewed);
 		note.setExtra(mId.toString());
-		return note;
-	}
-
-	public Note toNote() {
-		Note note = new Note();
-		note.id = mServerId;
-		note.color = getColorAsHexString();
-		note.title = mTitle;
-		note.description = mDescription;
-		note.created = mCreated;
-		note.edited = mEdited;
-		note.viewed = mViewed;
-		note.extra = mId.toString();
 		return note;
 	}
 }

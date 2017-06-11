@@ -33,12 +33,12 @@ import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.ui.base.BaseFragment;
 import ru.yandex.mobile_school.ui.views.ColorView;
 import ru.yandex.mobile_school.ui.views.LockableHorizontalScrollView;
 import ru.yandex.mobile_school.ui.views.LockableScrollView;
 import ru.yandex.mobile_school.R;
-import ru.yandex.mobile_school.data.ColorItem;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -82,9 +82,9 @@ public class ColorPickerFragment extends BaseFragment {
 	private LinearLayout.LayoutParams defaultViewParams;
 	private LinearLayout.LayoutParams favoriteViewParams;
 	private final View.OnTouchListener defaultTouchListener = new ViewColorTouchListener();
-	private ColorItem mColorItem;
+	private Note mNote;
 
-	public static ColorPickerFragment newInstance(ColorItem item) {
+	public static ColorPickerFragment newInstance(Note item) {
 		ColorPickerFragment fragment = new ColorPickerFragment();
 		if (item != null) {
 			Bundle args = new Bundle();
@@ -113,24 +113,24 @@ public class ColorPickerFragment extends BaseFragment {
 
 		Bundle arguments = getArguments();
 		if (savedInstanceState != null && savedInstanceState.containsKey(SAVED_COLOR_ITEM)) {
-			mColorItem = savedInstanceState.getParcelable(SAVED_COLOR_ITEM);
+			mNote = savedInstanceState.getParcelable(SAVED_COLOR_ITEM);
 		} else if (arguments != null && arguments.containsKey(ARG_COLOR_ITEM)) {
-			mColorItem = arguments.getParcelable(ARG_COLOR_ITEM);
+			mNote = arguments.getParcelable(ARG_COLOR_ITEM);
 			((AppCompatActivity) getActivity()).getSupportActionBar()
 					.setTitle(R.string.color_picker_fragment_add_title);
 		} else {
-			mColorItem = new ColorItem();
+			mNote = new Note();
 			((AppCompatActivity) getActivity()).getSupportActionBar()
 					.setTitle(R.string.color_picker_fragment_edit_title);
 		}
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			mCurrentColorView.setTransitionName(mColorItem.getId().toString());
+			mCurrentColorView.setTransitionName(mNote.getId().toString());
 		}
-		mColorItem.setViewed();
-		mCurrentColorView.setCurrentColor(mColorItem.getColor());
-		mTitleEdit.setText(mColorItem.getTitle());
-		mDescriptionEdit.setText(mColorItem.getDescription());
-		setCurrentColorDescription(mColorItem.getColor());
+		mNote.setViewed();
+		mCurrentColorView.setCurrentColor(mNote.getColor());
+		mTitleEdit.setText(mNote.getTitle());
+		mDescriptionEdit.setText(mNote.getDescription());
+		setCurrentColorDescription(mNote.getColor());
 		setColorItemMetadata();
 
 		DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -188,17 +188,17 @@ public class ColorPickerFragment extends BaseFragment {
 	}
 
 	private void setColorItemMetadata() {
-		if (mColorItem == null) {
+		if (mNote == null) {
 			return;
 		}
 		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
 		format.setTimeZone(TimeZone.getDefault());
 		mDateCreatedText.setText(getString(R.string.color_picker_created_date,
-				format.format(mColorItem.getCreatedDate())));
+				format.format(mNote.getCreatedDate())));
 		mDateEditedText.setText(getString(R.string.color_picker_edited_date,
-				format.format(mColorItem.getEditedDate())));
+				format.format(mNote.getEditedDate())));
 		mDateViewedText.setText(getString(R.string.color_picker_viewed_date,
-				format.format(mColorItem.getViewedDate())));
+				format.format(mNote.getViewedDate())));
 	}
 
 	private void restoreFavoriteColors(View view) {
@@ -328,11 +328,11 @@ public class ColorPickerFragment extends BaseFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.color_fragment_menu_done:
-				mColorItem.setColor(mCurrentColorView.getCurrentColor());
-				mColorItem.setTitle(mTitleEdit.getText().toString());
-				mColorItem.setDescription(mDescriptionEdit.getText().toString());
+				mNote.setColor(mCurrentColorView.getCurrentColor());
+				mNote.setTitle(mTitleEdit.getText().toString());
+				mNote.setDescription(mDescriptionEdit.getText().toString());
 				Intent intent = new Intent();
-				intent.putExtra(EXTRA_COLOR_ITEM, mColorItem);
+				intent.putExtra(EXTRA_COLOR_ITEM, mNote);
 
 				View view = getView();
 				if (view != null) {
@@ -362,7 +362,7 @@ public class ColorPickerFragment extends BaseFragment {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		ColorItem savedColor = new ColorItem(
+		Note savedColor = new Note(
 				mCurrentColorView.getCurrentColor(),
 				mTitleEdit.getText().toString(),
 				mDescriptionEdit.getText().toString());

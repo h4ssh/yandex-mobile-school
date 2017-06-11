@@ -9,45 +9,45 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
-import ru.yandex.mobile_school.data.ColorItem;
+import ru.yandex.mobile_school.model.Note;
 
 /**
  * Created by hash on 28/05/2017.
  */
 
-public class ColorItemUnitTest {
+public class NoteUnitTest {
 
 	private static final String TEST_TITLE = "Test title";
 	private static final String TEST_DESCRIPTION = "Test description";
 
 	@Test
 	public void constructorTestSimple() throws Exception {
-		ColorItem colorItem = new ColorItem(Color.WHITE, TEST_TITLE, TEST_DESCRIPTION);
-		assertEquals(Color.WHITE, colorItem.getColor());
-		assertEquals(TEST_TITLE, colorItem.getTitle());
-		assertEquals(TEST_DESCRIPTION, colorItem.getDescription());
+		Note note = new Note(Color.WHITE, TEST_TITLE, TEST_DESCRIPTION);
+		assertEquals(Color.WHITE, note.getColor());
+		assertEquals(TEST_TITLE, note.getTitle());
+		assertEquals(TEST_DESCRIPTION, note.getDescription());
 	}
 
 	@Test
 	public void constructorTestNullTitle() throws Exception {
-		ColorItem colorItem = new ColorItem(Color.YELLOW, null, TEST_DESCRIPTION);
-		assertEquals(Color.YELLOW, colorItem.getColor());
-		assertEquals("", colorItem.getTitle());
-		assertEquals(TEST_DESCRIPTION, colorItem.getDescription());
+		Note note = new Note(Color.YELLOW, null, TEST_DESCRIPTION);
+		assertEquals(Color.YELLOW, note.getColor());
+		assertEquals("", note.getTitle());
+		assertEquals(TEST_DESCRIPTION, note.getDescription());
 	}
 
 	@Test
 	public void constructorTestNullDescription() throws Exception {
-		ColorItem colorItem = new ColorItem(Color.RED, TEST_TITLE, null);
-		assertEquals(Color.RED, colorItem.getColor());
-		assertEquals(TEST_TITLE, colorItem.getTitle());
-		assertEquals("", colorItem.getDescription());
+		Note note = new Note(Color.RED, TEST_TITLE, null);
+		assertEquals(Color.RED, note.getColor());
+		assertEquals(TEST_TITLE, note.getTitle());
+		assertEquals("", note.getDescription());
 	}
 
 	@Test
 	public void updateWithTest() throws Exception {
-		ColorItem initial = new ColorItem(Color.RED, TEST_TITLE, TEST_DESCRIPTION);
-		ColorItem updated = new ColorItem(Color.BLUE, null, null);
+		Note initial = new Note(Color.RED, TEST_TITLE, TEST_DESCRIPTION);
+		Note updated = new Note(Color.BLUE, null, null);
 		initial.updateWith(updated);
 		assertThat(initial.getId(), not(equalTo(updated.getId())));
 		assertThat(initial.getColor(), equalTo(updated.getColor()));

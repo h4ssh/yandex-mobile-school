@@ -21,8 +21,6 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 
-import ru.yandex.mobile_school.data.ColorItem;
-import ru.yandex.mobile_school.data.ColorItemJsonAdapter;
 import ru.yandex.mobile_school.model.db.BaseHelper;
 import ru.yandex.mobile_school.model.db.ColorItemCursorWrapper;
 import ru.yandex.mobile_school.model.db.DbSchema;
@@ -57,25 +55,25 @@ public class StorageModel {
 		mUserId = mSharedPreferences.getInt(SHARED_PREFS_USER, DEFAULT_USER_ID);
 	}
 
-	public ArrayList<ColorItem> getColorItems() {
-		ArrayList<ColorItem> colorItems = new ArrayList<>();
+	public ArrayList<Note> getColorItems() {
+		ArrayList<Note> notes = new ArrayList<>();
 
 		ColorItemCursorWrapper cursor = queryColorItems(null, null);
 
 		try {
 			cursor.moveToFirst();
 			while (!cursor.isAfterLast()) {
-				colorItems.add(cursor.getColorItem());
+				notes.add(cursor.getColorItem());
 				cursor.moveToNext();
 			}
 		} finally {
 			cursor.close();
 		}
 
-		return colorItems;
+		return notes;
 	}
 
-	public ColorItem getColorItem(UUID id) {
+	public Note getColorItem(UUID id) {
 		ColorItemCursorWrapper itemCursor = queryColorItems(
 				ColorsTable.Cols.ID + " = ?",
 				new String[] {id.toString()}
@@ -85,20 +83,20 @@ public class StorageModel {
 		}
 
 		itemCursor.moveToFirst();
-		ColorItem colorItem = itemCursor.getColorItem();
+		Note note = itemCursor.getColorItem();
 		itemCursor.close();
-		return colorItem;
+		return note;
 	}
 
-	public int updateColorItem(ColorItem item) {
+	public int updateColorItem(Note item) {
 		return mBaseHelper.updateColor(item);
 	}
 
-	public int addColorItem(ColorItem item) {
+	public int addColorItem(Note item) {
 		return mBaseHelper.insertColor(item);
 	}
 
-	public int deleteColorItem(ColorItem item) {
+	public int deleteColorItem(Note item) {
 		return mBaseHelper.deleteColor(item);
 	}
 
@@ -121,7 +119,7 @@ public class StorageModel {
 		if (!parent.exists() && !parent.mkdirs()) {
 			return false;
 		}
-		JsonAdapter<List<ColorItem>> adapter = getColorsListJsonAdapter();
+		JsonAdapter<List<Note>> adapter = getColorsListJsonAdapter();
 		String json = adapter.toJson(getColorItems());
 		FileWriter file = null;
 		try {
@@ -162,8 +160,8 @@ public class StorageModel {
 		} finally {
 			saveCloseReader(br);
 		}
-		JsonAdapter<List<ColorItem>> adapter = getColorsListJsonAdapter();
-		List<ColorItem> items = null;
+		JsonAdapter<List<Note>> adapter = getColorsListJsonAdapter();
+		List<Note> items = null;
 		try {
 			items = adapter.fromJson(text.toString());
 		} catch (IOException ignored) {
@@ -177,9 +175,9 @@ public class StorageModel {
 		return true;
 	}
 
-	public void replaceColorItems(ArrayList<ColorItem> items) {
+	public void replaceColorItems(ArrayList<Note> items) {
 		mBaseHelper.clearColors();
-		for (ColorItem item : items) {
+		for (Note item : items) {
 			addColorItem(item);
 		}
 	}
@@ -193,11 +191,11 @@ public class StorageModel {
 		}
 	}
 
-	private JsonAdapter<List<ColorItem>> getColorsListJsonAdapter() {
+	private JsonAdapter<List<Note>> getColorsListJsonAdapter() {
 		Moshi moshi = new Moshi.Builder()
-				.add(new ColorItemJsonAdapter())
+				.add(new NoteJsonAdapter())
 				.build();
-		Type type = Types.newParameterizedType(List.class, ColorItem.class);
+		Type type = Types.newParameterizedType(List.class, Note.class);
 		return moshi.adapter(type);
 	}
 

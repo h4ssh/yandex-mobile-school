@@ -19,9 +19,9 @@ import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.ui.views.ColorView;
 import ru.yandex.mobile_school.R;
-import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.utils.DateFilter;
 import ru.yandex.mobile_school.utils.DateUtils;
 
@@ -34,8 +34,8 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 	}
 
 	public interface AdapterOnClickListener {
-		void onClick(int position, ColorItem colorItem);
-		void onLongClick(int position, ColorItem colorItem);
+		void onClick(int position, Note note);
+		void onLongClick(int position, Note note);
 	}
 
 	static final String SORT_PARAM_TITLE = "sort_param_title";
@@ -47,15 +47,15 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 	static final String FILTER_PARAM_EDITED = "filter_param_edited";
 	static final String FILTER_PARAM_VIEWED = "filter_param_viewed";
 
-	private ArrayList<ColorItem> mColors;
-	private ArrayList<ColorItem> mFiltered;
+	private ArrayList<Note> mColors;
+	private ArrayList<Note> mFiltered;
 	private ItemFilter mItemFilter = new ItemFilter();
 	private String mSortParam;
 	private boolean mSortAscending;
 	private AdapterAsyncActionsListener mListener;
 	private AdapterOnClickListener mClickListener;
 
-	ColorsListAdapter(ArrayList<ColorItem> items) {
+	ColorsListAdapter(ArrayList<Note> items) {
 		mColors = items;
 		mFiltered = items;
 	}
@@ -82,7 +82,7 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 					@Override
 					public void onClick(View v) {
 						int position = getAdapterPosition();
-						ColorItem item = getColorItem(position);
+						Note item = getColorItem(position);
 						mClickListener.onClick(position, item);
 					}
 				});
@@ -90,7 +90,7 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 					@Override
 					public boolean onLongClick(View v) {
 						int position = getAdapterPosition();
-						ColorItem item = getColorItem(position);
+						Note item = getColorItem(position);
 						mClickListener.onLongClick(position, item);
 						return true;
 					}
@@ -127,7 +127,7 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 			viewHolder = (ColorsListAdapter.ViewHolder) convertView.getTag();
 		}
 
-		ColorItem colorItem = (ColorItem) getItem(position);
+		Note colorItem = (Note) getItem(position);
 		viewHolder.mColorView.setCurrentColor(colorItem.getColor());
 		viewHolder.mTitleView.setText(colorItem.getTitle());
 		viewHolder.mDescriptionView.setText(colorItem.getDescription());
@@ -144,11 +144,11 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 
 	@Override
 	public void onBindViewHolder(ViewHolder holder, int position) {
-		ColorItem colorItem = mFiltered.get(position);
-		holder.mColorView.setCurrentColor(colorItem.getColor());
-		holder.mTitleView.setText(colorItem.getTitle());
-		holder.mDescriptionView.setText(colorItem.getDescription());
-		ViewCompat.setTransitionName(holder.mColorView, colorItem.getId().toString());
+		Note note = mFiltered.get(position);
+		holder.mColorView.setCurrentColor(note.getColor());
+		holder.mTitleView.setText(note.getTitle());
+		holder.mDescriptionView.setText(note.getDescription());
+		ViewCompat.setTransitionName(holder.mColorView, note.getId().toString());
 	}
 
 	@Override
@@ -168,9 +168,9 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 
 			@Override
 			protected Void doInBackground(Object[] params) {
-				Collections.sort(mFiltered, new Comparator<ColorItem>() {
+				Collections.sort(mFiltered, new Comparator<Note>() {
 					@Override
-					public int compare(ColorItem c1, ColorItem c2) {
+					public int compare(Note c1, Note c2) {
 						switch (sortParam) {
 							case SORT_PARAM_TITLE:
 								if (ascending) {
@@ -226,9 +226,9 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 
 	public void search(String query) {
 		String lowerQuery = query.toLowerCase(Locale.getDefault());
-		ArrayList<ColorItem> filtered = new ArrayList<>();
+		ArrayList<Note> filtered = new ArrayList<>();
 		for (int i = 0; i < mColors.size(); i++) {
-			ColorItem item = mColors.get(i);
+			Note item = mColors.get(i);
 			if (item.getTitle().toLowerCase(Locale.getDefault()).contains(lowerQuery) ||
 					item.getDescription().toLowerCase(Locale.getDefault()).contains(lowerQuery)) {
 				filtered.add(item);
@@ -243,7 +243,7 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 		return mItemFilter;
 	}
 
-	public void addItem(ColorItem item) {
+	public void addItem(Note item) {
 		mColors.add(item);
 		if (mFiltered != mColors) {
 			mFiltered.add(item);
@@ -251,13 +251,13 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 		notifyDataSetChanged();
 	}
 
-	public void changeData(ArrayList<ColorItem> items) {
+	public void changeData(ArrayList<Note> items) {
 		mColors = items;
 		mFiltered = items;
 		notifyDataSetChanged();
 	}
 
-	public void deleteItem(ColorItem item) {
+	public void deleteItem(Note item) {
 		mColors.remove(item);
 		mFiltered.remove(item);
 		notifyDataSetChanged();
@@ -268,12 +268,12 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 		notifyDataSetChanged();
 	}
 
-	public ColorItem getColorItem(int position) {
+	public Note getColorItem(int position) {
 		return mFiltered.get(position);
 	}
 
-	public ColorItem getColorItem(UUID id) {
-		for (ColorItem item: mColors) {
+	public Note getColorItem(UUID id) {
+		for (Note item: mColors) {
 			if (item.getId().equals(id)) {
 				return item;
 			}
@@ -307,7 +307,7 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 			FilterResults results = new FilterResults();
 
 			DateFilter filter = DateUtils.getDateFilter(constraint.toString());
-			ArrayList<ColorItem> filtered = new ArrayList<>();
+			ArrayList<Note> filtered = new ArrayList<>();
 			for (int i = 0; i < mColors.size(); i++) {
 				switch (filter.getParamName()) {
 					case FILTER_PARAM_CREATED:
@@ -335,7 +335,7 @@ public class ColorsListAdapter extends RecyclerView.Adapter<ColorsListAdapter.Vi
 		@SuppressWarnings("unchecked")
 		@Override
 		protected void publishResults(CharSequence constraint, FilterResults results) {
-			mFiltered = (ArrayList<ColorItem>) results.values;
+			mFiltered = (ArrayList<Note>) results.values;
 			notifyDataSetChanged();
 		}
 	}

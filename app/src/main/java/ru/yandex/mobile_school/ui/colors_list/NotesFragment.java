@@ -30,7 +30,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.yandex.mobile_school.App;
 import ru.yandex.mobile_school.R;
-import ru.yandex.mobile_school.data.ColorItem;
+import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.model.StorageModel;
 import ru.yandex.mobile_school.presenters.IBasePresenter;
 import ru.yandex.mobile_school.presenters.NotesPresenter;
@@ -150,23 +150,23 @@ public class NotesFragment extends BaseFragment implements
 	}
 
 	@Override
-	public void onClick(int position, ColorItem colorItem) {
+	public void onClick(int position, Note note) {
 		mEditPosition = position;
-		ColorPickerFragment fragment = ColorPickerFragment.newInstance(colorItem);
+		ColorPickerFragment fragment = ColorPickerFragment.newInstance(note);
 		fragment.setTargetFragment(getFragment(), REQUEST_CODE_EDIT);
 		NotesActivity listActivity = (NotesActivity) getActivity();
 		View itemView = mColorsListView.getLayoutManager().findViewByPosition(position);
 		View sharedView = itemView.findViewById(R.id.colors_list_item_color_view);
-		listActivity.replaceFragmentWithShared(fragment, sharedView, colorItem.getId().toString());
+		listActivity.replaceFragmentWithShared(fragment, sharedView, note.getId().toString());
 		listActivity.setNavBarItemsEnabled(false);
 	}
 
 	@Override
-	public void onLongClick(int position, ColorItem colorItem) {
-		getDeleteAlertDialog(colorItem).show();
+	public void onLongClick(int position, Note note) {
+		getDeleteAlertDialog(note).show();
 	}
 
-	private AlertDialog getDeleteAlertDialog(final ColorItem item) {
+	private AlertDialog getDeleteAlertDialog(final Note item) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 		builder.setTitle(R.string.delete_dialog_title);
 		builder.setMessage(R.string.delete_dialog_text);
@@ -193,12 +193,12 @@ public class NotesFragment extends BaseFragment implements
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK) {
-			ColorItem item = data.getParcelableExtra(ColorPickerFragment.EXTRA_COLOR_ITEM);
+			Note item = data.getParcelableExtra(ColorPickerFragment.EXTRA_COLOR_ITEM);
 			addColorItem(item);
 		}
 		if (requestCode == REQUEST_CODE_EDIT) {
-			ColorItem old = mListAdapter.getColorItem(mEditPosition);
-			ColorItem updated;
+			Note old = mListAdapter.getColorItem(mEditPosition);
+			Note updated;
 			if (resultCode == RESULT_OK) {
 				updated = data.getParcelableExtra(ColorPickerFragment.EXTRA_COLOR_ITEM);
 			} else {
@@ -211,12 +211,12 @@ public class NotesFragment extends BaseFragment implements
 			alert(getString(R.string.colors_list_sort_started));
 			StorageModel storage = StorageModel.get(getContext());
 			storage.updateColorItem(updated);
-			presenter.updateNote(storage.getUserId(), updated.getId(),
+			presenter.updateNote(storage.getUserId(),
 					updated.getServerId(), updated.toNoteDTO());
 		}
 	}
 
-	private void addColorItem(ColorItem item) {
+	private void addColorItem(Note item) {
 		StorageModel storage = StorageModel.get(getContext());
 		storage.addColorItem(item);
 		presenter.addNote(storage.getUserId(), item.getId(), item.toNoteDTO());
@@ -431,16 +431,16 @@ public class NotesFragment extends BaseFragment implements
 		}
 	}
 
-	public void onGetUserNotes(int user, ArrayList<ColorItem> items) {
+	public void onGetUserNotes(ArrayList<Note> items) {
         // TODO: move to presenter
 		StorageModel.get(getContext()).replaceColorItems(items);
 		mListAdapter.changeData(items);
 	}
 
-	public void onAddUserNote(int user, UUID itemId, int noteId) {
+	public void onAddUserNote(UUID itemId, int noteId) {
         // TODO: move to presenter
 		StorageModel storage = StorageModel.get(getContext());
-		ColorItem item = storage.getColorItem(itemId);
+		Note item = storage.getColorItem(itemId);
 		item.setServerId(noteId);
 		storage.updateColorItem(item);
 		mListAdapter.getColorItem(itemId).setServerId(noteId);
