@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class NoteDTO {
 
     @SerializedName("id")
-    private String id;
+    private int id;
     @SerializedName("title")
     private String title;
     @SerializedName("description")
@@ -23,11 +23,11 @@ public class NoteDTO {
     @SerializedName("extra")
     private String extra;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

@@ -8,7 +8,6 @@ import android.support.annotation.ColorInt;
 import java.util.Date;
 import java.util.UUID;
 
-import ru.yandex.mobile_school.api.Note;
 import ru.yandex.mobile_school.model.dto.NoteDTO;
 import ru.yandex.mobile_school.utils.DateUtils;
 
@@ -77,7 +76,7 @@ public class ColorItem implements Parcelable {
 		mCreated = note.getCreated();
 		mEdited = note.getEdited();
 		mViewed = note.getViewed();
-		mServerId = Integer.parseInt(note.getId());
+		mServerId = note.getId();
 	}
 
 	protected ColorItem(Parcel in) {
@@ -203,6 +202,19 @@ public class ColorItem implements Parcelable {
 		dest.writeString(mEdited);
 		dest.writeString(mViewed);
 		dest.writeInt(mServerId);
+	}
+
+	public NoteDTO toNoteDTO() {
+		NoteDTO note = new NoteDTO();
+		note.setId(mServerId);
+		note.setColor(getColorAsHexString());
+		note.setTitle(mTitle);
+		note.setDescription(mDescription);
+		note.setCreated(mCreated);
+		note.setEdited(mEdited);
+		note.setViewed(mViewed);
+		note.setExtra(mId.toString());
+		return note;
 	}
 
 	public Note toNote() {

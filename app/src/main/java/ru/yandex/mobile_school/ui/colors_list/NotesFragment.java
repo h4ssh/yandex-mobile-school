@@ -13,7 +13,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +30,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.yandex.mobile_school.App;
 import ru.yandex.mobile_school.R;
-import ru.yandex.mobile_school.api.NotesAPIClient;
 import ru.yandex.mobile_school.data.ColorItem;
 import ru.yandex.mobile_school.model.StorageModel;
 import ru.yandex.mobile_school.presenters.IBasePresenter;
@@ -51,8 +49,7 @@ public class NotesFragment extends BaseFragment implements
 		ColorsListAsyncActor.ColorsListAsyncActorListener,
 		ColorsListAdapter.AdapterAsyncActionsListener,
 		ColorsListAdapter.AdapterOnClickListener,
-		ColorsListLooperThread.Callback,
-		NotesAPIClient.NotesAPICallbacks {
+		ColorsListLooperThread.Callback{
 
 	private static final int REQUEST_CODE_ADD = 1;
 	private static final int REQUEST_CODE_EDIT = 2;
@@ -180,8 +177,7 @@ public class NotesFragment extends BaseFragment implements
 				StorageModel storage = StorageModel.get(getContext());
 				storage.deleteColorItem(item);
 				if (item.getServerId() != 0) {
-					NotesAPIClient.get().deleteUserNote(storage.getUserId(), item.getId(),
-							item.getServerId(), getFragment());
+					presenter.deleteNote(storage.getUserId(), item.getServerId());
 				}
 			}
 		});
@@ -215,15 +211,15 @@ public class NotesFragment extends BaseFragment implements
 			alert(getString(R.string.colors_list_sort_started));
 			StorageModel storage = StorageModel.get(getContext());
 			storage.updateColorItem(updated);
-			NotesAPIClient.get().updateUserNote(storage.getUserId(), updated.getId(),
-					updated.getServerId(), updated.toNote(), this);
+			presenter.updateNote(storage.getUserId(), updated.getId(),
+					updated.getServerId(), updated.toNoteDTO());
 		}
 	}
 
 	private void addColorItem(ColorItem item) {
 		StorageModel storage = StorageModel.get(getContext());
 		storage.addColorItem(item);
-		NotesAPIClient.get().addUserNote(storage.getUserId(), item.getId(), item.toNote(), this);
+		presenter.addNote(storage.getUserId(), item.getId(), item.toNoteDTO());
 		mListAdapter.addItem(item);
 	}
 
@@ -239,9 +235,14 @@ public class NotesFragment extends BaseFragment implements
 				mPendingOperations--;
 			}
 		}
+
+		if (mProgressBar == null) {
+            return; // TODO: fix and delete scope
+        }
+
 		if (mPendingOperations > 0) {
 			mProgressBar.setVisibility(View.VISIBLE);
-		} else {
+		} else  {
 			mProgressBar.setVisibility(View.GONE);
 		}
 	}
@@ -430,35 +431,19 @@ public class NotesFragment extends BaseFragment implements
 		}
 	}
 
-	private static final String TAG_API = "API CALLBACKS";
-
 	public void onGetUserNotes(int user, ArrayList<ColorItem> items) {
+        // TODO: move to presenter
 		StorageModel.get(getContext()).replaceColorItems(items);
 		mListAdapter.changeData(items);
 	}
 
-	@Override
 	public void onAddUserNote(int user, UUID itemId, int noteId) {
-		Log.d(TAG_API, "On add user note: " + user + " UUID: " + itemId.toString() + " noteId: " + noteId);
+        // TODO: move to presenter
 		StorageModel storage = StorageModel.get(getContext());
 		ColorItem item = storage.getColorItem(itemId);
 		item.setServerId(noteId);
 		storage.updateColorItem(item);
 		mListAdapter.getColorItem(itemId).setServerId(noteId);
-	}
-
-	@Override
-	public void onDeleteUserNote(int user, UUID itemId) {
-	}
-
-	@Override
-	public void onUpdateUserNote(int user, UUID itemId) {
-		Log.d(TAG_API, "update");
-	}
-
-	@Override
-	public void onError(String message) {
-		alert("API error: " + message);
 	}
 
 	@Override
