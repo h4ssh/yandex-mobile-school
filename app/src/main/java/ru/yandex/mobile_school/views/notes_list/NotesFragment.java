@@ -3,7 +3,6 @@ package ru.yandex.mobile_school.views.notes_list;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -19,9 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -31,7 +28,6 @@ import ru.yandex.mobile_school.App;
 import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.presenters.IBasePresenter;
-import ru.yandex.mobile_school.presenters.NotesListAdapter;
 import ru.yandex.mobile_school.presenters.NotesListAsyncActor;
 import ru.yandex.mobile_school.presenters.NotesListLooperThread;
 import ru.yandex.mobile_school.presenters.NotesPresenter;
@@ -48,8 +44,6 @@ public class NotesFragment extends BaseFragment implements
         NotesListGenerateFragment.NotesListGenerateDialogListener,
         NotesListUserFragment.NotesListUserDialogListener,
         NotesListAsyncActor.NotesListAsyncActorListener,
-		NotesListAdapter.AdapterAsyncActionsListener,
-		NotesListAdapter.AdapterOnClickListener,
 		NotesListLooperThread.Callback{
 
 	private static final int REQUEST_CODE_ADD = 1;
@@ -64,7 +58,6 @@ public class NotesFragment extends BaseFragment implements
 	private int mEditPosition = 0;
 	private int mPendingOperations = 0;
 	private NotesListAsyncActor mAsyncActor;
-	private NotesListAdapter mListAdapter;
 	private NotificationManager mNotifyManager;
 	private NotificationCompat.Builder mBuilder;
 	private NotesListLooperThread mLooperThread;
@@ -98,10 +91,6 @@ public class NotesFragment extends BaseFragment implements
 		mLooperThread = new NotesListLooperThread(new Handler(), this);
 		mLooperThread.start();
 		mLooperThread.prepareHandler();
-
-		mListAdapter = new NotesListAdapter(presenter.getLocalNotes());
-		mListAdapter.setAdapterSortListener(this);
-		mListAdapter.setAdapterOnClickListener(this);
 	}
 
     @Override
@@ -126,7 +115,7 @@ public class NotesFragment extends BaseFragment implements
 		mNotesListView.setLayoutManager(new LinearLayoutManager(getContext()));
 		mNotesListView.addItemDecoration(new DividerItemDecoration(getContext(),
 				DividerItemDecoration.VERTICAL));
-		mNotesListView.setAdapter(mListAdapter);
+		mNotesListView.setAdapter(presenter.getNotesAdapter());
 		mAddNoteFAB.setOnClickListener(v -> {
             NoteEditFragment fragment = NoteEditFragment.newInstance(null);
             fragment.setTargetFragment(getFragment(), REQUEST_CODE_ADD);
@@ -153,7 +142,6 @@ public class NotesFragment extends BaseFragment implements
 		return this;
 	}
 
-	@Override
 	public void onClick(int position, Note note) {
 		mEditPosition = position;
 		NoteEditFragment fragment = NoteEditFragment.newInstance(note);
@@ -165,8 +153,7 @@ public class NotesFragment extends BaseFragment implements
 		listActivity.setNavBarItemsEnabled(false);
 	}
 
-	@Override
-	public void onLongClick(int position, Note note) {
+	public void onLongClick(Note note) {
 		getDeleteAlertDialog(note).show();
 	}
 
@@ -175,7 +162,6 @@ public class NotesFragment extends BaseFragment implements
 		builder.setTitle(R.string.delete_dialog_title);
 		builder.setMessage(R.string.delete_dialog_text);
 		builder.setPositiveButton(R.string.button_delete, (dialog, which) -> {
-            mListAdapter.deleteItem(item);
             presenter.deleteLocalNote(item);
             if (item.getServerId() != 0) {
                 presenter.deleteNote(item.getServerId());
@@ -198,7 +184,7 @@ public class NotesFragment extends BaseFragment implements
             addColorItem(item);
         }
         if (requestCode == REQUEST_CODE_EDIT) {
-            Note old = mListAdapter.getColorItem(mEditPosition);
+            Note old = presenter.getNoteAtPosition(mEditPosition);
             Note updated;
             if (resultCode == RESULT_OK) {
                 updated = resultIntent.getParcelableExtra(NoteEditFragment.EXTRA_COLOR_ITEM);
@@ -208,7 +194,7 @@ public class NotesFragment extends BaseFragment implements
             }
             old.updateWith(updated);
             displayProgressBarIfNeeded(true);
-            mListAdapter.resort();
+            presenter.resortNotes();
             presenter.updateLocalNote(updated);
             presenter.updateNote(updated.getServerId(), updated.toNoteDTO());
         }
@@ -218,7 +204,6 @@ public class NotesFragment extends BaseFragment implements
 	private void addColorItem(Note item) {
 		presenter.addLocalNote(item);
 		presenter.postNote(item.getId(), item.toNoteDTO());
-		mListAdapter.addItem(item);
 	}
 
 	private void alert(String text) {
@@ -292,7 +277,7 @@ public class NotesFragment extends BaseFragment implements
 				searchFragment.show(getActivity().getSupportFragmentManager(), "");
 				break;
 			case R.id.notes_list_menu_reset:
-				mListAdapter.resetFilters();
+				presenter.resetFilters();
 				break;
 			default:
 				break;
@@ -303,35 +288,13 @@ public class NotesFragment extends BaseFragment implements
 	@Override
 	public void onSortPositiveClick(int sortParam, boolean ascending) {
 		displayProgressBarIfNeeded(true);
-		Resources res = getResources();
-		String[] sortParams = res.getStringArray(R.array.notes_list_sort_by_items);
-		String selectedParam = sortParams[sortParam];
-		if (selectedParam.equals(res.getString(R.string.notes_list_sort_by_title))) {
-			mListAdapter.sortBy(NotesListAdapter.SORT_PARAM_TITLE, ascending);
-		} else if (selectedParam.equals(res.getString(R.string.notes_list_sort_by_created))) {
-			mListAdapter.sortBy(NotesListAdapter.SORT_PARAM_CREATED, ascending);
-		} else if (selectedParam.equals(res.getString(R.string.notes_list_sort_by_edited))) {
-			mListAdapter.sortBy(NotesListAdapter.SORT_PARAM_EDITED, ascending);
-		} else if (selectedParam.equals(res.getString(R.string.notes_list_sort_by_viewed))) {
-			mListAdapter.sortBy(NotesListAdapter.SORT_PARAM_VIEWED, ascending);
-		}
+		presenter.sort(sortParam, ascending);
 	}
 
 	@Override
 	public void onFilterPositiveClick(int filterParam, Date startDate, Date endDate) {
 		displayProgressBarIfNeeded(true);
-		Resources res = getResources();
-		String[] filterParams = res.getStringArray(R.array.notes_list_filter_by_items);
-		String selectedParam = filterParams[filterParam];
-		String filterName = "";
-		if (selectedParam.equals(res.getString(R.string.notes_list_filter_by_created))) {
-			filterName = NotesListAdapter.FILTER_PARAM_CREATED;
-		} else if (selectedParam.equals(res.getString(R.string.notes_list_filter_by_edited))) {
-			filterName = NotesListAdapter.FILTER_PARAM_EDITED;
-		} else if (selectedParam.equals(res.getString(R.string.notes_list_filter_by_viewed))) {
-			filterName = NotesListAdapter.FILTER_PARAM_VIEWED;
-		}
-		mListAdapter.filter(filterName, startDate, endDate);
+		presenter.filter(filterParam, startDate, endDate);
 	}
 
 	@Override
@@ -347,14 +310,14 @@ public class NotesFragment extends BaseFragment implements
 	}
 
 	@Override
-	public void onSearchClick(String query) {
-		mListAdapter.search(query);
+	public void onSearchClick(String query){
+        presenter.search(query);
 	}
 
 	@Override
 	public void onItemsAddFinish() {
 		displayProgressBarIfNeeded(false);
-		mListAdapter.changeData(presenter.getLocalNotes());
+        presenter.refreshLocal();
 		alert(getString(R.string.notes_list_generator_finish));
 		mBuilder.setContentText("Generating complete").setProgress(0, 0, false);
 		mNotifyManager.notify(ASYNC_ACTION_NOTIFICATION_ID, mBuilder.build());
@@ -364,16 +327,6 @@ public class NotesFragment extends BaseFragment implements
 	public void onItemsAddProgress(int percent) {
 		mBuilder.setProgress(100, percent, false);
 		mNotifyManager.notify(ASYNC_ACTION_NOTIFICATION_ID, mBuilder.build());
-	}
-
-	@Override
-	public void onSortFinish() {
-		displayProgressBarIfNeeded(false);
-	}
-
-	@Override
-	public void onFilterFinish() {
-		displayProgressBarIfNeeded(false);
 	}
 
 	@Override
@@ -398,19 +351,11 @@ public class NotesFragment extends BaseFragment implements
 	public void onColorsImported(boolean result) {
 		displayProgressBarIfNeeded(false);
 		if (result) {
-			mListAdapter.changeData(presenter.getLocalNotes());
+			presenter.refreshLocal();
 			alert(getString(R.string.notes_list_import_success));
 		} else {
 			alert(getString(R.string.notes_list_import_error));
 		}
-	}
-
-	public void onGetUserNotes(ArrayList<Note> items) {
-		mListAdapter.changeData(items);
-	}
-
-	public void onAddUserNote(UUID itemId, int noteId) {
-		mListAdapter.getColorItem(itemId).setServerId(noteId);
 	}
 
 	@Override
@@ -424,4 +369,9 @@ public class NotesFragment extends BaseFragment implements
 	protected IBasePresenter getPresenter() {
 		return presenter;
 	}
+
+    @Override
+    public void hideLoading() {
+        displayProgressBarIfNeeded(false);
+    }
 }

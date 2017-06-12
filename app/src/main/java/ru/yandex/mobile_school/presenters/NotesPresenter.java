@@ -1,12 +1,17 @@
 package ru.yandex.mobile_school.presenters;
 
+import android.content.Context;
+import android.content.res.Resources;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.inject.Inject;
 
 import io.reactivex.disposables.Disposable;
 import ru.yandex.mobile_school.App;
+import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.model.NotesModel;
 import ru.yandex.mobile_school.model.dto.NoteDTO;
@@ -18,15 +23,21 @@ import ru.yandex.mobile_school.model.dto.UpdateNoteDTO;
 import ru.yandex.mobile_school.views.notes_list.NotesFragment;
 import ru.yandex.mobile_school.views.IView;
 
-public class NotesPresenter extends BasePresenter {
+public class NotesPresenter extends BasePresenter
+    implements NotesListAdapter.AdapterOnClickListener,
+    NotesListAdapter.AdapterAsyncActionsListener{
 
     private NotesFragment view;
+    private NotesListAdapter mNotesAdapter;
 
     @Inject
     NotesModel model;
 
     @Inject
     StorageModel storage;
+
+    @Inject
+    Context context;
 
     public NotesPresenter() {
         App.getComponent().inject(this);
@@ -62,7 +73,7 @@ public class NotesPresenter extends BasePresenter {
             items.add(new Note(note));
         }
         storage.replaceNotes(items);
-        view.onGetUserNotes(items);
+        refreshLocal();
     }
 
     public void postNote(UUID itemId, NoteDTO note) {
@@ -81,7 +92,7 @@ public class NotesPresenter extends BasePresenter {
         Note note = storage.getNote(UUID.fromString(result.getUuid()));
         note.setServerId(result.getData());
         updateLocalNote(note);
-        view.onAddUserNote(UUID.fromString(result.getUuid()), result.getData());
+        mNotesAdapter.getColorItem(UUID.fromString(result.getUuid())).setServerId(result.getData());
     }
 
     public void updateNote(int noteId, NoteDTO note) {
@@ -116,6 +127,7 @@ public class NotesPresenter extends BasePresenter {
 
     public void deleteLocalNote(Note note) {
         storage.deleteNote(note);
+        mNotesAdapter.deleteNote(note);
     }
 
     public void updateLocalNote(Note note) {
@@ -124,6 +136,7 @@ public class NotesPresenter extends BasePresenter {
 
     public void addLocalNote(Note note) {
         storage.addNote(note);
+        mNotesAdapter.addNote(note);
     }
 
     public Note getNote(UUID id) {
@@ -137,4 +150,87 @@ public class NotesPresenter extends BasePresenter {
     public int getUserId() { return storage.getUserId(); }
 
     // endregion Storage
+
+    public NotesListAdapter getNotesAdapter() {
+        if (mNotesAdapter == null) {
+            mNotesAdapter = new NotesListAdapter(getLocalNotes());
+            mNotesAdapter.setAdapterOnClickListener(this);
+            mNotesAdapter.setAdapterSortListener(this);
+        }
+        return mNotesAdapter;
+    }
+
+    // region Adapter callbacks
+
+    @Override
+    public void onClick(int position, Note note) {
+        view.onClick(position, note);
+    }
+
+    @Override
+    public void onLongClick(int position, Note note) {
+        view.onLongClick(note);
+    }
+
+    @Override
+    public void onSortFinish() {
+        view.hideLoading();
+    }
+
+    @Override
+    public void onFilterFinish() {
+        view.hideLoading();
+    }
+
+    // endregion Adapter callbacks
+
+    public void resortNotes() {
+        mNotesAdapter.resort();
+    }
+
+    public Note getNoteAtPosition(int position) {
+        return mNotesAdapter.getNoteAtPosition(position);
+    }
+
+    public void resetFilters() {
+        mNotesAdapter.resetFilters();
+    }
+
+    public void filter(int filterParam, Date start, Date end) {
+        Resources res = context.getResources();
+        String[] filterParams = res.getStringArray(R.array.notes_list_filter_by_items);
+        String selectedParam = filterParams[filterParam];
+        String filterName = "";
+        if (selectedParam.equals(res.getString(R.string.notes_list_filter_by_created))) {
+            filterName = NotesListAdapter.FILTER_PARAM_CREATED;
+        } else if (selectedParam.equals(res.getString(R.string.notes_list_filter_by_edited))) {
+            filterName = NotesListAdapter.FILTER_PARAM_EDITED;
+        } else if (selectedParam.equals(res.getString(R.string.notes_list_filter_by_viewed))) {
+            filterName = NotesListAdapter.FILTER_PARAM_VIEWED;
+        }
+        mNotesAdapter.filter(filterName, start, end);
+    }
+
+    public void search(String query) {
+        mNotesAdapter.search(query);
+    }
+
+    public void refreshLocal() {
+        mNotesAdapter.changeData(getLocalNotes());
+    }
+
+    public void sort(int sortParam, boolean ascending) {
+        Resources res = context.getResources();
+        String[] sortParams = res.getStringArray(R.array.notes_list_sort_by_items);
+        String selectedParam = sortParams[sortParam];
+        if (selectedParam.equals(res.getString(R.string.notes_list_sort_by_title))) {
+            mNotesAdapter.sortBy(NotesListAdapter.SORT_PARAM_TITLE, ascending);
+        } else if (selectedParam.equals(res.getString(R.string.notes_list_sort_by_created))) {
+            mNotesAdapter.sortBy(NotesListAdapter.SORT_PARAM_CREATED, ascending);
+        } else if (selectedParam.equals(res.getString(R.string.notes_list_sort_by_edited))) {
+            mNotesAdapter.sortBy(NotesListAdapter.SORT_PARAM_EDITED, ascending);
+        } else if (selectedParam.equals(res.getString(R.string.notes_list_sort_by_viewed))) {
+            mNotesAdapter.sortBy(NotesListAdapter.SORT_PARAM_VIEWED, ascending);
+        }
+    }
 }
