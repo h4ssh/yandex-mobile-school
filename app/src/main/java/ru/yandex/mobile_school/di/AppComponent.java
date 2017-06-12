@@ -6,9 +6,10 @@ import dagger.Component;
 import ru.yandex.mobile_school.model.BaseModel;
 import ru.yandex.mobile_school.model.StorageModel;
 import ru.yandex.mobile_school.presenters.BasePresenter;
+import ru.yandex.mobile_school.presenters.NotesListLooperThread;
 import ru.yandex.mobile_school.presenters.NotesPresenter;
 import ru.yandex.mobile_school.views.notes_list.NotesFragment;
-import ru.yandex.mobile_school.views.notes_list.NotesListAsyncActor;
+import ru.yandex.mobile_school.presenters.NotesListAsyncActor;
 
 @SuppressWarnings("WeakerAccess")
 @Singleton
@@ -25,5 +26,7 @@ public interface AppComponent {
 
     void inject(StorageModel storage);
 
-    void inject(NotesListAsyncActor notesAsyncActor);
+    void inject(NotesListAsyncActor notesListAsyncActor);
+
+    void inject(NotesListLooperThread looperThread);
 }

@@ -32,7 +32,7 @@ public class NotesPresenter extends BasePresenter {
         App.getComponent().inject(this);
     }
 
-    public void onCreate(NotesFragment view) {
+    public void onCreateView(NotesFragment view) {
         this.view = view;
     }
 

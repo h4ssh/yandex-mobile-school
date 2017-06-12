@@ -334,7 +334,7 @@ public class NoteEditFragment extends BaseFragment {
 
 	@Override
 	protected IBasePresenter getPresenter() {
-		return null; // TODO: return presenter
+		return null;
 	}
 
 	@Override

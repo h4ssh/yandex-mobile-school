@@ -31,6 +31,9 @@ import ru.yandex.mobile_school.App;
 import ru.yandex.mobile_school.R;
 import ru.yandex.mobile_school.model.Note;
 import ru.yandex.mobile_school.presenters.IBasePresenter;
+import ru.yandex.mobile_school.presenters.NotesListAdapter;
+import ru.yandex.mobile_school.presenters.NotesListAsyncActor;
+import ru.yandex.mobile_school.presenters.NotesListLooperThread;
 import ru.yandex.mobile_school.presenters.NotesPresenter;
 import ru.yandex.mobile_school.views.BaseFragment;
 import ru.yandex.mobile_school.views.note_edit.NoteEditFragment;
@@ -112,7 +115,7 @@ public class NotesFragment extends BaseFragment implements
 							 Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_notes_list, container, false);
 		ButterKnife.bind(this, view);
-        presenter.onCreate(this);
+        presenter.onCreateView(this);
 
 		NotesActivity activity = (NotesActivity) getActivity();
 		activity.getSupportActionBar().setTitle(R.string.app_name);
@@ -206,7 +209,6 @@ public class NotesFragment extends BaseFragment implements
             old.updateWith(updated);
             displayProgressBarIfNeeded(true);
             mListAdapter.resort();
-            alert(getString(R.string.notes_list_sort_started));
             presenter.updateLocalNote(updated);
             presenter.updateNote(updated.getServerId(), updated.toNoteDTO());
         }
@@ -301,7 +303,6 @@ public class NotesFragment extends BaseFragment implements
 	@Override
 	public void onSortPositiveClick(int sortParam, boolean ascending) {
 		displayProgressBarIfNeeded(true);
-		alert(getString(R.string.notes_list_sort_started));
 		Resources res = getResources();
 		String[] sortParams = res.getStringArray(R.array.notes_list_sort_by_items);
 		String selectedParam = sortParams[sortParam];
@@ -319,7 +320,6 @@ public class NotesFragment extends BaseFragment implements
 	@Override
 	public void onFilterPositiveClick(int filterParam, Date startDate, Date endDate) {
 		displayProgressBarIfNeeded(true);
-		alert(getString(R.string.notes_list_filter_started));
 		Resources res = getResources();
 		String[] filterParams = res.getStringArray(R.array.notes_list_filter_by_items);
 		String selectedParam = filterParams[filterParam];
@@ -369,13 +369,11 @@ public class NotesFragment extends BaseFragment implements
 	@Override
 	public void onSortFinish() {
 		displayProgressBarIfNeeded(false);
-		alert(getString(R.string.notes_list_sort_finished));
 	}
 
 	@Override
 	public void onFilterFinish() {
 		displayProgressBarIfNeeded(false);
-		alert(getString(R.string.notes_list_filter_finished));
 	}
 
 	@Override

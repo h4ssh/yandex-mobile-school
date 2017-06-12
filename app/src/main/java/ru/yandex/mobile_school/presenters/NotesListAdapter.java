@@ -1,4 +1,4 @@
-package ru.yandex.mobile_school.views.notes_list;
+package ru.yandex.mobile_school.presenters;
 
 import android.os.AsyncTask;
 import android.support.v4.view.ViewCompat;
@@ -38,14 +38,14 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListAdapter.View
 		void onLongClick(int position, Note note);
 	}
 
-	static final String SORT_PARAM_TITLE = "sort_param_title";
-	static final String SORT_PARAM_CREATED = "sort_param_created";
-	static final String SORT_PARAM_EDITED = "sort_param_edited";
-	static final String SORT_PARAM_VIEWED = "sort_param_viewed";
+	public static final String SORT_PARAM_TITLE = "sort_param_title";
+	public static final String SORT_PARAM_CREATED = "sort_param_created";
+	public static final String SORT_PARAM_EDITED = "sort_param_edited";
+	public static final String SORT_PARAM_VIEWED = "sort_param_viewed";
 
-	static final String FILTER_PARAM_CREATED = "filter_param_created";
-	static final String FILTER_PARAM_EDITED = "filter_param_edited";
-	static final String FILTER_PARAM_VIEWED = "filter_param_viewed";
+	public static final String FILTER_PARAM_CREATED = "filter_param_created";
+	public static final String FILTER_PARAM_EDITED = "filter_param_edited";
+	public static final String FILTER_PARAM_VIEWED = "filter_param_viewed";
 
 	private ArrayList<Note> mNotes;
 	private ArrayList<Note> mFiltered;
@@ -55,7 +55,7 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListAdapter.View
 	private AdapterAsyncActionsListener mListener;
 	private AdapterOnClickListener mClickListener;
 
-	NotesListAdapter(ArrayList<Note> items) {
+	public NotesListAdapter(ArrayList<Note> items) {
 		mNotes = items;
 		mFiltered = items;
 	}
@@ -78,63 +78,21 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListAdapter.View
 			ButterKnife.bind(this, itemView);
 
 			if (mClickListener != null) {
-				itemView.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						int position = getAdapterPosition();
-						Note item = getColorItem(position);
-						mClickListener.onClick(position, item);
-					}
-				});
-				itemView.setOnLongClickListener(new View.OnLongClickListener() {
-					@Override
-					public boolean onLongClick(View v) {
-						int position = getAdapterPosition();
-						Note item = getColorItem(position);
-						mClickListener.onLongClick(position, item);
-						return true;
-					}
-				});
+				itemView.setOnClickListener(v -> {
+                    int position = getAdapterPosition();
+                    Note item = getColorItem(position);
+                    mClickListener.onClick(position, item);
+                });
+				itemView.setOnLongClickListener(v -> {
+                    int position = getAdapterPosition();
+                    Note item = getColorItem(position);
+                    mClickListener.onLongClick(position, item);
+                    return true;
+                });
 			}
 		}
 	}
 
-	/*
-	ListView's Base Adapter with ViewHolder
-
-	@Override
-	public int getCount() {
-		return mFiltered.size();
-	}
-
-	@Override
-	public Object getItem(int position) {
-		return mFiltered.get(position);
-	}
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		NotesListAdapter.ViewHolder viewHolder;
-
-		if (convertView == null){
-			LayoutInflater inflater = (LayoutInflater) mWeakContext.get()
-					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			convertView = inflater.inflate(R.layout.notes_list_item, parent, false);
-			viewHolder = new NotesListAdapter.ViewHolder();
-			ButterKnife.bind(viewHolder, convertView);
-			convertView.setTag(viewHolder);
-		} else {
-			viewHolder = (NotesListAdapter.ViewHolder) convertView.getTag();
-		}
-
-		Note colorItem = (Note) getItem(position);
-		viewHolder.mColorView.setCurrentColor(colorItem.getColor());
-		viewHolder.mTitleView.setText(colorItem.getTitle());
-		viewHolder.mDescriptionView.setText(colorItem.getDescription());
-
-		return convertView;
-	}
-*/
 	@Override
 	public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		View view = LayoutInflater.from(parent.getContext())
@@ -168,40 +126,37 @@ public class NotesListAdapter extends RecyclerView.Adapter<NotesListAdapter.View
 
 			@Override
 			protected Void doInBackground(Object[] params) {
-				Collections.sort(mFiltered, new Comparator<Note>() {
-					@Override
-					public int compare(Note c1, Note c2) {
-						switch (sortParam) {
-							case SORT_PARAM_TITLE:
-								if (ascending) {
-									return c1.getTitle().compareToIgnoreCase(c2.getTitle());
-								} else {
-									return c2.getTitle().compareToIgnoreCase(c1.getTitle());
-								}
-							case SORT_PARAM_CREATED:
-								if (ascending) {
-									return c1.getCreatedDate().compareTo(c2.getCreatedDate());
-								} else {
-									return  c2.getCreatedDate().compareTo(c1.getCreatedDate());
-								}
-							case SORT_PARAM_EDITED:
-								if (ascending) {
-									return c1.getEditedDate().compareTo(c2.getEditedDate());
-								} else {
-									return c2.getEditedDate().compareTo(c1.getEditedDate());
-								}
-							case SORT_PARAM_VIEWED:
-								if (ascending) {
-									return c1.getViewedDate().compareTo(c2.getViewedDate());
-								} else {
-									return c2.getViewedDate().compareTo(c1.getViewedDate());
-								}
-							default:
-								return 0;
-						}
+				Collections.sort(mFiltered, (c1, c2) -> {
+                    switch (sortParam) {
+                        case SORT_PARAM_TITLE:
+                            if (ascending) {
+                                return c1.getTitle().compareToIgnoreCase(c2.getTitle());
+                            } else {
+                                return c2.getTitle().compareToIgnoreCase(c1.getTitle());
+                            }
+                        case SORT_PARAM_CREATED:
+                            if (ascending) {
+                                return c1.getCreatedDate().compareTo(c2.getCreatedDate());
+                            } else {
+                                return  c2.getCreatedDate().compareTo(c1.getCreatedDate());
+                            }
+                        case SORT_PARAM_EDITED:
+                            if (ascending) {
+                                return c1.getEditedDate().compareTo(c2.getEditedDate());
+                            } else {
+                                return c2.getEditedDate().compareTo(c1.getEditedDate());
+                            }
+                        case SORT_PARAM_VIEWED:
+                            if (ascending) {
+                                return c1.getViewedDate().compareTo(c2.getViewedDate());
+                            } else {
+                                return c2.getViewedDate().compareTo(c1.getViewedDate());
+                            }
+                        default:
+                            return 0;
+                    }
 
-					}
-				});
+                });
 				return null;
 			}
 

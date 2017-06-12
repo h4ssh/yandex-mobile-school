@@ -1,4 +1,4 @@
-package ru.yandex.mobile_school.views.notes_list;
+package ru.yandex.mobile_school.presenters;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -6,6 +6,7 @@ import android.os.Message;
 
 import javax.inject.Inject;
 
+import ru.yandex.mobile_school.App;
 import ru.yandex.mobile_school.model.StorageModel;
 
 public class NotesListLooperThread extends HandlerThread {
@@ -28,7 +29,8 @@ public class NotesListLooperThread extends HandlerThread {
 
 	public NotesListLooperThread(Handler responseHandler, Callback callback) {
 		super(TAG);
-		mResponseHandler = responseHandler;
+        App.getComponent().inject(this);
+        mResponseHandler = responseHandler;
 		mCallback = callback;
 	}
 
@@ -38,14 +40,11 @@ public class NotesListLooperThread extends HandlerThread {
 	}
 
 	public void prepareHandler() {
-		mWorkerHandler = new Handler(getLooper(), new Handler.Callback() {
-			@Override
-			public boolean handleMessage(Message msg) {
-				String path = (String) msg.obj;
-				handleRequest(path, msg.what);
-				return true;
-			}
-		});
+		mWorkerHandler = new Handler(getLooper(), msg -> {
+            String path = (String) msg.obj;
+            handleRequest(path, msg.what);
+            return true;
+        });
 	}
 
 	private void handleRequest(final String path, final int what) {
@@ -56,15 +55,12 @@ public class NotesListLooperThread extends HandlerThread {
 			result = what == WHAT_IMPORT && storage.importNotes(path);
 		}
 
-		mResponseHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				if (what == WHAT_EXPORT) {
-					mCallback.onColorsExported(result);
-				} else if (what == WHAT_IMPORT) {
-					mCallback.onColorsImported(result);
-				}
-			}
-		});
+		mResponseHandler.post(() -> {
+            if (what == WHAT_EXPORT) {
+                mCallback.onColorsExported(result);
+            } else if (what == WHAT_IMPORT) {
+                mCallback.onColorsImported(result);
+            }
+        });
 	}
 }

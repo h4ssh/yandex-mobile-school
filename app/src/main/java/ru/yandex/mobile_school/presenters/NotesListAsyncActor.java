@@ -1,4 +1,4 @@
-package ru.yandex.mobile_school.views.notes_list;
+package ru.yandex.mobile_school.presenters;
 
 import android.os.AsyncTask;
 
