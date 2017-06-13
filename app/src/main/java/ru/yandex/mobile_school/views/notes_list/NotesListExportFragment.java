@@ -60,47 +60,34 @@ public class NotesListExportFragment extends DialogFragment {
 		builder.setTitle(getString(R.string.notes_list_export_title));
 		builder.setView(view)
 				.setPositiveButton(R.string.notes_list_export_export,
-						new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						if (mListener != null) {
-							mListener.onExportClick(mPathEditText.getText().toString());
-						}
-					}
-				})
+						(dialog, id) -> {
+                            if (mListener != null) {
+                                mListener.onExportClick(mPathEditText.getText().toString());
+                            }
+                        })
 				.setNegativeButton(R.string.notes_list_export_import,
-						new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						if (mListener != null) {
-							mListener.onImportClick(mPathEditText.getText().toString());
-						}
-					}
-				})
-				.setNeutralButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						dismiss();
-					}
-				});
+						(dialog, id) -> {
+                            if (mListener != null) {
+                                mListener.onImportClick(mPathEditText.getText().toString());
+                            }
+                        })
+				.setNeutralButton(R.string.button_cancel, (dialog, id) -> dismiss());
 		mPathEditText.setText(DEFAULT_PATH);
-		mPickButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-				intent.setType("file/*");
-				PackageManager manager = getContext().getPackageManager();
-				List<ResolveInfo> infos = manager.queryIntentActivities(intent, 0);
-				if (infos.size() > 0) {
-					startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
-				} else {
-					Toast.makeText(getContext(), getString(R.string.notes_list_export_intent_error),
-							Toast.LENGTH_SHORT).show();
-				}
+		mPickButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("file/*");
+            PackageManager manager = getContext().getPackageManager();
+            List<ResolveInfo> infos = manager.queryIntentActivities(intent, 0);
+            if (infos.size() > 0) {
+                startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
+            } else {
+                Toast.makeText(getContext(), getString(R.string.notes_list_export_intent_error),
+                        Toast.LENGTH_SHORT).show();
+            }
 
 
 
-			}
-		});
+        });
 		return builder.create();
 	}
 

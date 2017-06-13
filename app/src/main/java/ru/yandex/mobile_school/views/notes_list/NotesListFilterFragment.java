@@ -36,11 +36,11 @@ public class NotesListFilterFragment extends DialogFragment {
 
 	NotesListFilterDialogListener mListener;
 
-	@BindView(R.id.colors_list_filter_param) Spinner mFilterParamSpinner;
-	@BindView(R.id.colors_list_filter_start_date_check)	CheckBox mStartDateCheck;
-	@BindView(R.id.colors_list_filter_start_date) DatePicker mStartDatePicker;
-	@BindView(R.id.colors_list_filter_end_date_check) CheckBox mEndDateCheck;
-	@BindView(R.id.colors_list_filter_end_date) DatePicker mEndDatePicker;
+	@BindView(R.id.notes_list_filter_param) Spinner mFilterParamSpinner;
+	@BindView(R.id.notes_list_filter_start_date_check)	CheckBox mStartDateCheck;
+	@BindView(R.id.notes_list_filter_start_date) DatePicker mStartDatePicker;
+	@BindView(R.id.notes_list_filter_end_date_check) CheckBox mEndDateCheck;
+	@BindView(R.id.notes_list_filter_end_date) DatePicker mEndDatePicker;
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {

@@ -29,8 +29,8 @@ public class NotesListSortFragment extends DialogFragment {
 	NotesListSortDialogListener mListener;
 
 
-	@BindView(R.id.colors_list_sort_by) Spinner mSortBySpinner;
-	@BindView(R.id.colors_list_sort_order) Spinner mSortOrderSpinner;
+	@BindView(R.id.notes_list_sort_by) Spinner mSortBySpinner;
+	@BindView(R.id.notes_list_sort_order) Spinner mSortOrderSpinner;
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -43,22 +43,15 @@ public class NotesListSortFragment extends DialogFragment {
 		String[] sortByItems = getResources().getStringArray(R.array.notes_list_sort_by_items);
 		String[] sortOrderItems = getResources().getStringArray(R.array.notes_list_sort_order_items);
 		builder.setView(view)
-				.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						int pos = mSortBySpinner.getSelectedItemPosition();
-						boolean ascending = mSortOrderSpinner.getSelectedItemPosition() == 0;
-						if (mListener != null) {
-							saveState(pos, ascending);
-							mListener.onSortPositiveClick(pos, ascending);
-						}
-					}
-				})
-				.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dismiss();
-					}
-				});
+				.setPositiveButton(R.string.button_ok, (dialog, id) -> {
+                    int pos = mSortBySpinner.getSelectedItemPosition();
+                    boolean ascending = mSortOrderSpinner.getSelectedItemPosition() == 0;
+                    if (mListener != null) {
+                        saveState(pos, ascending);
+                        mListener.onSortPositiveClick(pos, ascending);
+                    }
+                })
+				.setNegativeButton(R.string.button_cancel, (dialog, id) -> dismiss());
 
 		mSortBySpinner.setAdapter(new ArrayAdapter<>(getContext(),
 				R.layout.support_simple_spinner_dropdown_item, sortByItems));

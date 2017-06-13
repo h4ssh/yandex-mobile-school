@@ -220,7 +220,7 @@ public class NotesFragment extends BaseFragment implements
 		}
 
 		if (mProgressBar == null) {
-            return; // TODO: fix and delete scope
+            return;
         }
 
 		if (mPendingOperations > 0) {

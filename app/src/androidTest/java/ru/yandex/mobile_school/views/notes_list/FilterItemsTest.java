@@ -60,11 +60,11 @@ public class FilterItemsTest {
 		appCompatCheckedTextView2.perform(click());
 
 		ViewInteraction appCompatCheckBox = onView(
-				allOf(withId(R.id.colors_list_filter_start_date_check), withText("Start date:")));
+				allOf(withId(R.id.notes_list_filter_start_date_check), withText("Start date:")));
 		appCompatCheckBox.perform(scrollTo(), click());
 
 		ViewInteraction appCompatCheckBox2 = onView(
-				allOf(withId(R.id.colors_list_filter_end_date_check), withText("End date:")));
+				allOf(withId(R.id.notes_list_filter_end_date_check), withText("End date:")));
 		appCompatCheckBox2.perform(scrollTo(), click());
 
 		ViewInteraction appCompatButton2 = onView(

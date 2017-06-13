@@ -22,7 +22,7 @@ public class NotesListGenerateFragment extends DialogFragment {
 
 	NotesListGenerateDialogListener mListener;
 
-	@BindView(R.id.colors_list_generate_edit) EditText mGenerateCountEditText;
+	@BindView(R.id.notes_list_generate_edit) EditText mGenerateCountEditText;
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -34,24 +34,17 @@ public class NotesListGenerateFragment extends DialogFragment {
 		mGenerateCountEditText.setText(DEFAULT_QUANTITY);
 		builder.setTitle(R.string.notes_list_generator_title);
 		builder.setView(view)
-				.setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						if (mListener != null) {
-							int quantity = Integer.parseInt(DEFAULT_QUANTITY);
-							try {
-								quantity = Integer.parseInt(mGenerateCountEditText.getText().toString());
-							} catch (Exception ignored) {
-							}
-							mListener.onGenerate(quantity);
-						}
-					}
-				})
-				.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dismiss();
-					}
-				});
+				.setPositiveButton(R.string.button_ok, (dialog, id) -> {
+                    if (mListener != null) {
+                        int quantity = Integer.parseInt(DEFAULT_QUANTITY);
+                        try {
+                            quantity = Integer.parseInt(mGenerateCountEditText.getText().toString());
+                        } catch (Exception ignored) {
+                        }
+                        mListener.onGenerate(quantity);
+                    }
+                })
+				.setNegativeButton(R.string.button_cancel, (dialog, id) -> dismiss());
 
 		return builder.create();
 	}

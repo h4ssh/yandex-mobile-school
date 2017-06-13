@@ -10,6 +10,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -150,31 +151,34 @@ public class NotesActivity extends BaseActivity implements BaseActivityCallback 
 
 	@Override
 	public void setTitle(String title) {
-		// TODO: implement
+		ActionBar bar = getSupportActionBar();
+		if (bar != null) {
+			bar.setTitle(title);
+		}
 	}
 
 	@Override
 	public void showProgressBar() {
-		// TODO: implement
 	}
 
 	@Override
 	public void hideProgressBar() {
-		// TODO: implement
 	}
 
 	@Override
 	public void showError(String error) {
-		// TODO: implement
+		showErrorDialog(error);
 	}
 
 	@Override
 	public void showDialog(String title, String message) {
-		// TODO: implement
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(title).setMessage(message).show();
 	}
 
 	@Override
 	public void showErrorDialog(String error) {
-		// TODO: implement
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(error).show();
 	}
 }

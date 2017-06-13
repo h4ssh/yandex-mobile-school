@@ -24,7 +24,7 @@
                 android:text="@string/notes_list_filter_param"
                 android:layout_gravity="center_vertical"/>
             <Spinner
-                android:id="@+id/colors_list_filter_param"
+                android:id="@+id/notes_list_filter_param"
                 android:layout_width="0dp"
                 android:layout_weight="@integer/colors_list_filter_second_column_weight"
                 android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
             android:layout_marginTop="@dimen/note_fragment_between_margin"
             android:weightSum="@integer/colors_list_filter_columns_weight_sum">
             <CheckBox
-                android:id="@+id/colors_list_filter_start_date_check"
+                android:id="@+id/notes_list_filter_start_date_check"
                 android:layout_width="0dp"
                 android:layout_weight="@integer/colors_list_filter_first_column_weight"
                 android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
                 android:layout_gravity="center_vertical"
                 android:checked="true"/>
             <DatePicker
-                android:id="@+id/colors_list_filter_start_date"
+                android:id="@+id/notes_list_filter_start_date"
                 android:layout_width="0dp"
                 android:layout_weight="@integer/colors_list_filter_second_column_weight"
                 android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
             android:layout_marginTop="@dimen/note_fragment_between_margin"
             android:weightSum="@integer/colors_list_filter_columns_weight_sum">
             <CheckBox
-                android:id="@+id/colors_list_filter_end_date_check"
+                android:id="@+id/notes_list_filter_end_date_check"
                 android:layout_width="0dp"
                 android:layout_weight="@integer/colors_list_filter_first_column_weight"
                 android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                 android:layout_gravity="center_vertical"
                 android:checked="true"/>
             <DatePicker
-                android:id="@+id/colors_list_filter_end_date"
+                android:id="@+id/notes_list_filter_end_date"
                 android:layout_width="0dp"
                 android:layout_weight="@integer/colors_list_filter_second_column_weight"
                 android:layout_height="wrap_content"

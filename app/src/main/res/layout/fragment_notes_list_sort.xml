@@ -20,7 +20,7 @@
             android:layout_gravity="center_vertical"
             android:text="@string/notes_list_sort_by"/>
         <Spinner
-            android:id="@+id/colors_list_sort_by"
+            android:id="@+id/notes_list_sort_by"
             android:layout_width="0dp"
             android:layout_weight="0.6"
             android:layout_height="wrap_content"/>
@@ -42,7 +42,7 @@
             android:text="@string/notes_list_sort_order"
             android:layout_gravity="center_vertical"/>
         <Spinner
-            android:id="@+id/colors_list_sort_order"
+            android:id="@+id/notes_list_sort_order"
             android:layout_width="0dp"
             android:layout_weight="0.6"
             android:layout_height="wrap_content"/>

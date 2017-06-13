@@ -32,19 +32,12 @@ public class NotesListSearchFragment extends DialogFragment {
 		ButterKnife.bind(this, view);
 		builder.setTitle(getString(R.string.notes_list_search_title));
 		builder.setView(view)
-				.setPositiveButton(R.string.notes_list_search_search, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						if (mListener != null) {
-							mListener.onSearchClick(mSearchEditText.getText().toString());
-						}
-					}
-				})
-				.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dismiss();
-					}
-				});
+				.setPositiveButton(R.string.notes_list_search_search, (dialog, id) -> {
+                    if (mListener != null) {
+                        mListener.onSearchClick(mSearchEditText.getText().toString());
+                    }
+                })
+				.setNegativeButton(R.string.button_cancel, (dialog, id) -> dismiss());
 		return builder.create();
 	}
 }

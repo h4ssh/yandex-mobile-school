@@ -45,11 +45,11 @@ public class GenerateItemsTest {
 		floatingActionButton.perform(longClick());
 
 		ViewInteraction appCompatEditText = onView(
-				allOf(withId(R.id.colors_list_generate_edit), isDisplayed()));
+				allOf(withId(R.id.notes_list_generate_edit), isDisplayed()));
 		appCompatEditText.perform(click());
 
 		ViewInteraction appCompatEditText2 = onView(
-				allOf(withId(R.id.colors_list_generate_edit), isDisplayed()));
+				allOf(withId(R.id.notes_list_generate_edit), isDisplayed()));
 		appCompatEditText2.perform(replaceText("5"), closeSoftKeyboard());
 
 		ViewInteraction appCompatButton = onView(
